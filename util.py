@@ -14,6 +14,7 @@ from functools import wraps, reduce
 import shutil
 from dataclasses import dataclass
 
+
 def load_jsonl(path, open=open) -> List[dict]:
     data = []
     with open(path, "r") as f:
@@ -188,10 +189,10 @@ class JobFilesInfo:
     candidates_multiple_exists_on_alvis: bool
     
 
-def get_jobfiles_info(dataset: str, method: str, sample_model: str, candidate_model: str, temperature: str = "1.0") -> JobFilesInfo:
+def get_jobfiles_info(dataset: str, method: str, sample_model: str, patch_strategy: str, candidate_model: str, temperature: str = "1.0") -> JobFilesInfo:
     # Spec for running the generation and candidate generation
 
-    DATA_DATASET_DIR = os.path.join("data", sample_model, data_dir_path_map[dataset])
+    DATA_DATASET_DIR = os.path.join("data", data_dir_path_map[dataset], candidate_model)
     DATA_DATASET_GREEDY_DIR = os.path.join(DATA_DATASET_DIR, "greedy")
     DATA_DATASET_MULTIPLE_DIR = os.path.join(DATA_DATASET_DIR, "multiple")
 
@@ -203,20 +204,22 @@ def get_jobfiles_info(dataset: str, method: str, sample_model: str, candidate_mo
 
     # Candidates
     candidate_greedy_kwargs = [
+        ("model_name", candidate_model),
         ("temperature", "0.0"),
         ("n_samples", 1),
         ("num_return_sequences", 1),
     ]
     candidate_greedy_kwargs_str = "_".join(f"{k}={v}" for k, v in candidate_greedy_kwargs)
-    candidates_greedy_file = f"candidates_{dataset}_{method}_{candidate_model}_{candidate_greedy_kwargs_str}.jsonl"
+    candidates_greedy_file = f"candidates_{dataset}_{method}_{patch_strategy}_{candidate_greedy_kwargs_str}.jsonl"
     candidate_multiple_kwargs = [
+        ("model_name", candidate_model),
         ("temperature", temperature),
         ("generation_strategy", "beam_search"),
-        ("num_beams", 10),
+        ("num_beams", 1),
         ("num_return_sequences", 10),
     ]
     candidate_multiple_kwargs_str = "_".join(f"{k}={v}" for k, v in candidate_multiple_kwargs)
-    candidates_multiple_file = f"candidates_{dataset}_{method}_{candidate_model}_{candidate_multiple_kwargs_str}.jsonl"
+    candidates_multiple_file = f"candidates_{dataset}_{method}_{patch_strategy}_{candidate_multiple_kwargs_str}.jsonl"
 
     # Set up folders
     os.makedirs(DATA_DATASET_DIR, exist_ok=True)

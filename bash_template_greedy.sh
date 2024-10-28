@@ -12,10 +12,11 @@ export TRANSFORMERS_CACHE="/cephyr/users/adamhenr/Alvis/mimer/elle-elle-aime/.tr
 dataset="<<dataset>>"
 method="<<method>>"
 sample_model_name="<<sample_model_name>>"
+patch_strategy="<<patch_strategy>>"
 candidate_model_name="<<candidate_model_name>>"
 
 samples_path="samples_${dataset}_${method}_model_name_${sample_model_name}.jsonl.gz"
-kwargs="--n_workers 1 --temperature 0.0 --n_samples 1 --num_return_sequences 1"
-script="python generate_patches.py $samples_path $candidate_model_name $kwargs"
+kwargs="--model_name $candidate_model_name --n_workers 1 --temperature 0.0 --n_samples 1 --num_return_sequences 1"
+script="python generate_patches.py $samples_path $patch_strategy $kwargs"
 apptainer exec --nv $container_name $script
 # echo $script
