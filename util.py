@@ -121,6 +121,7 @@ data_dir_path_map = {
     "HumanEvalJava": "humaneval-java",
 }
 
+
 def ssh_alvis(commands: Iterable[str], base_path=ALVIS_BASE_DIR) -> str:
     with SSHClient() as ssh:
         ssh.set_missing_host_key_policy(AutoAddPolicy())
@@ -164,6 +165,7 @@ def read_alvis(path: str, base_path=ALVIS_BASE_DIR) -> bytes:
         with sftp.open(remote_path, "r") as f:
             return f.read()
 
+
 @dataclass
 class JobFilesInfo:
     DATA_DATASET_DIR: str
@@ -187,61 +189,77 @@ class JobFilesInfo:
     samples_exists_on_alvis: bool
     candidates_greedy_exists_on_alvis: bool
     candidates_multiple_exists_on_alvis: bool
-    
 
-def get_jobfiles_info(dataset: str, method: str, sample_model: str, patch_strategy: str, candidate_model: str, temperature: str = "1.0") -> JobFilesInfo:
+
+def get_jobfiles_info(
+    dataset: str,
+    method: str,
+    patch_strategy: str,
+    candidate_model: str,
+    temperature: str = "1.0",
+) -> JobFilesInfo:
     # Spec for running the generation and candidate generation
 
-    DATA_DATASET_DIR = os.path.join("data", data_dir_path_map[dataset], candidate_model)
-    DATA_DATASET_GREEDY_DIR = os.path.join(DATA_DATASET_DIR, "greedy")
-    DATA_DATASET_MULTIPLE_DIR = os.path.join(DATA_DATASET_DIR, "multiple")
+    DATASET_DIR = os.path.join("data", data_dir_path_map[dataset])
+    GENERATED_DATA_DIR = os.path.join(DATASET_DIR, candidate_model)
+    DATA_DATASET_GREEDY_DIR = os.path.join(GENERATED_DATA_DIR, "greedy")
+    DATA_DATASET_MULTIPLE_DIR = os.path.join(GENERATED_DATA_DIR, "multiple")
 
-    samples_kwargs = [
-        ("model_name", sample_model),
-    ]
-    samples_kwargs_str = "_".join(f"{k}_{v}" for k, v in samples_kwargs)
-    samples_file = f"samples_{dataset}_{method}_{samples_kwargs_str}.jsonl"
+    samples_file = f"samples_{dataset}_{method}_.jsonl"
 
     # Candidates
     candidate_greedy_kwargs = [
-        ("model_name", candidate_model),
-        ("temperature", "0.0"),
-        ("n_samples", 1),
+        ("model_name", candidate_model.replace("/", ":")),
+        ("generation_strategy", "beam_search"),
         ("num_return_sequences", 1),
     ]
-    candidate_greedy_kwargs_str = "_".join(f"{k}={v}" for k, v in candidate_greedy_kwargs)
+    candidate_greedy_kwargs_str = "_".join(
+        f"{k}={v}" for k, v in candidate_greedy_kwargs
+    )
     candidates_greedy_file = f"candidates_{dataset}_{method}_{patch_strategy}_{candidate_greedy_kwargs_str}.jsonl"
     candidate_multiple_kwargs = [
-        ("model_name", candidate_model),
+        ("model_name", candidate_model.replace("/", ":")),
         ("temperature", temperature),
-        ("generation_strategy", "beam_search"),
-        ("num_beams", 1),
+        ("generation_strategy", "sampling"),
         ("num_return_sequences", 10),
     ]
-    candidate_multiple_kwargs_str = "_".join(f"{k}={v}" for k, v in candidate_multiple_kwargs)
+    candidate_multiple_kwargs_str = "_".join(
+        f"{k}={v}" for k, v in candidate_multiple_kwargs
+    )
     candidates_multiple_file = f"candidates_{dataset}_{method}_{patch_strategy}_{candidate_multiple_kwargs_str}.jsonl"
 
     # Set up folders
-    os.makedirs(DATA_DATASET_DIR, exist_ok=True)
+    os.makedirs(DATASET_DIR, exist_ok=True)
+    os.makedirs(GENERATED_DATA_DIR, exist_ok=True)
     os.makedirs(DATA_DATASET_GREEDY_DIR, exist_ok=True)
     os.makedirs(DATA_DATASET_MULTIPLE_DIR, exist_ok=True)
     # Data dir files
-    samples_data_dir_path = os.path.join(DATA_DATASET_DIR, samples_file)
+    samples_data_dir_path = os.path.join(DATASET_DIR, samples_file)
     samples_exists = os.path.exists(samples_data_dir_path)
-    candidates_greedy_data_dir_path = os.path.join(DATA_DATASET_GREEDY_DIR, candidates_greedy_file)
+    candidates_greedy_data_dir_path = os.path.join(
+        DATA_DATASET_GREEDY_DIR, candidates_greedy_file
+    )
     candidates_greedy_exists = os.path.exists(candidates_greedy_data_dir_path)
-    candidates_multiple_data_dir_path = os.path.join(DATA_DATASET_MULTIPLE_DIR, candidates_multiple_file)
+    candidates_multiple_data_dir_path = os.path.join(
+        DATA_DATASET_MULTIPLE_DIR, candidates_multiple_file
+    )
     candidates_multiple_exists = os.path.exists(candidates_multiple_data_dir_path)
     # Alvis files
     samples_alvis_path = os.path.join(ALVIS_BASE_DIR, samples_file)
     samples_exists_on_alvis = bool(ssh_alvis([f"ls {samples_file}.gz"]))
     candidates_greedy_alvis_path = os.path.join(ALVIS_BASE_DIR, candidates_greedy_file)
-    candidates_greedy_exists_on_alvis = bool(ssh_alvis([f"ls {candidates_greedy_file}.gz"]))
-    candidates_multiple_alvis_path = os.path.join(ALVIS_BASE_DIR, candidates_multiple_file)
-    candidates_multiple_exists_on_alvis = bool(ssh_alvis([f"ls {candidates_multiple_file}.gz"]))
+    candidates_greedy_exists_on_alvis = bool(
+        ssh_alvis([f"ls {candidates_greedy_file}"])
+    )
+    candidates_multiple_alvis_path = os.path.join(
+        ALVIS_BASE_DIR, candidates_multiple_file
+    )
+    candidates_multiple_exists_on_alvis = bool(
+        ssh_alvis([f"ls {candidates_multiple_file}"])
+    )
 
     return JobFilesInfo(
-        DATA_DATASET_DIR=DATA_DATASET_DIR,
+        DATA_DATASET_DIR=DATASET_DIR,
         DATA_DATASET_GREEDY_DIR=DATA_DATASET_GREEDY_DIR,
         DATA_DATASET_MULTIPLE_DIR=DATA_DATASET_MULTIPLE_DIR,
         samples_file=samples_file,
