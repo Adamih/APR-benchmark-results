@@ -111,8 +111,7 @@ def get_samples_greedy(item: dict) -> str | None:
 # Then run "ls" to make sure the ssh connection works properly.
 # The user is "adamhenr" and the password is "yhE5s3WH4r7s#%".
 
-ALVIS_BASE_DIR = os.path.join("mimer", "elle-elle-aime")
-LOCAL_BASE_DIR = os.path.join("..", "elle-elle-aime")
+BASE_DIR = os.path.join("..", "elle-elle-aime")
 DATA_DIR = "data"
 
 data_dir_path_map = {
@@ -122,48 +121,48 @@ data_dir_path_map = {
 }
 
 
-def ssh_alvis(commands: Iterable[str], base_path=ALVIS_BASE_DIR) -> str:
-    with SSHClient() as ssh:
-        ssh.set_missing_host_key_policy(AutoAddPolicy())
-        ssh.connect(
-            "alvis1.c3se.chalmers.se", username="adamhenr", password="yhE5s3WH4r7s#%"
-        )
-        cmd = " && ".join((f"cd {base_path}", *commands))
-        stdin, stdout, stderr = ssh.exec_command(cmd)
-        stdout_str = stdout.read().decode()
-    return stdout_str
+# def ssh_alvis(commands: Iterable[str], base_path=ALVIS_BASE_DIR) -> str:
+#     with SSHClient() as ssh:
+#         ssh.set_missing_host_key_policy(AutoAddPolicy())
+#         ssh.connect(
+#             "alvis1.c3se.chalmers.se", username="adamhenr", password="yhE5s3WH4r7s#%"
+#         )
+#         cmd = " && ".join((f"cd {base_path}", *commands))
+#         stdin, stdout, stderr = ssh.exec_command(cmd)
+#         stdout_str = stdout.read().decode()
+#     return stdout_str
 
 
-def write_alvis(
-    path: str, data: bytes, replace=False, base_path=ALVIS_BASE_DIR
-) -> bool:
-    remote_path = os.path.join(base_path, path)
-    with SSHClient() as ssh:
-        ssh.set_missing_host_key_policy(AutoAddPolicy())
-        ssh.connect(
-            "alvis1.c3se.chalmers.se", username="adamhenr", password="yhE5s3WH4r7s#%"
-        )
-        sftp = ssh.open_sftp()
-        file_alrad_exists = os.path.basename(remote_path) in sftp.listdir(
-            os.path.dirname(remote_path)
-        )
-        if not replace and file_alrad_exists:
-            raise ValueError(f"File {remote_path} already exists.")
-        with sftp.open(remote_path, "w") as f:
-            f.write(data)
-        return file_alrad_exists
+# def write_alvis(
+#     path: str, data: bytes, replace=False, base_path=ALVIS_BASE_DIR
+# ) -> bool:
+#     remote_path = os.path.join(base_path, path)
+#     with SSHClient() as ssh:
+#         ssh.set_missing_host_key_policy(AutoAddPolicy())
+#         ssh.connect(
+#             "alvis1.c3se.chalmers.se", username="adamhenr", password="yhE5s3WH4r7s#%"
+#         )
+#         sftp = ssh.open_sftp()
+#         file_alrad_exists = os.path.basename(remote_path) in sftp.listdir(
+#             os.path.dirname(remote_path)
+#         )
+#         if not replace and file_alrad_exists:
+#             raise ValueError(f"File {remote_path} already exists.")
+#         with sftp.open(remote_path, "w") as f:
+#             f.write(data)
+#         return file_alrad_exists
 
 
-def read_alvis(path: str, base_path=ALVIS_BASE_DIR) -> bytes:
-    with SSHClient() as ssh:
-        ssh.set_missing_host_key_policy(AutoAddPolicy())
-        ssh.connect(
-            "alvis1.c3se.chalmers.se", username="adamhenr", password="yhE5s3WH4r7s#%"
-        )
-        sftp = ssh.open_sftp()
-        remote_path = os.path.join(base_path, path)
-        with sftp.open(remote_path, "r") as f:
-            return f.read()
+# def read_alvis(path: str, base_path=ALVIS_BASE_DIR) -> bytes:
+#     with SSHClient() as ssh:
+#         ssh.set_missing_host_key_policy(AutoAddPolicy())
+#         ssh.connect(
+#             "alvis1.c3se.chalmers.se", username="adamhenr", password="yhE5s3WH4r7s#%"
+#         )
+#         sftp = ssh.open_sftp()
+#         remote_path = os.path.join(base_path, path)
+#         with sftp.open(remote_path, "r") as f:
+#             return f.read()
 
 
 @dataclass
@@ -244,19 +243,6 @@ def get_jobfiles_info(
         DATA_DATASET_MULTIPLE_DIR, candidates_multiple_file
     )
     candidates_multiple_exists = os.path.exists(candidates_multiple_data_dir_path)
-    # Alvis files
-    samples_alvis_path = os.path.join(ALVIS_BASE_DIR, samples_file)
-    samples_exists_on_alvis = bool(ssh_alvis([f"ls {samples_file}.gz"]))
-    candidates_greedy_alvis_path = os.path.join(ALVIS_BASE_DIR, candidates_greedy_file)
-    candidates_greedy_exists_on_alvis = bool(
-        ssh_alvis([f"ls {candidates_greedy_file}"])
-    )
-    candidates_multiple_alvis_path = os.path.join(
-        ALVIS_BASE_DIR, candidates_multiple_file
-    )
-    candidates_multiple_exists_on_alvis = bool(
-        ssh_alvis([f"ls {candidates_multiple_file}"])
-    )
 
     return JobFilesInfo(
         DATA_DATASET_DIR=DATASET_DIR,
@@ -268,13 +254,7 @@ def get_jobfiles_info(
         samples_data_dir_path=samples_data_dir_path,
         candidates_greedy_data_dir_path=candidates_greedy_data_dir_path,
         candidates_multiple_data_dir_path=candidates_multiple_data_dir_path,
-        samples_alvis_path=samples_alvis_path,
-        candidates_multiple_alvis_path=candidates_multiple_alvis_path,
-        candidates_greedy_alvis_path=candidates_greedy_alvis_path,
         samples_exists=samples_exists,
         candidates_greedy_exists=candidates_greedy_exists,
         candidates_multiple_exists=candidates_multiple_exists,
-        samples_exists_on_alvis=samples_exists_on_alvis,
-        candidates_greedy_exists_on_alvis=candidates_greedy_exists_on_alvis,
-        candidates_multiple_exists_on_alvis=candidates_multiple_exists_on_alvis,
     )
