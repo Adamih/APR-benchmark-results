@@ -1,6 +1,7 @@
 import gzip
 import json
 import os
+import re
 import sys
 from os import PathLike, path
 from paramiko.client import SSHClient, AutoAddPolicy
@@ -106,6 +107,24 @@ def get_samples_greedy(item: dict) -> str | None:
     samples = get_samples(item)
     return samples[0] if samples else None
 
+def unwrap_code_block(sample: str) -> str | None:
+    # Regex pattern captures content between triple backticks, optionally with a language specifier
+    pattern = r'```(?:\w+)?\n([\s\S]*?)```'
+    match = re.search(pattern, sample)
+    if not match:
+        return None
+    return match.group(1).strip()
+
+def openai_get_samples_instruct(item: dict) -> List[str | None] | None:
+    if not item["generation"]:
+        return None
+    samples = (c["message"]["content"] for c in item["generation"]["choices"])
+    cleaned_samples = map(unwrap_code_block, samples)
+    return list(cleaned_samples)
+
+def openai_get_samples_greedy_instruct(item: dict) -> str | None:
+    samples = openai_get_samples_instruct(item)
+    return samples[0] if samples else None
 
 # SSH into the server "alvis1.c3se.chalmers.se", called "alvis1" in ssh config file.
 # Then run "ls" to make sure the ssh connection works properly.
