@@ -15,6 +15,8 @@ from functools import wraps, reduce
 import shutil
 from dataclasses import dataclass
 
+Tokens = List[int]
+
 
 def load_jsonl(path, open=open) -> List[dict]:
     data = []
@@ -54,13 +56,13 @@ def truncate(sample: str) -> str:
 
 def tokenize_code(
     sample: str, tokenizer: PreTrainedTokenizerBase, length: int
-) -> List[int]:
+) -> Tokens:
     return tokenizer.encode(sample)[:length] if length else tokenizer.encode(sample)
 
 
 def get_edit_distance_distribution_star(
-    samples: List[List[int]],
-    gready_sample: List[int],
+    samples: List[Tokens],
+    gready_sample: Tokens,
 ):
     num = []
     max_length = len(gready_sample)
@@ -70,10 +72,11 @@ def get_edit_distance_distribution_star(
     return num, max_length
 
 
+# Input is the edit distances of the bugs and a threshhold of what edit distance should count 
 def calculate_ratio(numbers: List[int], threshold: float) -> float:
     count = sum(1 for num in numbers if num <= threshold)
     total = len(numbers)
-    ratio = count / total if total > 0 else 0
+    ratio = count / total if total > 0.0 else 0.0
     return ratio
 
 
