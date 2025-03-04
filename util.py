@@ -1,11 +1,12 @@
 import gzip
 import json
+import math
 import os
 import re
 import sys
 from os import PathLike, path
 from paramiko.client import SSHClient, AutoAddPolicy
-from typing import List, Tuple, TypeAlias, Generator, Iterable
+from typing import Counter, List, Tuple, TypeAlias, Generator, Iterable
 from huggingface_hub import list_datasets
 from datasets import load_dataset, load_dataset_builder
 from itertools import islice
@@ -72,7 +73,87 @@ def get_edit_distance_distribution_star(
     return num, max_length
 
 
-# Input is the edit distances of the bugs and a threshhold of what edit distance should count 
+# ===== New functions =====
+
+
+def compute_cdd(
+    distances: List[int], alpha: float = 0.05, xi: float = 0.01, ml: int = 100
+) -> Tuple[List[float], float, bool]:
+    """
+    Computes p*(d) as a list, where index `d` holds the probability of edit distance `d`.
+
+    Parameters:
+    -----------
+    distances   : list of ints, where index `d` holds the edit distance d
+    alpha       : float in [0,1], hyper-parameter controlling similarity
+                : default: 0.05
+    xi          : float in [0,1], threshold for deciding leakage
+                : default: 0.01
+    ml          : int, max length of l
+                : default: 100
+
+    Returns:
+    --------
+    p_star_list : list of floats, where index `d` holds probability p*(d)
+    peakedness  : float, cumulative sum of p*(d) from 0 to floor(alpha * l)
+    is_leaked   : bool, True if the dataset is leaked, False
+    """
+    n = len(distances)
+    assert n > 0, "CDD requires at least one distance."
+
+    # Get max observed distance up to ml
+    l = min(max(distances), ml)
+
+    # Count occurrences of each distance
+    counts = Counter(distances)
+
+    # Normalize counts to get probabilities
+    p_star_list = [0.0] * (l + 1)
+    for d, count in counts.items():
+        p_star_list[d] = count / n
+
+    cutoff = int(math.floor(alpha * l))
+    peakedness = sum(p_star_list[: cutoff + 1])
+    is_leaked = peakedness > xi
+
+    return p_star_list, peakedness, is_leaked
+
+
+def compute_ted(S: List[Tokens], distances: List[int], tau: int = 2) -> List[bool]:
+    """
+    Computes TED over list of edit distances.
+
+    Parameters:
+    -----------
+    S           : list of token sequences, where index `i` holds the i-th sample
+    distances   : list of ints, where index `d` holds the edit distance d
+    tau         : int, threshold for excluding samples
+                : default: 2
+
+    Returns:
+    --------
+    flagged_samples : list of bools, where index `i` holds True if the i-th sample is flagged
+    """
+    n = len(distances)
+    assert n > 0, "TED requires at least one distance."
+
+    flagged_samples = [False] * n
+
+    __unique = set()
+    for i in range(n):
+        s = tuple(S[i])
+        d = distances[i]
+        flagged_samples[i] = d <= tau or s in __unique
+        __unique.add(s)
+
+    return flagged_samples
+
+
+# ===== End of new functions =====
+
+
+# Calculate the ratio of numbers that are less than or equal to a given threshold.
+# The threshold argument specifies the maximum value that should be counted.
 def calculate_ratio(numbers: List[int], threshold: float) -> float:
     count = sum(1 for num in numbers if num <= threshold)
     total = len(numbers)
@@ -110,13 +191,15 @@ def get_samples_greedy(item: dict) -> str | None:
     samples = get_samples(item)
     return samples[0] if samples else None
 
+
 def unwrap_code_block(sample: str) -> str | None:
     # Regex pattern captures content between triple backticks, optionally with a language specifier
-    pattern = r'```(?:\w+)?\n([\s\S]*?)```'
+    pattern = r"```(?:\w+)?\n([\s\S]*?)```"
     match = re.search(pattern, sample)
     if not match:
         return None
     return match.group(1).strip()
+
 
 def openai_get_samples_instruct(item: dict) -> List[str | None] | None:
     if not item["generation"]:
@@ -125,9 +208,11 @@ def openai_get_samples_instruct(item: dict) -> List[str | None] | None:
     cleaned_samples = map(unwrap_code_block, samples)
     return list(cleaned_samples)
 
+
 def openai_get_samples_greedy_instruct(item: dict) -> str | None:
     samples = openai_get_samples_instruct(item)
     return samples[0] if samples else None
+
 
 # SSH into the server "alvis1.c3se.chalmers.se", called "alvis1" in ssh config file.
 # Then run "ls" to make sure the ssh connection works properly.
