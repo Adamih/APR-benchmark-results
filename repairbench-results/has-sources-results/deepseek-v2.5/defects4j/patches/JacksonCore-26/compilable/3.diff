@@ -1,0 +1,39 @@
+diff --git a/tmp/fcc770f1-ec96-4659-8ad8-bb62c1975049_buggy.java b/tmp/0e3f256e-1b69-4008-a5fe-b0f47a118b11_fixed.java
+index 0722547..d2adf8a 100644
+--- a/tmp/fcc770f1-ec96-4659-8ad8-bb62c1975049_buggy.java
++++ b/tmp/0e3f256e-1b69-4008-a5fe-b0f47a118b11_fixed.java
+@@ -1,26 +1,31 @@
+     @Override
+     public void feedInput(byte[] buf, int start, int end) throws IOException
+     {
+         // Must not have remaining input
+         if (_inputPtr < _inputEnd) {
+             _reportError("Still have %d undecoded bytes, should not call 'feedInput'", _inputEnd - _inputPtr);
+         }
+         if (end < start) {
+             _reportError("Input end (%d) may not be before start (%d)", end, start);
+         }
+         // and shouldn't have been marked as end-of-input
+         if (_endOfInput) {
+             _reportError("Already closed, can not feed more input");
+         }
+         // Time to update pointers first
+         _currInputProcessed += _origBufferLen;
+ 
+-        // Also need to adjust row start, to work as if it extended into the past wrt new buffer
++        // Adjust row start to account for the new input buffer
+         _currInputRowStart = start - (_inputEnd - _currInputRowStart);
+ 
+-        // And then update buffer settings
++        // Update buffer settings
+         _inputBuffer = buf;
+         _inputPtr = start;
+         _inputEnd = end;
+         _origBufferLen = end - start;
++
++        // Adjust the row start to reflect the actual column number
++        if (_currInputRowStart < 0) {
++            _currInputRowStart = 0;
++        }
+     }
+\ No newline at end of file

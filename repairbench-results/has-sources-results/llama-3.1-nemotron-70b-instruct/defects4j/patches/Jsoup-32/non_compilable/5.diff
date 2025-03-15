@@ -1,0 +1,14 @@
+diff --git a/tmp/aef81d13-4c3b-4124-8a22-6f02ddaa8702_buggy.java b/tmp/d925415c-1616-46b3-92b9-1560b23b8aeb_fixed.java
+index 91469b4..9b46db5 100644
+--- a/tmp/aef81d13-4c3b-4124-8a22-6f02ddaa8702_buggy.java
++++ b/tmp/d925415c-1616-46b3-92b9-1560b23b8aeb_fixed.java
+@@ -1,6 +1,7 @@
+ @Override
+ public Element clone() {
+     Element clone = (Element) super.clone();
+-        clone.classNames();
++    // Create a defensive copy of the classNames set to ensure clone has its own set
++    clone.getClass().getDeclaredField("classNamesSet").set(clone, new LinkedHashSet<>(clone.classNames()));
+     return clone;
+ }
+\ No newline at end of file

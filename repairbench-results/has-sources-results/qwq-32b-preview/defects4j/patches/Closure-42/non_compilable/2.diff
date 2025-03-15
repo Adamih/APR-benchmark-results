@@ -1,0 +1,46 @@
+diff --git a/tmp/247ba4a4-9493-4ee0-a3ce-e0a4b88684fb_buggy.java b/tmp/cf25b6e8-64e1-4b7f-a45a-e9d3e453ab54_fixed.java
+index 4d0be80..1926068 100644
+--- a/tmp/247ba4a4-9493-4ee0-a3ce-e0a4b88684fb_buggy.java
++++ b/tmp/cf25b6e8-64e1-4b7f-a45a-e9d3e453ab54_fixed.java
+@@ -1,10 +1,36 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
+-
+-        // Return the bare minimum to put the AST in a valid state.
++    // Check if this is a "for each" loop
++    if (isForEachLoop(loopNode)) {
++        // Transform "for each" loop into "for...of" loop
++        return transformForEachLoop(loopNode);
++    } else {
++        // For standard "for-in" loops, proceed as before
+         return newNode(
+-          Token.FOR,
++            Token.FOR_IN,
+             transform(loopNode.getIterator()),
+             transform(loopNode.getIteratedObject()),
+-          transformBlock(loopNode.getBody()));
++            transformBlock(loopNode.getBody())
++        );
++    }
++}
++
++private boolean isForEachLoop(ForInLoop loopNode) {
++    // Implement logic to determine if this is a "for each" loop
++    // This might involve checking the loop's structure or specific tokens
++    // For example, checking if the loop starts with "for each"
++    // This is pseudo-code and needs to be adapted to the actual AST structure
++    return loopNode.isForEach(); // Assuming there's a method to check this
++}
++
++private Node transformForEachLoop(ForInLoop loopNode) {
++    // Transform "for each" loop into "for...of" loop
++    // Assuming the loop is of the form: for each (var declarator in object) { body }
++    // Transform it to: for (var declarator of object) { body }
++    Node forOfNode = newNode(Token.FOR_OF,
++        transform(loopNode.getIterator()),
++        transform(loopNode.getIteratedObject()),
++        transformBlock(loopNode.getBody())
++    );
++    return forOfNode;
+ }
+\ No newline at end of file

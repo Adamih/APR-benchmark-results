@@ -1,0 +1,38 @@
+diff --git a/tmp/57fd13cf-1ffe-4c89-a57c-9da4b9e1c6ce_buggy.java b/tmp/a78f7646-cb10-45c8-843c-56c8009199db_fixed.java
+index 9739964..84cbfd9 100644
+--- a/tmp/57fd13cf-1ffe-4c89-a57c-9da4b9e1c6ce_buggy.java
++++ b/tmp/a78f7646-cb10-45c8-843c-56c8009199db_fixed.java
+@@ -1,27 +1,27 @@
+ public int[] calculateSpans(int[] prices) {
+-
+     int[] spans = new int[prices.length];
+     spans[0] = 1; // Span of first element is always 1
+ 
+     Stack<Integer> indexStack = new Stack<>();
+ 
+     // Push the index of first element
+     indexStack.push(0);
+ 
+     for (int i = 1; i < prices.length; i++) {
+-      while (!indexStack.isEmpty()
+-          && prices[indexStack.peek()] <= prices[i])
++        while (!indexStack.isEmpty() && prices[indexStack.peek()] <= prices[i]) {
+             indexStack.pop();
++        }
+ 
+         // If index stack is empty, the price at index 'i'
+         // is greater than all previous values
+-      if (indexStack.isEmpty())
++        if (indexStack.isEmpty()) {
+             spans[i] = i + 1;
+-      else
++        } else {
+             spans[i] = i - indexStack.peek();
++        }
+ 
+         indexStack.push(i);
+     }
+ 
+     return spans;
+ }
+\ No newline at end of file

@@ -1,0 +1,30 @@
+diff --git a/tmp/6de1eb27-99ec-4967-9325-9a9df8f5b7f7_buggy.java b/tmp/b87814e6-2256-4ba0-b9ad-868636543fdc_fixed.java
+index 5f96616..44d8b9c 100644
+--- a/tmp/6de1eb27-99ec-4967-9325-9a9df8f5b7f7_buggy.java
++++ b/tmp/b87814e6-2256-4ba0-b9ad-868636543fdc_fixed.java
+@@ -1,20 +1,23 @@
+   @Override
+   public void matchConstraint(JSType constraint) {
+     // We only want to match constraints on anonymous types.
+     if (hasReferenceName()) {
+       return;
+     }
+ 
+     // Handle the case where the constraint object is a record type.
+     //
+     // param constraint {{prop: (number|undefined)}}
+     // function f(constraint) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+     // taking any each property on the record and trying to match
+     // properties on this object.
+-    if (constraint.isRecordType()) {
+-      matchRecordTypeConstraint(constraint.toObjectType());
++    if (constraint.isRecordType() || constraint.isUnionType()) {
++      ObjectType constraintObj = ObjectType.cast(constraint.restrictByNotNullOrUndefined());
++      if (constraintObj != null && constraintObj.isRecordType()) {
++        matchRecordTypeConstraint(constraintObj);
++      }
+     }
+   }

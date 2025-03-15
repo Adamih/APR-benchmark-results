@@ -1,0 +1,29 @@
+diff --git a/tmp/d89a2996-7f9d-41ee-af00-6d77afe5003a_buggy.java b/tmp/c038ba9a-edb2-472f-a4b3-d3a7612e028b_fixed.java
+index f47d784..89cadbc 100644
+--- a/tmp/d89a2996-7f9d-41ee-af00-6d77afe5003a_buggy.java
++++ b/tmp/c038ba9a-edb2-472f-a4b3-d3a7612e028b_fixed.java
+@@ -1,12 +1,22 @@
+-  @Override
+ public void process(Node externs, Node root) {
+   NodeTraversal.traverse(compiler, root, this);
+   if (MAKE_LOCAL_NAMES_UNIQUE) {
+     MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+     NodeTraversal t = new NodeTraversal(compiler, renamer);
+     t.traverseRoots(externs, root);
+   }
++  NodeTraversal.traverse(compiler, root, new NodeVisitor() {
++    @Override
++    public void visit(Node node) {
++      if (node.isVar() && node.getFirstChild().getString().equals("arguments")) {
++        Node argumentsVarNode = node.getFirstChild();
++        String uniqueName = getUniqueName(argumentsVarNode.getString());  // Method getUniqueName() should be defined to avoid name collision
++        argumentsVarNode.setString(uniqueName);
++      }
++      // Other needed handling for the node
++    }
++  });
+   removeDuplicateDeclarations(root);
+   new PropogateConstantAnnotations(compiler, assertOnChange)
+       .process(externs, root);
+ }
+\ No newline at end of file

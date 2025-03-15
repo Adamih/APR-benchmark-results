@@ -1,0 +1,21 @@
+diff --git a/tmp/735b88dd-f244-4bc3-a7ab-01fb2fb752f1_buggy.java b/tmp/fc031ab8-c5fa-4236-9b65-cfb44d645118_fixed.java
+index ae12a4d..76ce74c 100644
+--- a/tmp/735b88dd-f244-4bc3-a7ab-01fb2fb752f1_buggy.java
++++ b/tmp/fc031ab8-c5fa-4236-9b65-cfb44d645118_fixed.java
+@@ -1,3 +1,14 @@
+ private boolean isFormatAsBlock(Document.OutputSettings out) {
+-        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
++    return tag.formatAsBlock() || hasBlockParent() || out.outline();
++}
++
++private boolean hasBlockParent() {
++    Element parent = parent();
++    while (parent != null) {
++        if (parent.tag().formatAsBlock()) {
++            return true;
++        }
++        parent = parent.parent();
++    }
++    return false;
+ }
+\ No newline at end of file

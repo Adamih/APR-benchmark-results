@@ -1,0 +1,32 @@
+diff --git a/tmp/ad2621e7-b8cb-4ab8-9e99-93d46fdb18dd_buggy.java b/tmp/1958cf12-851f-46a0-b652-898f31249d42_fixed.java
+index f47d784..e77ee13 100644
+--- a/tmp/ad2621e7-b8cb-4ab8-9e99-93d46fdb18dd_buggy.java
++++ b/tmp/1958cf12-851f-46a0-b652-898f31249d42_fixed.java
+@@ -1,12 +1,26 @@
+ @Override
+ public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+         MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+         NodeTraversal t = new NodeTraversal(compiler, renamer);
+         t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
++    
++    // Additional logic to handle 'arguments' object
++    NodeTraversal.traverse(compiler, root, new AbstractPostOrderCallback() {
++        @Override
++        public void visit(NodeTraversal t, Node n, Node parent) {
++            if (n.isVar() && n.getFirstChild().isName() && 
++                "arguments".equals(n.getFirstChild().getString())) {
++                Node nameNode = n.getFirstChild();
++                Node exprNode = IR.exprResult(IR.assign(nameNode.cloneNode(), nameNode.removeFirstChild()));
++                parent.replaceChild(n, exprNode);
++                compiler.reportChangeToEnclosingScope(exprNode);
++            }
++        }
++    });
+ }
+\ No newline at end of file

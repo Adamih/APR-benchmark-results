@@ -1,0 +1,17 @@
+diff --git a/tmp/bade07f2-6447-4abf-b027-6ea8fd56b8da_buggy.java b/tmp/e72db259-5140-47ac-b993-e8536a0746c3_fixed.java
+index 22640dd..02a1234 100644
+--- a/tmp/bade07f2-6447-4abf-b027-6ea8fd56b8da_buggy.java
++++ b/tmp/e72db259-5140-47ac-b993-e8536a0746c3_fixed.java
+@@ -1,3 +1,11 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++  // Traverse up the AST to check for a surrounding catch block
++  Node parent = cfgNode.getParent();
++  while (parent!= null) {
++    if (parent.isBlock() && parent.hasChildNode_RAFTER(NodeType.CATCH)) {
++      return true;
++    }
++    parent = parent.getParent();
++  }
+   return false;
+ }
+\ No newline at end of file

@@ -1,0 +1,39 @@
+diff --git a/tmp/7d7824d2-fb1c-448a-8fe4-79835f2f1d4f_buggy.java b/tmp/271de93d-1dec-41fd-b115-e7b2fb30dbaf_fixed.java
+index 46817a7..f77b566 100644
+--- a/tmp/7d7824d2-fb1c-448a-8fe4-79835f2f1d4f_buggy.java
++++ b/tmp/271de93d-1dec-41fd-b115-e7b2fb30dbaf_fixed.java
+@@ -1,16 +1,27 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++
++    // Add properties present in either record type
++    Set<String> combinedProperties = new HashSet<>(this.properties.keySet());
++    combinedProperties.addAll(that.toMaybeRecordType().getOwnPropertyNames());
++
++    for (String property : combinedProperties) {
++        boolean thisHasProperty = this.hasProperty(property);
++        boolean thatHasProperty = that.toMaybeRecordType().hasProperty(property);
++
++        if (thisHasProperty && thatHasProperty) {
++            JSType thisPropertyType = this.getPropertyType(property);
++            JSType thatPropertyType = that.toMaybeRecordType().getPropertyType(property);
++            builder.addProperty(property, thisPropertyType.getLeastSupertype(thatPropertyType), null);
++        } else if (thisHasProperty) {
++            builder.addProperty(property, this.getPropertyType(property), null);
++        } else if (thatHasProperty) {
++            builder.addProperty(property, that.toMaybeRecordType().getPropertyType(property), null);
+         }
+     }
+     return builder.build();
+ }
+\ No newline at end of file

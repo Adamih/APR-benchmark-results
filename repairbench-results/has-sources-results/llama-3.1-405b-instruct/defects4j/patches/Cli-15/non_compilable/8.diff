@@ -1,0 +1,36 @@
+diff --git a/tmp/e885b671-c179-4006-a3aa-0d91222ba634_buggy.java b/tmp/4f7e3a0e-dc77-40c4-8f7e-32ddd20a5463_fixed.java
+index 4e8b037..ea0a0e7 100644
+--- a/tmp/e885b671-c179-4006-a3aa-0d91222ba634_buggy.java
++++ b/tmp/4f7e3a0e-dc77-40c4-8f7e-32ddd20a5463_fixed.java
+@@ -1,20 +1,27 @@
+ public List getValues(final Option option,
+                       List defaultValues) {
+     // initialize the return list
+     List valueList = (List) values.get(option);
+ 
+     // grab the correct default values
+     if ((valueList == null) || valueList.isEmpty()) {
+         valueList = defaultValues;
+     }
+ 
+     // augment the list with the default values
+     if ((valueList == null) || valueList.isEmpty()) {
+         valueList = (List) this.defaultValues.get(option);
++    } else {
++        List defaultValueList = (List) this.defaultValues.get(option);
++        if (defaultValueList!= null) {
++            List combinedList = new ArrayList(valueList);
++            int remainingCapacity = option.getArgument().getMaximum() - valueList.size();
++            for (int i = 0; i < remainingCapacity && i < defaultValueList.size(); i++) {
++                combinedList.add(defaultValueList.get(i));
++            }
++            valueList = combinedList;
++        }
+     }
+-                // if there are more default values as specified, add them to
+-                // the list.
+-                    // copy the list first
+ 
+     return valueList == null? Collections.EMPTY_LIST : valueList;
+ }
+\ No newline at end of file

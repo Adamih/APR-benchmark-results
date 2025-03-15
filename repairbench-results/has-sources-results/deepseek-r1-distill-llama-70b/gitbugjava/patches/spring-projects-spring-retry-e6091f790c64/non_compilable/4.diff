@@ -1,0 +1,81 @@
+diff --git a/tmp/d2f0e1f2-417d-489b-a1e7-dddf1d8532de_buggy.java b/tmp/c7ccd08c-0952-4bdf-b584-e0646e7f8d61_fixed.java
+index b8e3fa3..d81fa21 100644
+--- a/tmp/d2f0e1f2-417d-489b-a1e7-dddf1d8532de_buggy.java
++++ b/tmp/c7ccd08c-0952-4bdf-b584-e0646e7f8d61_fixed.java
+@@ -1,65 +1,65 @@
+-	/**
+-	 * Builds the {@link BackOffPolicy} with the given parameters.
+-	 * @return the {@link BackOffPolicy} instance
+-	 */
+ public BackOffPolicy build() {
+     if (this.multiplier != null && this.multiplier > 0 || this.multiplierSupplier != null) {
+         ExponentialBackOffPolicy policy;
+         if (Boolean.TRUE.equals(this.random)) {
+             policy = new ExponentialRandomBackOffPolicy();
+         }
+         else {
+             policy = new ExponentialBackOffPolicy();
+         }
+         if (this.delay != null) {
+             policy.setInitialInterval(this.delay);
+         }
+         if (this.delaySupplier != null) {
+             policy.initialIntervalSupplier(this.delaySupplier);
+         }
+         if (this.multiplier != null) {
+             policy.setMultiplier(this.multiplier);
+         }
+-			if (this.multiplierSupplier != null) {
++        else if (this.multiplierSupplier != null) {
+             policy.multiplierSupplier(this.multiplierSupplier);
+         }
+-			if (this.maxDelay != null && this.delay != null) {
+-				policy.setMaxInterval(
+-						this.maxDelay > this.delay ? this.maxDelay : ExponentialBackOffPolicy.DEFAULT_MAX_INTERVAL);
++        Long delayValue = (this.delay != null) ? this.delay : 
++            (this.delaySupplier != null) ? this.delaySupplier.get() : null;
++        Long maxDelayValue = (this.maxDelay != null) ? this.maxDelay : 
++            (this.maxDelaySupplier != null) ? this.maxDelaySupplier.get() : null;
++        if (maxDelayValue != null) {
++            if (delayValue != null && maxDelayValue > delayValue) {
++                policy.setMaxInterval(maxDelayValue);
++            } else {
++                policy.setMaxInterval(ExponentialBackOffPolicy.DEFAULT_MAX_INTERVAL);
+             }
+-			if (this.maxDelaySupplier != null) {
+-				policy.maxIntervalSupplier(this.maxDelaySupplier);
+         }
+         if (this.sleeper != null) {
+             policy.setSleeper(this.sleeper);
+         }
+         return policy;
+     }
+     if (this.maxDelay != null && this.delay != null && this.maxDelay > this.delay) {
+         UniformRandomBackOffPolicy policy = new UniformRandomBackOffPolicy();
+         if (this.delay != null) {
+             policy.setMinBackOffPeriod(this.delay);
+         }
+         if (this.delaySupplier != null) {
+             policy.minBackOffPeriodSupplier(this.delaySupplier);
+         }
+         if (this.maxDelay != null) {
+             policy.setMaxBackOffPeriod(this.maxDelay);
+         }
+         if (this.maxDelaySupplier != null) {
+             policy.maxBackOffPeriodSupplier(this.maxDelaySupplier);
+         }
+         if (this.sleeper != null) {
+             policy.setSleeper(this.sleeper);
+         }
+         return policy;
+     }
+     FixedBackOffPolicy policy = new FixedBackOffPolicy();
+     if (this.delay != null) {
+         policy.setBackOffPeriod(this.delay);
+     }
+     if (this.sleeper != null) {
+         policy.setSleeper(this.sleeper);
+     }
+     return policy;
+ }
+\ No newline at end of file

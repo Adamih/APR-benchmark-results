@@ -1,0 +1,44 @@
+diff --git a/tmp/3e24cd53-a69c-41fd-959c-03a4202507d6_buggy.java b/tmp/02b392c6-e02c-4771-a7f3-7c7d264825c0_fixed.java
+index 07b0792..496f3e4 100644
+--- a/tmp/3e24cd53-a69c-41fd-959c-03a4202507d6_buggy.java
++++ b/tmp/02b392c6-e02c-4771-a7f3-7c7d264825c0_fixed.java
+@@ -1,22 +1,37 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+-      // Make sure this assignment is not in a loop.
++      // Make sure this assignment is not in a loop or in a function
++      // that could be called recursively.
+       for (BasicBlock block = ref.getBasicBlock();
+            block!= null; block = block.getParent()) {
+         if (block.isFunction) {
++          for (FunctionCallSite site : getCallSitesOf(block)) {
++            if (isRecursiveFunction(site)) {
++              return false;
++            }
++          }
+           break;
+         } else if (block.isLoop) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }
++
++    // TODO: please replace '...' with your actual method logic
++    private Iterable<FunctionCallSite> getCallSitesOf(BasicBlock block) {
++      //...
++    }
++
++    private boolean isRecursiveFunction(FunctionCallSite site) {
++      //...
++    }
+\ No newline at end of file

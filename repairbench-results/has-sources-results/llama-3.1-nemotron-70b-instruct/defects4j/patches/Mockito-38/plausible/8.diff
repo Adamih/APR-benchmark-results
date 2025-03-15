@@ -1,0 +1,17 @@
+diff --git a/tmp/c3275e8a-0086-448d-baf3-38908fe86e59_buggy.java b/tmp/e56eada2-c786-49fd-920a-862647d0bf6f_fixed.java
+index db60019..d679e17 100644
+--- a/tmp/c3275e8a-0086-448d-baf3-38908fe86e59_buggy.java
++++ b/tmp/e56eada2-c786-49fd-920a-862647d0bf6f_fixed.java
+@@ -1,3 +1,10 @@
++/**
++ * Fixed version of the buggy function to handle null arguments.
++ */
+ private boolean toStringEquals(Matcher m, Object arg) {
+-        return StringDescription.toString(m).equals(arg.toString());
++    // If arg is null, convert it to "null" string for comparison
++    String argStr = (arg == null)? "null" : arg.toString();
++    // If Matcher is null, this would also throw NPE, so handle it
++    String matcherStr = (m == null)? "null" : StringDescription.toString(m);
++    return matcherStr.equals(argStr);
+ }
+\ No newline at end of file

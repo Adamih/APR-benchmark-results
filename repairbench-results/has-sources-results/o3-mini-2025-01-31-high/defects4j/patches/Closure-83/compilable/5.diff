@@ -1,0 +1,28 @@
+diff --git a/tmp/57925e36-a051-43f7-9f52-cfba1212fa96_buggy.java b/tmp/23811ab8-023d-4890-a20e-14cf4a9d3f60_fixed.java
+index 072c672..8b6220f 100644
+--- a/tmp/57925e36-a051-43f7-9f52-cfba1212fa96_buggy.java
++++ b/tmp/23811ab8-023d-4890-a20e-14cf4a9d3f60_fixed.java
+@@ -1,20 +1,7 @@
+ @Override
+ public int parseArguments(Parameters params) throws CmdLineException {
+-        String param = params.getParameter(0);
+-
+-        if (param == null) {
++    // The version flag is not meant to take an extra argument.
++    // Always set it to true and consume no additional parameter.
+     setter.addValue(true);
+     return 0;
+-        } else {
+-          String lowerParam = param.toLowerCase();
+-          if (TRUES.contains(lowerParam)) {
+-            setter.addValue(true);
+-          } else if (FALSES.contains(lowerParam)) {
+-            setter.addValue(false);
+-          } else {
+-            setter.addValue(true);
+-            return 0;
+-          }
+-          return 1;
+-        }
+ }
+\ No newline at end of file

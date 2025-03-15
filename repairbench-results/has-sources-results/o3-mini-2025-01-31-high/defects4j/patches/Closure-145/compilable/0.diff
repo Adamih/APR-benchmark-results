@@ -1,0 +1,33 @@
+diff --git a/tmp/9e970c7b-d444-41d3-8bb7-1755fcf84755_buggy.java b/tmp/fe12d66e-f85b-41c1-812b-9fe0c6aedb0a_fixed.java
+index 57f69c5..6096198 100644
+--- a/tmp/9e970c7b-d444-41d3-8bb7-1755fcf84755_buggy.java
++++ b/tmp/fe12d66e-f85b-41c1-812b-9fe0c6aedb0a_fixed.java
+@@ -1,12 +1,17 @@
+-  /**
+-   * @return Whether the Node is a DO or FUNCTION (with or without
+-   * labels).
+-   */
+ private boolean isOneExactlyFunctionOrDo(Node n) {
+-        // For labels with block children, we need to ensure that a
+-        // labeled FUNCTION or DO isn't generated when extraneous BLOCKs 
+-        // are skipped. 
+-          // Either a empty statement or an block with more than one child,
+-          // way it isn't a FUNCTION or DO.
+-      return (n.getType() == Token.FUNCTION || n.getType() == Token.DO);
++  // Unwrap any LABEL nodes.
++  while (n.getType() == Token.LABEL) {
++    n = n.getLastChild();
++  }
++
++  // If we have a BLOCK, we only “unwrap” it when it has exactly one child.
++  if (n.getType() == Token.BLOCK) {
++    if (n.getChildCount() == 1) {
++      return isOneExactlyFunctionOrDo(n.getFirstChild());
++    }
++    return false;
++  }
++
++  // If it’s a FUNCTION or DO node then we must not skip the braces.
++  return !(n.getType() == Token.FUNCTION || n.getType() == Token.DO);
+ }
+\ No newline at end of file

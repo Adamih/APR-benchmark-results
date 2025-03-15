@@ -1,0 +1,43 @@
+diff --git a/tmp/a9e1708f-cee9-4dbb-8788-ee20fcc1763a_buggy.java b/tmp/f634b98d-f3d5-4a00-85f3-42f454db3930_fixed.java
+index 4b7f469..b727776 100644
+--- a/tmp/a9e1708f-cee9-4dbb-8788-ee20fcc1763a_buggy.java
++++ b/tmp/f634b98d-f3d5-4a00-85f3-42f454db3930_fixed.java
+@@ -1,10 +1,32 @@
+ static boolean isSimpleNumber(String s) {
+-    int len = s.length();
+-    for (int index = 0; index < len; index++) {
+-      char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++    if (s.isEmpty()) {
+         return false;
+     }
++
++    try {
++        // Attempt to parse the string as a double to handle floating-point numbers
++        Double.parseDouble(s);
++        return true;
++    } catch (NumberFormatException e) {
++        // If parsing as a double fails, check for other valid number formats
++        if (s.charAt(0) == '0' && s.length() > 1) {
++            // Handle octal and hexadecimal numbers
++            if (s.charAt(1) == 'x' || s.charAt(1) == 'X') {
++                try {
++                    Integer.parseInt(s.substring(2), 16);
++                    return true;
++                } catch (NumberFormatException ex) {
++                    return false;
++                }
++            } else {
++                try {
++                    Integer.parseInt(s.substring(1), 8);
++                    return true;
++                } catch (NumberFormatException ex) {
++                    return false;
++                }
++            }
++        }
++        return false;
+     }
+-    return len > 0;
+ }
+\ No newline at end of file

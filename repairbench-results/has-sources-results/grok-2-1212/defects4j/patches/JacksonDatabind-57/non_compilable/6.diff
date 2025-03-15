@@ -1,0 +1,26 @@
+diff --git a/tmp/2e529ac0-e731-41e5-9f07-c6618fb6993b_buggy.java b/tmp/896c9ef3-e59e-46b3-ba58-9cc097288d8a_fixed.java
+index 08a41cf..524ba8c 100644
+--- a/tmp/2e529ac0-e731-41e5-9f07-c6618fb6993b_buggy.java
++++ b/tmp/896c9ef3-e59e-46b3-ba58-9cc097288d8a_fixed.java
+@@ -1,12 +1,18 @@
+     /**
+      * Overloaded version of {@link #readValue(InputStream)}.
+      */
+     public <T> MappingIterator<T> readValues(byte[] src, int offset, int length)
+         throws IOException, JsonProcessingException
+     {
+         if (_dataFormatReaders != null) {
+             return _detectBindAndReadValues(_dataFormatReaders.findFormat(src, offset, length), false);
+         }
+-        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src),
+-                true));
++        
++        // Create a ByteArrayInputStream with the specified offset and length
++        ByteArrayInputStream bais = new ByteArrayInputStream(src, offset, length);
++        
++        // Create a parser with the correct encoding (UTF-8 is a safe default)
++        JsonParser parser = _parserFactory.createParser(bais, Charset.forName("UTF-8"));
++        
++        return _bindAndReadValues(_considerFilter(parser, true));
+     }
+\ No newline at end of file

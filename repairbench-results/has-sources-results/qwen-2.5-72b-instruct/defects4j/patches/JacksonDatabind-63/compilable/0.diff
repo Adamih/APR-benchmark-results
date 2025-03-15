@@ -1,0 +1,41 @@
+diff --git a/tmp/e6e0ec07-9375-4125-90bf-bc9246eab74f_buggy.java b/tmp/65a14d77-32d4-46ad-92c8-423545b8c786_fixed.java
+index f955f47..5c7face 100644
+--- a/tmp/e6e0ec07-9375-4125-90bf-bc9246eab74f_buggy.java
++++ b/tmp/65a14d77-32d4-46ad-92c8-423545b8c786_fixed.java
+@@ -1,34 +1,34 @@
+ public String getDescription() {
+     if (_desc == null) {
+         StringBuilder sb = new StringBuilder();
+ 
+         if (_from == null) { // can this ever occur?
+             sb.append("UNKNOWN");
+         } else {
+             Class<?> cls = (_from instanceof Class<?>) ? (Class<?>)_from : _from.getClass();
+             // Hmmh. Although Class.getName() is mostly ok, it does look
+             // butt-ugly for arrays.
+             // 06-Oct-2016, tatu: as per [databind#1403], `getSimpleName()` not so good
+             //   as it drops enclosing class. So let's try bit different approach
+             String pkgName = com.fasterxml.jackson.databind.util.ClassUtil.getPackageName(cls);
+             if (pkgName != null) {
+                 sb.append(pkgName);
+                 sb.append('.');
+             }
+-                    sb.append(cls.getSimpleName());
++            sb.append(cls.getCanonicalName());
+         }
+         sb.append('[');
+         if (_fieldName != null) {
+             sb.append('"');
+             sb.append(_fieldName);
+             sb.append('"');
+         } else if (_index >= 0) {
+             sb.append(_index);
+         } else {
+             sb.append('?');
+         }
+         sb.append(']');
+         _desc = sb.toString();
+     }
+     return _desc;
+ }
+\ No newline at end of file

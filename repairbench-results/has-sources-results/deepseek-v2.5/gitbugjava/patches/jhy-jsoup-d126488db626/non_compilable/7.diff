@@ -1,0 +1,36 @@
+diff --git a/tmp/30b86155-7c28-4408-a00e-b9779cef4089_buggy.java b/tmp/597293ac-0b95-4c2f-9005-22b80399b555_fixed.java
+index 5bf31b1..cfa292d 100644
+--- a/tmp/30b86155-7c28-4408-a00e-b9779cef4089_buggy.java
++++ b/tmp/597293ac-0b95-4c2f-9005-22b80399b555_fixed.java
+@@ -1,17 +1,24 @@
+ private String consumeSubQuery() {
+     StringBuilder sq = StringUtil.borrowBuilder();
+     while (!tq.isEmpty()) {
+-            if (tq.matches("("))
++        if (tq.matches("(")) {
+             sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+-            else if (tq.matches("["))
++        } else if (tq.matches("[")) {
+             sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++        } else if (tq.matchesAny(Combinators)) {
++            if (sq.length() > 0) {
+                 break;
+-                else
++            } else {
+                 tq.consume();
+-            else
++            }
++        } else {
++            // Check if the current token is a combinator before appending it to sq
++            if (tq.matchesAny(Combinators)) {
++                break;
++            } else {
+                 sq.append(tq.consume());
+             }
++        }
++    }
+     return StringUtil.releaseBuilder(sq);
+ }
+\ No newline at end of file

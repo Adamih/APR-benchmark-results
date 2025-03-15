@@ -1,0 +1,25 @@
+diff --git a/tmp/68d8ab15-1e2f-4590-8118-a4ae134e8c90_buggy.java b/tmp/118f2259-1802-4cb6-9262-f44d5750b67e_fixed.java
+index 4b7f469..970cb3d 100644
+--- a/tmp/68d8ab15-1e2f-4590-8118-a4ae134e8c90_buggy.java
++++ b/tmp/118f2259-1802-4cb6-9262-f44d5750b67e_fixed.java
+@@ -1,10 +1,14 @@
+   static boolean isSimpleNumber(String s) {
+-    int len = s.length();
+-    for (int index = 0; index < len; index++) {
+-      char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++    if (s.isEmpty()) {
+       return false;
+     }
++    if (s.startsWith("0") && s.length() > 1) {
++      return false;
++    }
++    try {
++      Double.parseDouble(s);
++      return true;
++    } catch (NumberFormatException e) {
++      return false;
+     }
+-    return len > 0;
+   }
+\ No newline at end of file

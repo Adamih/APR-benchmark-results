@@ -1,0 +1,14 @@
+diff --git a/tmp/6145bbed-81ff-4717-8589-50f325cbaac1_buggy.java b/tmp/5f5a8c52-082b-41ba-b444-137d198342ae_fixed.java
+index 6fecc90..86df209 100644
+--- a/tmp/6145bbed-81ff-4717-8589-50f325cbaac1_buggy.java
++++ b/tmp/5f5a8c52-082b-41ba-b444-137d198342ae_fixed.java
+@@ -1,7 +1,7 @@
+ static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+         return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+     } else {
+-      return mayBeStringHelper(n);
++        return mayBeStringHelper(n) || (n.isAdd() && (mayBeStringHelper(n.getFirstChild()) || mayBeStringHelper(n.getLastChild())));
+     }
+ }
+\ No newline at end of file

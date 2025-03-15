@@ -1,0 +1,18 @@
+diff --git a/tmp/2ec888cc-b980-41a4-8e5b-c2111fde9b4b_buggy.java b/tmp/639892e5-1d05-41cb-a445-a8b3bb36a296_fixed.java
+index 42d4174..73a80a5 100644
+--- a/tmp/2ec888cc-b980-41a4-8e5b-c2111fde9b4b_buggy.java
++++ b/tmp/639892e5-1d05-41cb-a445-a8b3bb36a296_fixed.java
+@@ -1,7 +1,9 @@
+-  /**
+-   * Returns the remainder of the line.
+-   */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    // Adjust for any active annotation span that might have consumed the line start.
++    if (lineNumberAnnotation != null && lineIndexAnnotation != 0) {
++      result = result.substring(lineIndexAnnotation);
++      lineIndexAnnotation = 0;
++    }
+     return result;
+   }
+\ No newline at end of file

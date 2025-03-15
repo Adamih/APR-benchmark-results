@@ -1,0 +1,16 @@
+diff --git a/tmp/ae5f0d69-54c4-4632-ada7-1447eda92ec9_buggy.java b/tmp/e182f62f-7268-4371-a00d-78378e99f2a3_fixed.java
+index 5eedc11..b3ef17c 100644
+--- a/tmp/ae5f0d69-54c4-4632-ada7-1447eda92ec9_buggy.java
++++ b/tmp/e182f62f-7268-4371-a00d-78378e99f2a3_fixed.java
+@@ -1,6 +1,10 @@
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+     tb.insert(startTag);
++    if (startTag.isSelfClosing()) {
++        tb.insert(new Token.EndTag(startTag.tagName));
++    } else {
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
++    }
+     tb.transition(Text);
+ }
+\ No newline at end of file

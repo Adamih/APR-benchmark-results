@@ -1,0 +1,31 @@
+diff --git a/tmp/fdb23f61-8927-4a2a-a1a1-438577d96fae_buggy.java b/tmp/45c54514-3fef-4bdd-952f-5b0b89e8451e_fixed.java
+index e5ad041..17ab09d 100644
+--- a/tmp/fdb23f61-8927-4a2a-a1a1-438577d96fae_buggy.java
++++ b/tmp/45c54514-3fef-4bdd-952f-5b0b89e8451e_fixed.java
+@@ -1,19 +1,13 @@
+ @Override
+-    protected JavaType _narrow(Class<?> subclass)
+-    {
++protected JavaType _narrow(Class<?> subclass) {
+     if (_class == subclass) {
+         return this;
+     }
+-        // Should we check that there is a sub-class relationship?
+-        // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+-        //    placeholder values, so no.
+-        /*
++    // Ensure the subclass is compatible with the current type
+     if (!_class.isAssignableFrom(subclass)) {
+-            throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+-                    +_class.getName());
++        throw new IllegalArgumentException("Class " + subclass.getName() + " not a subtype of " + _class.getName());
+     }
+-        */
+-        // 15-Jan-2015, tatu: Not correct; should really re-resolve...
+-        return new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
+-                _valueHandler, _typeHandler, _asStatic);
++    // Re-resolve bindings for the new subclass
++    TypeBindings newBindings = _typeFactory._resolveBindings(subclass, _bindings);
++    return new SimpleType(subclass, newBindings, _superClass, _superInterfaces, _valueHandler, _typeHandler, _asStatic);
+ }
+\ No newline at end of file

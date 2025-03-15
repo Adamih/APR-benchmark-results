@@ -1,0 +1,59 @@
+diff --git a/tmp/0ecce815-e640-4582-96ab-e557f10640f5_buggy.java b/tmp/b09b3bbe-e382-4d61-9689-cd61413f013f_fixed.java
+index 670114d..8a4be17 100644
+--- a/tmp/0ecce815-e640-4582-96ab-e557f10640f5_buggy.java
++++ b/tmp/b09b3bbe-e382-4d61-9689-cd61413f013f_fixed.java
+@@ -1,48 +1,52 @@
+ @Override
+ public void visit(NodeTraversal t, Node n, Node parent) {
+ 
+   // Record global variable and function declarations
+   if (t.inGlobalScope()) {
+     if (NodeUtil.isVarDeclaration(n)) {
+       NameInformation ns = createNameInformation(t, n, parent);
+       Preconditions.checkNotNull(ns);
+       recordSet(ns.name, n);
+     } else if (NodeUtil.isFunctionDeclaration(n)) {
+       Node nameNode = n.getFirstChild();
+       NameInformation ns = createNameInformation(t, nameNode, n);
+       if (ns!= null) {
+         JsName nameInfo = getName(nameNode.getString(), true);
+         recordSet(nameInfo.name, nameNode);
+       }
+     } else if (NodeUtil.isObjectLitKey(n, parent)) {
+       NameInformation ns = createNameInformation(t, n, parent);
+       if (ns!= null) {
+         recordSet(ns.name, n);
+       }
+     }
+   }
+ 
+   // Record assignments and call sites
+   if (n.isAssign()) {
+     Node nameNode = n.getFirstChild();
+ 
+     NameInformation ns = createNameInformation(t, nameNode, n);
+     if (ns!= null) {
+       if (ns.isPrototype) {
+         recordPrototypeSet(ns.prototypeClass, ns.prototypeProperty, n);
+       } else {
+         recordSet(ns.name, nameNode);
+       }
+     }
+   } else if (n.isCall()) {
+     Node nameNode = n.getFirstChild();
+     NameInformation ns = createNameInformation(t, nameNode, n);
+-        if (ns != null && ns.onlyAffectsClassDef) {
++    if (ns!= null) { // Removed the ns.onlyAffectsClassDef condition
+       JsName name = getName(ns.name, false);
+       if (name!= null) {
++        if (ns.onlyAffectsClassDef) { // Added a conditional block for this case
+           refNodes.add(new ClassDefiningFunctionNode(
+               name, n, parent, parent.getParent()));
++        } else {
++          // Handle other cases (if any) or simply do nothing
++        }
+       }
+     }
+   }
+ }
+\ No newline at end of file

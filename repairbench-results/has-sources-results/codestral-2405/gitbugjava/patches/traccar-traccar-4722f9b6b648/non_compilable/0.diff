@@ -1,0 +1,38 @@
+diff --git a/tmp/9b2871f4-fd3e-49c8-9c45-17009b1bf655_buggy.java b/tmp/75b5733c-c7ce-466c-9db3-6a1b9111f5e1_fixed.java
+index c84c989..87dbec5 100644
+--- a/tmp/9b2871f4-fd3e-49c8-9c45-17009b1bf655_buggy.java
++++ b/tmp/75b5733c-c7ce-466c-9db3-6a1b9111f5e1_fixed.java
+@@ -1,27 +1,5 @@
+-    private Position decodeIridiumPosition(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
+-
+-        buf.readUnsignedShortLE(); // length
+-
+-        buf.skipBytes(3); // identification header
+-        buf.readUnsignedIntLE(); // index
+-
+-        DeviceSession deviceSession = getDeviceSession(
+-                channel, remoteAddress, buf.readSlice(15).toString(StandardCharsets.US_ASCII));
+-        if (deviceSession == null) {
+-            return null;
+-        }
+-
+-        Position position = new Position(getProtocolName());
+-        position.setDeviceId(deviceSession.getDeviceId());
+-
+-        buf.readUnsignedByte(); // session status
+-        buf.skipBytes(4); // reserved
+-        buf.readUnsignedIntLE(); // date and time
+-
+-        buf.skipBytes(23); // coordinates block
+-
+-        buf.skipBytes(3); // data tag header
+-        decodeMinimalDataSet(position, buf);
+-
+-        return position;
+-    }
++long timestamp = buf.readUnsignedIntLE(); // date and time
++Instant instant = Instant.ofEpochSecond(timestamp);
++DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
++String formattedDateTime = formatter.format(instant.atZone(ZoneId.of("UTC")));
++position.setTime(formattedDateTime);
+\ No newline at end of file

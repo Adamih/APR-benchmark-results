@@ -1,0 +1,37 @@
+diff --git a/tmp/de7f8ed7-6bb8-496f-b9c8-46f2f7bf067f_buggy.java b/tmp/8f83fc18-7a5b-43ba-ba2f-93cf1a37fe74_fixed.java
+index 602226b..4fd5212 100644
+--- a/tmp/de7f8ed7-6bb8-496f-b9c8-46f2f7bf067f_buggy.java
++++ b/tmp/8f83fc18-7a5b-43ba-ba2f-93cf1a37fe74_fixed.java
+@@ -1,26 +1,26 @@
+ private void findAliases(NodeTraversal t) {
+   Scope scope = t.getScope();
+   for (Var v : scope.getVarIterable()) {
+     Node n = v.getNode();
+     int type = n.getType();
+     Node parent = n.getParent();
+     if (parent.isVar()) {
+       if (n.hasChildren() && n.getFirstChild().isQualifiedName()) {
+         String name = n.getString();
+         Var aliasVar = scope.getVar(name);
+         aliases.put(name, aliasVar);
+ 
+         String qualifiedName =
+             aliasVar.getInitialValue().getQualifiedName();
+         transformation.addAlias(name, qualifiedName);
+-          // Bleeding functions already get a BAD_PARAMETERS error, so just
+-          // do nothing.
+-          // Parameters of the scope function also get a BAD_PARAMETERS
+-          // error.
+       } else {
+-          // TODO(robbyw): Support using locals for private variables.
++        // The condition below was removed from the if block
++        // and now all locals will be reported as non-alias locals
+         report(t, n, GOOG_SCOPE_NON_ALIAS_LOCAL, n.getString());
+       }
++    } else {
++      // TODO(robbyw): Support using locals for private variables.
++      // report(t, n, GOOG_SCOPE_NON_ALIAS_LOCAL, n.getString());
+     }
+   }
+ }
+\ No newline at end of file

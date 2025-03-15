@@ -1,0 +1,39 @@
+diff --git a/tmp/9fe6fbfa-2bc3-4f4a-a39a-67d3f92fdd7d_buggy.java b/tmp/984d7efd-68aa-4990-b2b0-8b0ae6609d93_fixed.java
+index de9af32..5c018bd 100644
+--- a/tmp/9fe6fbfa-2bc3-4f4a-a39a-67d3f92fdd7d_buggy.java
++++ b/tmp/984d7efd-68aa-4990-b2b0-8b0ae6609d93_fixed.java
+@@ -1,18 +1,25 @@
+-  /**
+-   * @see #findCalledFunctions(Node)
+-   */
+-  private void findCalledFunctions(
+-      Node node, Set<String> changed) {
++private void findCalledFunctions(Node node, Set<String> changed) {
+   Preconditions.checkArgument(changed != null);
+   // For each referenced function, add a new reference
+   if (node.getType() == Token.CALL) {
+-      Node child = node.getFirstChild();
+-      if (child.getType() == Token.NAME) {
+-        changed.add(child.getString());
++    Node callee = node.getFirstChild();
++    if (callee != null) {
++      if (callee.getType() == Token.NAME) {
++        changed.add(callee.getString());
++      } else if (callee.getType() == Token.GETPROP) {
++        // In a call like f.call(...), the AST for the callee is a GETPROP node.
++        // Its first child is the function name (f) and its second child is "call".
++        Node obj = callee.getFirstChild();
++        Node prop = (obj != null) ? obj.getNext() : null;
++        if (prop != null && "call".equals(prop.getString()) &&
++            obj.getType() == Token.NAME) {
++          changed.add(obj.getString());
++        }
++      }
+     }
+   }
+ 
+   for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+     findCalledFunctions(c, changed);
+   }
+ }
+\ No newline at end of file

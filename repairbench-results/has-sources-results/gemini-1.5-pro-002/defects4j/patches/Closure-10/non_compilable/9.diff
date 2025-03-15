@@ -1,0 +1,23 @@
+diff --git a/tmp/88fddf51-eea5-490a-a717-48c00e67e593_buggy.java b/tmp/267e3888-eb90-4fed-882d-152e1762d553_fixed.java
+index 6fecc90..61ce869 100644
+--- a/tmp/88fddf51-eea5-490a-a717-48c00e67e593_buggy.java
++++ b/tmp/267e3888-eb90-4fed-882d-152e1762d553_fixed.java
+@@ -1,7 +1,18 @@
+   static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+       return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+     } else {
++      switch (n.getToken()) {
++        case NAME:
++        case GETPROP:
++          return true;
++        case STRING:
++        case TEMPLATELIT:
++        case ADD:
++        case HOOK:
++          return true;
++        default:
+           return mayBeStringHelper(n);
+       }
+     }
++  }

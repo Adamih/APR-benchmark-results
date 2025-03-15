@@ -1,0 +1,31 @@
+diff --git a/tmp/807e9120-c7b1-4112-86e5-f40f0fb696b3_buggy.java b/tmp/3b829d6c-aa00-4cc6-bfd9-1c8abada65a7_fixed.java
+index 8afddc6..211a380 100644
+--- a/tmp/807e9120-c7b1-4112-86e5-f40f0fb696b3_buggy.java
++++ b/tmp/3b829d6c-aa00-4cc6-bfd9-1c8abada65a7_fixed.java
+@@ -1,22 +1,22 @@
+ @Override
+ protected CompilerOptions createOptions() {
+   CompilerOptions options = new CompilerOptions();
+   options.setCodingConvention(new ClosureCodingConvention());
+   CompilationLevel level = flags.compilation_level;
+   level.setOptionsForCompilationLevel(options);
+   if (flags.debug) {
+     level.setDebugOptionsForCompilationLevel(options);
+   }
+ 
+   WarningLevel wLevel = flags.warning_level;
+   wLevel.setOptionsForWarningLevel(options);
+   for (FormattingOption formattingOption : flags.formatting) {
+     formattingOption.applyToOptions(options);
+   }
+-    if (flags.process_closure_primitives) {
+-      options.closurePass = true;
+-    }
++  
++  // Explicitly set closurePass based on the flag value.
++  options.closurePass = flags.process_closure_primitives;
+ 
+   initOptionsFromFlags(options);
+   return options;
+ }
+\ No newline at end of file

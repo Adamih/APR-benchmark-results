@@ -1,0 +1,27 @@
+diff --git a/tmp/e3fd286a-51b7-4624-b53f-97d4d7cdf032_buggy.java b/tmp/b241b4a5-ebfd-4341-a1b2-abaf5645c781_fixed.java
+index ae6c2b1..12e9077 100644
+--- a/tmp/e3fd286a-51b7-4624-b53f-97d4d7cdf032_buggy.java
++++ b/tmp/b241b4a5-ebfd-4341-a1b2-abaf5645c781_fixed.java
+@@ -1,10 +1,19 @@
++/**
++ * Parses a time zone ID from the given text, starting at the specified position.
++ * 
++ * @param bucket  the bucket to fill, not null
++ * @param text    the text to parse, not null
++ * @param position  the position to start parsing from
++ * @return the new position,=~position if failed
++ */
+ public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+     String str = text.substring(position);
+-            for (String id : ALL_IDS) {
+-                if (str.startsWith(id)) {
++    // Sort IDs by length in descending order to avoid matching shorter IDs first
++    for (String id : ALL_IDS.stream().sorted((a, b) -> Integer.compare(b.length(), a.length())).toArray(String[]::new)) {
++        if (str.startsWith(id) && (position + id.length() == text.length() ||!Character.isLetterOrDigit(text.charAt(position + id.length())))) {
+             bucket.setZone(DateTimeZone.forID(id));
+             return position + id.length();
+         }
+     }
+     return ~position;
+ }
+\ No newline at end of file

@@ -1,0 +1,35 @@
+diff --git a/tmp/f0037750-989c-4766-a629-91abcac2c94c_buggy.java b/tmp/ffb79368-2b1f-46b4-b4ea-8411f1c5b636_fixed.java
+index a7f0d46..4ae1d9c 100644
+--- a/tmp/f0037750-989c-4766-a629-91abcac2c94c_buggy.java
++++ b/tmp/ffb79368-2b1f-46b4-b4ea-8411f1c5b636_fixed.java
+@@ -1,22 +1,28 @@
+ void add(String newcode) {
+     maybeEndStatement();
+ 
+     if (newcode.length() == 0) {
+         return;
+     }
+ 
+     char c = newcode.charAt(0);
++    char lastChar = getLastChar();
++
++    // Check if the current character and the last character are both word characters
++    // or if the current character is a backslash, while the last character is a word character.
++    // Also, ensure that we are not between two slashes in a regular expression.
+     if ((isWordChar(c) || c == '\\') &&
+-        isWordChar(getLastChar())) {
++        isWordChar(lastChar) &&
++        !(lastChar == '/' && c == '/')) {
+         // need space to separate. This is not pretty printing.
+         // For example: "return foo;"
+         append(" ");
+         // Do not allow a forward slash to appear after a DIV.
+         // For example,
+         // REGEXP DIV REGEXP
+         // is valid and should print like
+         // / // / /
+     }
+ 
+     append(newcode);
+ }
+\ No newline at end of file

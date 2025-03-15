@@ -1,0 +1,20 @@
+diff --git a/tmp/5968e56d-295d-45ce-ac94-3496479d6555_buggy.java b/tmp/4bb7d641-090f-41c7-b89b-d6527617e74c_fixed.java
+index df97798..a8b5728 100644
+--- a/tmp/5968e56d-295d-45ce-ac94-3496479d6555_buggy.java
++++ b/tmp/4bb7d641-090f-41c7-b89b-d6527617e74c_fixed.java
+@@ -1,9 +1,13 @@
+ protected void _serializeXmlNull(JsonGenerator jgen) throws IOException
+ {
+     // 14-Nov-2016, tatu: As per [dataformat-xml#213], we may have explicitly
+     //    configured root name...
+     if (jgen instanceof ToXmlGenerator) {
+-            _initWithRootName((ToXmlGenerator) jgen, ROOT_NAME_FOR_NULL);
++        ToXmlGenerator xmlGen = (ToXmlGenerator) jgen;
++        _initWithRootName(xmlGen, xmlGen.getOutputContext().getCurrentName());
++        xmlGen.writeStartObject();
++        xmlGen.writeEndObject();
++        return;
+     }
+     super.serializeValue(jgen, null);
+ }
+\ No newline at end of file

@@ -1,0 +1,50 @@
+diff --git a/tmp/78f55135-fdb1-4b38-965a-db3672c7290f_buggy.java b/tmp/f777eff6-a98b-4ba1-8e9e-a154638a8211_fixed.java
+index 98d89dc..399251f 100644
+--- a/tmp/78f55135-fdb1-4b38-965a-db3672c7290f_buggy.java
++++ b/tmp/f777eff6-a98b-4ba1-8e9e-a154638a8211_fixed.java
+@@ -1,23 +1,44 @@
++/**
++ * Fixed version of the compute function to handle NaN (Not a Number) comparisons correctly.
++ * 
++ * @param left  The left operand.
++ * @param right The right operand.
++ * @return The result of the comparison.
++ */
+ private boolean compute(Object left, Object right) {
+     left = reduce(left);
+     right = reduce(right);
+ 
+     if (left instanceof InitialContext) {
+         ((InitialContext) left).reset();
+     }
+     if (right instanceof InitialContext) {
+         ((InitialContext) right).reset();
+     }
+     if (left instanceof Iterator && right instanceof Iterator) {
+         return findMatch((Iterator) left, (Iterator) right);
+     }
+     if (left instanceof Iterator) {
+         return containsMatch((Iterator) left, right);
+     }
+     if (right instanceof Iterator) {
+         return containsMatch((Iterator) right, left);
+     }
+     double ld = InfoSetUtil.doubleValue(left);
+     double rd = InfoSetUtil.doubleValue(right);
++    
++    // Fix: Explicitly handle NaN cases
++    if (Double.isNaN(ld) || Double.isNaN(rd)) {
++        switch (getOperator()) { // Assume getOperator() returns the comparison operator
++            case ">":
++            case "<":
++                return false; // NaN is neither greater than nor less than any number
++            case "=":
++                return ld == rd; // NaN equals NaN, but no other number
++            default:
++                throw new UnsupportedOperationException("Unsupported operator for NaN comparison");
++        }
++    } else {
+         return evaluateCompare(ld == rd? 0 : ld < rd? -1 : 1);
+     }
++}
+\ No newline at end of file

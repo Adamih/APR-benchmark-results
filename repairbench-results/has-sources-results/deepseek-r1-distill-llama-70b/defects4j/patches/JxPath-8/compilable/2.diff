@@ -1,0 +1,49 @@
+diff --git a/tmp/beb8a540-417a-46d6-9f42-e58a38e7a74f_buggy.java b/tmp/ca6fc7fa-f4d2-47ff-9750-4f9e01ccf9da_fixed.java
+index 98d89dc..361600b 100644
+--- a/tmp/beb8a540-417a-46d6-9f42-e58a38e7a74f_buggy.java
++++ b/tmp/ca6fc7fa-f4d2-47ff-9750-4f9e01ccf9da_fixed.java
+@@ -1,23 +1,43 @@
+ private boolean compute(Object left, Object right) {
+     left = reduce(left);
+     right = reduce(right);
+ 
+     if (left instanceof InitialContext) {
+         ((InitialContext) left).reset();
+     }
+     if (right instanceof InitialContext) {
+         ((InitialContext) right).reset();
+     }
++
++    // Handle cases where either operand is NaN
++    if (left instanceof Double && (left == Double.NaN || ((Double) left).isNaN())) {
++        return handleNaN(right, left);
++    }
++    if (right instanceof Double && (right == Double.NaN || ((Double) right).isNaN())) {
++        return handleNaN(left, right);
++    }
++
+     if (left instanceof Iterator && right instanceof Iterator) {
+         return findMatch((Iterator) left, (Iterator) right);
+     }
+     if (left instanceof Iterator) {
+         return containsMatch((Iterator) left, right);
+     }
+     if (right instanceof Iterator) {
+         return containsMatch((Iterator) right, left);
+     }
++
+     double ld = InfoSetUtil.doubleValue(left);
+     double rd = InfoSetUtil.doubleValue(right);
+     return evaluateCompare(ld == rd ? 0 : ld < rd ? -1 : 1);
+ }
++
++private boolean handleNaN(Object left, Object right) {
++    if (left == right) {
++        return true;
++    }
++    if (left instanceof Number && right instanceof Number) {
++        return ((Number) left).doubleValue() == ((Number) right).doubleValue();
++    }
++    return false;
++}
+\ No newline at end of file

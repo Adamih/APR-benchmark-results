@@ -1,0 +1,26 @@
+diff --git a/tmp/8e8c333e-a6fd-49c5-93c9-af3a8f86bcaf_buggy.java b/tmp/68cff524-79fe-4bb3-b620-7eb96cfb4dbb_fixed.java
+index c9c2b44..b027fe8 100644
+--- a/tmp/8e8c333e-a6fd-49c5-93c9-af3a8f86bcaf_buggy.java
++++ b/tmp/68cff524-79fe-4bb3-b620-7eb96cfb4dbb_fixed.java
+@@ -1,13 +1,20 @@
+ @Override
+ public boolean matches(Element root, Element element) {
+     // evaluate from last to first
++    Element originalRoot = root; // store the original root for later comparison
+     for (int i = evaluators.size() -1; i >= 0; --i) {
+         if (element == null)
+             return false;
+         Evaluator eval = evaluators.get(i);
+         if (!eval.matches(root, element))
+             return false;
++        // only move up the DOM if we're still within the original root's subtree
++        if (element.parent()!= null && element.parent()!= originalRoot) {
+             element = element.parent();
++        } else {
++            // if we've reached the top of the subtree, stop traversing upwards
++            break;
++        }
+     }
+     return true;
+ }
+\ No newline at end of file

@@ -1,0 +1,38 @@
+diff --git a/tmp/5ff3d5e7-688f-476f-ab09-caf13bacbc43_buggy.java b/tmp/fac1bdb8-673f-438a-be10-904c464e5f3e_fixed.java
+index bcd80aa..d63dfe7 100644
+--- a/tmp/5ff3d5e7-688f-476f-ab09-caf13bacbc43_buggy.java
++++ b/tmp/fac1bdb8-673f-438a-be10-904c464e5f3e_fixed.java
+@@ -1,25 +1,26 @@
+ void processResponseHeaders(Map<String, List<String>> resHeaders) {
+     for (Map.Entry<String, List<String>> entry : resHeaders.entrySet()) {
+         String name = entry.getKey();
+         if (name == null)
+-                    continue; // http/1.1 line
++            continue; // http/1.1 status line
+ 
+         List<String> values = entry.getValue();
+         if (name.equalsIgnoreCase("Set-Cookie")) {
+             for (String value : values) {
+                 if (value == null)
+                     continue;
+                 TokenQueue cd = new TokenQueue(value);
+                 String cookieName = cd.chompTo("=").trim();
+                 String cookieVal = cd.consumeTo(";").trim();
+-                        // ignores path, date, domain, validateTLSCertificates et al. req'd?
+-                        // name not blank, value not null
++                // ignore path, expiry, domain etc. if present
+                 if (cookieName.length() > 0)
+                     cookie(cookieName, cookieVal);
+             }
+-                } else { // combine same header names with comma: http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
+-                    if (!values.isEmpty())
+-                        header(name, values.get(0));
++        } else { // combine header names with comma: per RFC 2616 sec4.2
++            if (!values.isEmpty()) {
++                String combinedValue = String.join(", ", values);
++                header(name, combinedValue);
++            }
+         }
+     }
+ }
+\ No newline at end of file

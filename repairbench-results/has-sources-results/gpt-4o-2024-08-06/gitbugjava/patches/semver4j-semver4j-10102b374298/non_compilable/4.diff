@@ -1,0 +1,14 @@
+diff --git a/tmp/fbb557e8-c8ee-4496-91ce-b7d626636bb1_buggy.java b/tmp/2198f63e-41e8-4408-bc75-b7d0790a189e_fixed.java
+index 593602f..dfb5aa5 100644
+--- a/tmp/fbb557e8-c8ee-4496-91ce-b7d626636bb1_buggy.java
++++ b/tmp/2198f63e-41e8-4408-bc75-b7d0790a189e_fixed.java
+@@ -1,6 +1,7 @@
+ @Override
+ public String toString() {
+     return rangesList.stream()
+         .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++        .map(range -> range.replaceAll("\\(", "").replaceAll("\\)", ""))
++        .collect(joining(" and "));
+ }
+\ No newline at end of file

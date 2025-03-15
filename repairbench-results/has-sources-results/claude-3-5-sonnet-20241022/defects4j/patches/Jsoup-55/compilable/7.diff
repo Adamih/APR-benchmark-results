@@ -1,0 +1,24 @@
+diff --git a/tmp/8d696790-96cf-435e-bd07-d46e879721e4_buggy.java b/tmp/307ba7e5-0a6c-4751-a2f7-4f8165d9314e_fixed.java
+index ef76662..e21e278 100644
+--- a/tmp/8d696790-96cf-435e-bd07-d46e879721e4_buggy.java
++++ b/tmp/307ba7e5-0a6c-4751-a2f7-4f8165d9314e_fixed.java
+@@ -1,17 +1,17 @@
+ void read(Tokeniser t, CharacterReader r) {
+     char c = r.consume();
+     switch (c) {
+         case '>':
+             t.tagPending.selfClosing = true;
+             t.emitTagPending();
+             t.transition(Data);
+             break;
+         case eof:
+             t.eofError(this);
+             t.transition(Data);
+             break;
+         default:
+-                    t.error(this);
++            r.unconsume(); // put the character back
+             t.transition(BeforeAttributeName);
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,18 @@
+diff --git a/tmp/7250b1a8-471e-468a-81b0-97beeb83837a_buggy.java b/tmp/33f1aee3-8752-4354-a8e4-c9302a79a2c4_fixed.java
+index 1c92640..78bf42d 100644
+--- a/tmp/7250b1a8-471e-468a-81b0-97beeb83837a_buggy.java
++++ b/tmp/33f1aee3-8752-4354-a8e4-c9302a79a2c4_fixed.java
+@@ -1,7 +1,13 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
++        if (name != null) {
++            // Special case for entries using the wrong character encoding
++            // instead of UTF-8 as required by zip standard.
++            // See MyzipTest for details
++            name = name.replace('\\', '/');
++        }
+         this.name = name;
+     }

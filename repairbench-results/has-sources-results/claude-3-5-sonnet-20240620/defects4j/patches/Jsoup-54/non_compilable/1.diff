@@ -1,0 +1,26 @@
+diff --git a/tmp/5de446f5-ae19-4dd0-aada-59ff5d0ad60b_buggy.java b/tmp/048663ca-2140-4ea0-a91a-81b0d2a2eaef_fixed.java
+index d5b3da9..8e3d7a7 100644
+--- a/tmp/5de446f5-ae19-4dd0-aada-59ff5d0ad60b_buggy.java
++++ b/tmp/048663ca-2140-4ea0-a91a-81b0d2a2eaef_fixed.java
+@@ -1,7 +1,18 @@
+ private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
+     for (Attribute attribute : source.attributes()) {
+-                // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+-                String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
++        String key = attribute.getKey();
++        // Check if the key starts with a valid XML name start character
++        if (XMLChar.isNameStart(key.charAt(0))) {
++            // Replace any invalid XML name characters in the rest of the key
++            if (key.length() > 1) {
++                StringBuilder sb = new StringBuilder().append(key.charAt(0));
++                for (int i = 1; i < key.length(); i++) {
++                    char c = key.charAt(i);
++                    sb.append(XMLChar.isName(c) ? c : '_');
++                }
++                key = sb.toString();
++            }
+             el.setAttribute(key, attribute.getValue());
+         }
+     }
++}
+\ No newline at end of file

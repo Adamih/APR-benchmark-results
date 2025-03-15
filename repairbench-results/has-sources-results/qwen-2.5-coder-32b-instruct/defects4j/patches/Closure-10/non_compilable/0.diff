@@ -1,0 +1,38 @@
+diff --git a/tmp/dd3050bc-75a3-4347-9022-2126e0fa60db_buggy.java b/tmp/3497118b-574b-483a-8632-fa21830d1602_fixed.java
+index 6fecc90..590d48d 100644
+--- a/tmp/dd3050bc-75a3-4347-9022-2126e0fa60db_buggy.java
++++ b/tmp/3497118b-574b-483a-8632-fa21830d1602_fixed.java
+@@ -1,7 +1,32 @@
+ static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+         return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+     } else {
++        switch (n.getToken()) {
++            case STRING:
++                return true;
++            case NAME:
++                // If the name is a known string constant, return true
++                return n.getString().length() > 0;
++            case ADD:
++                // If any child of an addition operation might be a string, return true
++                for (Node child = n.getFirstChild(); child != null; child = child.getNext()) {
++                    if (mayBeString(child, true)) {
++                        return true;
++                    }
++                }
++                return false;
++            case OR:
++            case HOOK:
++                // For OR and ternary operations, check if any branch might be a string
++                for (Node child = n.getFirstChild(); child != null; child = child.getNext()) {
++                    if (mayBeString(child, true)) {
++                        return true;
++                    }
++                }
++                return false;
++            default:
+                 return mayBeStringHelper(n);
+         }
+     }
++}
+\ No newline at end of file

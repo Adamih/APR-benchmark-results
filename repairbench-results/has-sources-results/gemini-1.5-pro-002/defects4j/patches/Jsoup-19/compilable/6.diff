@@ -1,0 +1,29 @@
+diff --git a/tmp/eba6839d-723d-4352-8880-83d75e260949_buggy.java b/tmp/10cdc05a-160a-4952-9e30-71aaa479935d_fixed.java
+index 4aff4e4..06d42fb 100644
+--- a/tmp/eba6839d-723d-4352-8880-83d75e260949_buggy.java
++++ b/tmp/10cdc05a-160a-4952-9e30-71aaa479935d_fixed.java
+@@ -1,15 +1,21 @@
+     private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+         // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+         // rels without a baseuri get removed
+-        String value = el.absUrl(attr.getKey());
+-        if (!preserveRelativeLinks)
+-            attr.setValue(value);
++        String value = attr.getValue();
++        if (preserveRelativeLinks) {
++            value = el.absUrl(attr.getKey());
++        } else {
++            attr.setValue(value = el.absUrl(attr.getKey()));
++        }
++
++        if (value.length() == 0) // provides a nice output for when absUrl fails, and prevents possible NPE in startsWith check via protocol validation
++            return false;
+         
+         for (Protocol protocol : protocols) {
+             String prot = protocol.toString() + ":";
+             if (value.toLowerCase().startsWith(prot)) {
+                 return true;
+             }
+         }
+         return false;
+     }

@@ -1,0 +1,32 @@
+diff --git a/tmp/7cdc9ab9-d90a-47e9-9f89-54d50c8b50f7_buggy.java b/tmp/cb75e466-c12b-4619-966a-ef675ca1c184_fixed.java
+index 072c672..0a20ceb 100644
+--- a/tmp/7cdc9ab9-d90a-47e9-9f89-54d50c8b50f7_buggy.java
++++ b/tmp/cb75e466-c12b-4619-966a-ef675ca1c184_fixed.java
+@@ -1,20 +1,18 @@
+ @Override
+ public int parseArguments(Parameters params) throws CmdLineException {
+   String param = params.getParameter(0);
+ 
+-        if (param == null) {
++  if (param == null || "-version".equalsIgnoreCase(param) || "--version".equalsIgnoreCase(param)) {
++    System.out.println("Closure Compiler (http://code.google.com/closure/compiler)\n" +
++              "Version: " + VERSION);
++    System.exit(0);
++  } else if (TRUES.contains(param.toLowerCase())) {
+     setter.addValue(true);
+-          return 0;
+-        } else {
+-          String lowerParam = param.toLowerCase();
+-          if (TRUES.contains(lowerParam)) {
+-            setter.addValue(true);
+-          } else if (FALSES.contains(lowerParam)) {
++  } else if (FALSES.contains(param.toLowerCase())) {
+     setter.addValue(false);
+   } else {
+     setter.addValue(true);
+     return 0;
+   }
+   return 1;
+ }
+\ No newline at end of file
+-      }

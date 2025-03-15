@@ -1,0 +1,17 @@
+diff --git a/tmp/c80b33b2-1305-4e36-8b28-aad7238219b5_buggy.java b/tmp/d2a0a745-479e-4558-a9a0-52b499ddf131_fixed.java
+index 593602f..94a0b60 100644
+--- a/tmp/c80b33b2-1305-4e36-8b28-aad7238219b5_buggy.java
++++ b/tmp/d2a0a745-479e-4558-a9a0-52b499ddf131_fixed.java
+@@ -1,6 +1,10 @@
+ @Override
+ public String toString() {
++    if (rangesList.size() == 1) {
++        return RangesList.formatRanges(rangesList.get(0));
++    } else {
+         return rangesList.stream()
+             .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++            .collect(Collectors.joining(" and "));
++    }
+ }
+\ No newline at end of file

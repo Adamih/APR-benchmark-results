@@ -1,0 +1,26 @@
+diff --git a/tmp/c8a84fdb-58b2-46e5-9c01-4994620954fd_buggy.java b/tmp/7023b4bd-ee6b-4dca-8254-5842cedb92ec_fixed.java
+index ef76662..6b8c731 100644
+--- a/tmp/c8a84fdb-58b2-46e5-9c01-4994620954fd_buggy.java
++++ b/tmp/7023b4bd-ee6b-4dca-8254-5842cedb92ec_fixed.java
+@@ -1,17 +1,20 @@
+         void read(Tokeniser t, CharacterReader r) {
+             char c = r.consume();
+             switch (c) {
+                 case '>':
+-                    t.tagPending.selfClosing = true;
++                    t.tagPending.selfClosing = false;
+                     t.emitTagPending();
+                     t.transition(Data);
+                     break;
++                case '/':
++                    t.tagPending.selfClosing = true;
++                    break;
+                 case eof:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+                 default:
+                     t.error(this);
+                     t.transition(BeforeAttributeName);
+             }
+         }

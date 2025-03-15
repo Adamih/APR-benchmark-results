@@ -1,0 +1,46 @@
+diff --git a/tmp/3f657ca8-0c1c-4d83-94be-1d78723aa131_buggy.java b/tmp/00e72fc9-ddd4-416b-bc3c-22435ab94d8b_fixed.java
+index de9af32..e624a48 100644
+--- a/tmp/3f657ca8-0c1c-4d83-94be-1d78723aa131_buggy.java
++++ b/tmp/00e72fc9-ddd4-416b-bc3c-22435ab94d8b_fixed.java
+@@ -1,18 +1,31 @@
+-  /**
+-   * @see #findCalledFunctions(Node)
+-   */
+-  private void findCalledFunctions(
+-      Node node, Set<String> changed) {
++private void findCalledFunctions(Node node, Set<String> changed) {
+     Preconditions.checkArgument(changed != null);
+-    // For each referenced function, add a new reference
++    
++    // Check if the node is a call node
+     if (node.getType() == Token.CALL) {
+-      Node child = node.getFirstChild();
+-      if (child.getType() == Token.NAME) {
+-        changed.add(child.getString());
++        Node callee = node.getFirstChild();
++        // If the callee is a NAME node, add its string value to changed
++        if (callee.getType() == Token.NAME) {
++            changed.add(callee.getString());
++        }
++        // If the callee is a GETPROP node, add the property name to changed
++        else if (callee.getType() == Token.GETPROP) {
++            Node prop = callee.getLastChild();
++            if (prop.getType() == Token.STRING) {
++                changed.add(prop.getString());
++            }
++        }
++        // If the callee is a MEMBEROPTCHAIN node, handle it similarly to GETPROP
++        else if (callee.getType() == Token.MEMBEROPTCHAIN) {
++            Node prop = callee.getLastChild();
++            if (prop.getType() == Token.STRING) {
++                changed.add(prop.getString());
++            }
+         }
+     }
+     
++    // Recurse into children
+     for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+         findCalledFunctions(c, changed);
+     }
+ }
+\ No newline at end of file

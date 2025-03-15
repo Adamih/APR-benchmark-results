@@ -1,0 +1,15 @@
+diff --git a/tmp/0605a852-836a-4d67-9c18-15e3b7b2f2e0_buggy.java b/tmp/ccba67bb-7b11-4df1-94cf-31cb527113e9_fixed.java
+index 22640dd..8cb6979 100644
+--- a/tmp/0605a852-836a-4d67-9c18-15e3b7b2f2e0_buggy.java
++++ b/tmp/ccba67bb-7b11-4df1-94cf-31cb527113e9_fixed.java
+@@ -1,3 +1,9 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++    // Check if the node is within a try-catch block
++    for (Node parent = cfgNode.getParent(); parent != null; parent = parent.getParent()) {
++        if (parent.isTry()) {
++            return true;
++        }
++    }
+     return false;
+ }
+\ No newline at end of file

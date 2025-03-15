@@ -1,0 +1,23 @@
+diff --git a/tmp/5204553a-7540-4f39-ae88-bb80d1291ba7_buggy.java b/tmp/9e786830-a628-4a7c-9d02-2d0e22dea7ec_fixed.java
+index 1bec4d6..3642867 100644
+--- a/tmp/5204553a-7540-4f39-ae88-bb80d1291ba7_buggy.java
++++ b/tmp/9e786830-a628-4a7c-9d02-2d0e22dea7ec_fixed.java
+@@ -1,14 +1,17 @@
+ private JavaType _mapType(Class<?> rawClass)
+ {
+     // 28-May-2015, tatu: Properties are special, as per [databind#810]
++    if (rawClass == Properties.class) {
++        return MapType.construct(rawClass, StringType.INSTANCE, StringType.INSTANCE);
++    }
+     JavaType[] typeParams = findTypeParameters(rawClass, Map.class);
+     // ok to have no types ("raw")
+     if (typeParams == null) {
+         return MapType.construct(rawClass, _unknownType(), _unknownType());
+     }
+     // but exactly 2 types if any found
+     if (typeParams.length != 2) {
+         throw new IllegalArgumentException("Strange Map type "+rawClass.getName()+": can not determine type parameters");
+     }
+     return MapType.construct(rawClass, typeParams[0], typeParams[1]);
+ }
+\ No newline at end of file

@@ -1,0 +1,45 @@
+diff --git a/tmp/d1bdd709-b66a-4c01-8b4f-006936daef8d_buggy.java b/tmp/ac1ba6cd-1c5c-491b-a0c8-56e401d89331_fixed.java
+index b2d53db..62f2544 100644
+--- a/tmp/d1bdd709-b66a-4c01-8b4f-006936daef8d_buggy.java
++++ b/tmp/ac1ba6cd-1c5c-491b-a0c8-56e401d89331_fixed.java
+@@ -1,34 +1,39 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+         t.dataBuffer.append(name);
+         r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
+             default:
++                if (c == '<' && r.matchesLetterSequence("!--")) {
++                    r.advance(3); // Skip the "!--" sequence
++                    t.transition(ScriptDataEscapedDashDash);
++                } else {
+                     t.dataBuffer.append(c);
+                     anythingElse(t, r);
++                }
+                 break;
+         }
+     } else {
+         anythingElse(t, r);
+     }
+ }
+\ No newline at end of file

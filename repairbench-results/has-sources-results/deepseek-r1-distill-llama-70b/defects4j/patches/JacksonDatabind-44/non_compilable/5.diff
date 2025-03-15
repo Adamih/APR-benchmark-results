@@ -1,0 +1,42 @@
+diff --git a/tmp/62351dcf-3a36-4529-8b58-94b01f6e531d_buggy.java b/tmp/4d403526-9d3b-4d7a-9f0f-1eff55672f3b_fixed.java
+index 1a63a66..76db4df 100644
+--- a/tmp/62351dcf-3a36-4529-8b58-94b01f6e531d_buggy.java
++++ b/tmp/4d403526-9d3b-4d7a-9f0f-1eff55672f3b_fixed.java
+@@ -1,21 +1,21 @@
+ @Override
+ @Deprecated
+-    protected JavaType _narrow(Class<?> subclass)
+-    {
++protected JavaType _narrow(Class<?> subclass) {
+     if (_class == subclass) {
+         return this;
+     }
+-        // Should we check that there is a sub-class relationship?
+-        // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+-        //    placeholder values (`Void`, `NoClass`), so can not quite do yet.
+-        // TODO: fix in 2.8
+-            /*
+-            throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+-                    +_class.getName());
+-                    */
+-            return new SimpleType(subclass, _bindings, this, _superInterfaces,
+-                    _valueHandler, _typeHandler, _asStatic);
+-        // Otherwise, stitch together the hierarchy. First, super-class
+-        // if not found, try a super-interface
+-        // should not get here but...
++    if (subclass != null && (_class.isAssignableFrom(subclass) || _hasInterface(subclass, _superInterfaces))) {
++        return new SimpleType(subclass, _bindings, this, _superInterfaces, _valueHandler, _typeHandler, _asStatic);
++    }
++    throw new IllegalArgumentException("Class " + subclass.getName() + " not subtype of " + _class.getName());
++}
++
++private boolean _hasInterface(Class<?> cls, List<JavaType> interfaces) {
++    if (cls == null) return false;
++    for (JavaType type : interfaces) {
++        if (type.getRawClass().isAssignableFrom(cls)) {
++            return true;
++        }
++    }
++    return false;
+ }
+\ No newline at end of file

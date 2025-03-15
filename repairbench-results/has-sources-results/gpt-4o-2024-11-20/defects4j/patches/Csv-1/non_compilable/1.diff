@@ -1,0 +1,23 @@
+diff --git a/tmp/40330e5f-7d8a-491d-ac7c-f0c493865c6b_buggy.java b/tmp/8820ea07-1afe-41dc-8961-2228a3c05b6d_fixed.java
+index 3ba614a..e88272f 100644
+--- a/tmp/40330e5f-7d8a-491d-ac7c-f0c493865c6b_buggy.java
++++ b/tmp/8820ea07-1afe-41dc-8961-2228a3c05b6d_fixed.java
+@@ -1,9 +1,16 @@
+ @Override
+ public int read() throws IOException {
+     int current = super.read();
+-        if (current == '\n') {
++    if (current == '\n' || current == '\r') {
+         lineCounter++;
++        // Handle cases where CR ('\r') is followed by LF ('\n') to avoid double-counting
++        if (current == '\r' && super.read() == '\n') {
++            // Do nothing, as the lineCounter should only increment once for CRLF sequences
++        } else {
++            // Rewind the stream by one character if it's not a part of CRLF
++            super.unread(current);
++        }
+     }
+     lastChar = current;
+     return lastChar;
+ }
+\ No newline at end of file

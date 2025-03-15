@@ -1,0 +1,22 @@
+diff --git a/tmp/6b7531e7-e116-4b1d-a651-71e3c5bd8cc6_buggy.java b/tmp/73c13d49-6dc3-4b57-9300-5966c0215f27_fixed.java
+index ae6c2b1..68031af 100644
+--- a/tmp/6b7531e7-e116-4b1d-a651-71e3c5bd8cc6_buggy.java
++++ b/tmp/73c13d49-6dc3-4b57-9300-5966c0215f27_fixed.java
+@@ -1,10 +1,16 @@
+ public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+     String str = text.substring(position);
+     for (String id : ALL_IDS) {
+         if (str.startsWith(id)) {
+             bucket.setZone(DateTimeZone.forID(id));
+             return position + id.length();
+         }
++        // Check for IDs with underscores replaced by spaces
++        String idWithSpace = id.replace('_', ' ');
++        if (str.startsWith(idWithSpace)) {
++            bucket.setZone(DateTimeZone.forID(id));
++            return position + idWithSpace.length();
++        }
+     }
+     return ~position;
+ }
+\ No newline at end of file

@@ -1,0 +1,26 @@
+diff --git a/tmp/41eee415-336f-4381-bf2a-21d6e302d672_buggy.java b/tmp/f04c33f7-1214-456f-ae97-06ad9a44444e_fixed.java
+index e5ad041..f79a5df 100644
+--- a/tmp/41eee415-336f-4381-bf2a-21d6e302d672_buggy.java
++++ b/tmp/f04c33f7-1214-456f-ae97-06ad9a44444e_fixed.java
+@@ -1,19 +1,19 @@
+     @Override
+     protected JavaType _narrow(Class<?> subclass)
+     {
+         if (_class == subclass) {
+             return this;
+         }
+         // Should we check that there is a sub-class relationship?
+         // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+         //    placeholder values, so no.
+         /*
+         if (!_class.isAssignableFrom(subclass)) {
+             throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+                     +_class.getName());
+         }
+         */
+         // 15-Jan-2015, tatu: Not correct; should really re-resolve...
+-        return new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
+-                _valueHandler, _typeHandler, _asStatic);
++        return new SimpleType(subclass, _bindings, _typeFactory._fromClass(_superClass, _bindings),
++               _superInterfaces, _valueHandler, _typeHandler, _asStatic);
+     }

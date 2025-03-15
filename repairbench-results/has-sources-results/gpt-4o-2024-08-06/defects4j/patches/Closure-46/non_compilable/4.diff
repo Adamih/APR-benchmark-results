@@ -1,0 +1,41 @@
+diff --git a/tmp/c0ffdbd5-cadc-48fc-9f81-483a3dce6ce1_buggy.java b/tmp/31c4d847-5552-4431-96ed-927d216a502a_fixed.java
+index 46817a7..7b57e0d 100644
+--- a/tmp/c0ffdbd5-cadc-48fc-9f81-483a3dce6ce1_buggy.java
++++ b/tmp/31c4d847-5552-4431-96ed-927d216a502a_fixed.java
+@@ -1,16 +1,30 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
++    RecordType thatRecordType = that.toMaybeRecordType();
++    
++    // Add properties from this type
+     for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++        JSType thisPropertyType = getPropertyType(property);
++        if (thatRecordType.hasProperty(property)) {
++            JSType thatPropertyType = thatRecordType.getPropertyType(property);
++            // Use the least supertype of the properties
++            builder.addProperty(property, thisPropertyType.getLeastSupertype(thatPropertyType), getPropertyNode(property));
++        } else {
++            // Add property exclusive to this type
++            builder.addProperty(property, thisPropertyType, getPropertyNode(property));
+         }
+     }
++    
++    // Add properties that are exclusive to the other type
++    for (String property : thatRecordType.getProperties()) {
++        if (!properties.containsKey(property)) {
++            builder.addProperty(property, thatRecordType.getPropertyType(property), thatRecordType.getPropertyNode(property));
++        }
++    }
++    
+     return builder.build();
+ }
+\ No newline at end of file

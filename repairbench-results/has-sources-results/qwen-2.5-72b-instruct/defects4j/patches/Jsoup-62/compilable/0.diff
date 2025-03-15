@@ -1,0 +1,30 @@
+diff --git a/tmp/5ae07e37-3cff-4e49-8cf6-2921bf07a641_buggy.java b/tmp/8ebdfeae-d8ae-4a3f-9134-b38adf9db21c_fixed.java
+index 7dc89ed..88734ba 100644
+--- a/tmp/5ae07e37-3cff-4e49-8cf6-2921bf07a641_buggy.java
++++ b/tmp/8ebdfeae-d8ae-4a3f-9134-b38adf9db21c_fixed.java
+@@ -1,20 +1,24 @@
+         boolean anyOtherEndTag(Token t, HtmlTreeBuilder tb) {
+             String name = t.asEndTag().normalName();
+             ArrayList<Element> stack = tb.getStack();
+             for (int pos = stack.size() -1; pos >= 0; pos--) {
+                 Element node = stack.get(pos);
+                 if (node.nodeName().equals(name)) {
+                     tb.generateImpliedEndTags(name);
+                     if (!name.equals(tb.currentElement().nodeName()))
+                         tb.error(this);
+                     tb.popStackToClose(name);
+                     break;
+                 } else {
+                     if (tb.isSpecial(node)) {
+                         tb.error(this);
+                         return false;
+                     }
+                 }
+             }
++            // Ensure that the current element is not a special element that should be closed before the target element
++            while (tb.isSpecial(tb.currentElement()) && !tb.currentElement().nodeName().equals(name)) {
++                tb.pop();
++            }
+             return true;
+         }
+\ No newline at end of file

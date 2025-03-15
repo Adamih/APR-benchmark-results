@@ -1,0 +1,19 @@
+diff --git a/tmp/494e630d-b7f6-4541-ac47-ca6c960b01a2_buggy.java b/tmp/e30e8b0f-b067-4e0d-9476-e00ec16d55b6_fixed.java
+index 42d4174..a86e870 100644
+--- a/tmp/494e630d-b7f6-4541-ac47-ca6c960b01a2_buggy.java
++++ b/tmp/e30e8b0f-b067-4e0d-9476-e00ec16d55b6_fixed.java
+@@ -1,7 +1,13 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
++    int startLineno = stream.getLineno();
++    int startCharno = stream.getCharno();
+     String result = stream.getRemainingJSDocLine();
++    int endLineno = stream.getLineno();
++    int endCharno = stream.getCharno();
++
++    jsdocBuilder.markText(startLineno, startCharno, endLineno, endCharno);
+     return result;
+   }
+\ No newline at end of file

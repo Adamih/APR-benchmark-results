@@ -1,0 +1,32 @@
+diff --git a/tmp/8690c2a8-da18-4f98-a813-ead1e409f7cb_buggy.java b/tmp/0c132684-32e9-47c4-a284-6da8efa20962_fixed.java
+index 072c672..5a78a20 100644
+--- a/tmp/8690c2a8-da18-4f98-a813-ead1e409f7cb_buggy.java
++++ b/tmp/0c132684-32e9-47c4-a284-6da8efa20962_fixed.java
+@@ -1,20 +1,22 @@
+ @Override
+ public int parseArguments(Parameters params) throws CmdLineException {
+   String param = params.getParameter(0);
+ 
+-        if (param == null) {
+-          setter.addValue(true);
++  if (param == null || param.equalsIgnoreCase("--version")) {
++    // Handle version flag here, e.g., print version info and return
++    System.out.println("Closure Compiler (http://code.google.com/closure/compiler)\n" +
++            "Version: " + VERSION);
+     return 0;
+   } else {
+     String lowerParam = param.toLowerCase();
+     if (TRUES.contains(lowerParam)) {
+       setter.addValue(true);
+     } else if (FALSES.contains(lowerParam)) {
+       setter.addValue(false);
+     } else {
+       setter.addValue(true);
+-            return 0;
++      return 1; // Return 1 if the parameter is not a true/false value and not --version
+     }
+-          return 1;
++    return 2; // Return 2 for a valid non-version parameter
+   }
+ }
+\ No newline at end of file

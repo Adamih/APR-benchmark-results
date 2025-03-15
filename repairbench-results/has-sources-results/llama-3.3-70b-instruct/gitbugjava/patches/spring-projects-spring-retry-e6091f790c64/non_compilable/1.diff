@@ -1,0 +1,90 @@
+diff --git a/tmp/a5af9291-2d1c-45b8-8a59-7c94ceadbc40_buggy.java b/tmp/e270d997-b9db-4250-976c-4d55cd8b7791_fixed.java
+index b8e3fa3..1834334 100644
+--- a/tmp/a5af9291-2d1c-45b8-8a59-7c94ceadbc40_buggy.java
++++ b/tmp/e270d997-b9db-4250-976c-4d55cd8b7791_fixed.java
+@@ -1,65 +1,65 @@
+ /**
+  * Builds the {@link BackOffPolicy} with the given parameters.
+  * @return the {@link BackOffPolicy} instance
+  */
+ public BackOffPolicy build() {
++    if (this.maxDelay!= null && this.delay!= null && this.maxDelay > this.delay && this.multiplier == null && this.multiplierSupplier == null) {
++        UniformRandomBackOffPolicy policy = new UniformRandomBackOffPolicy();
++        if (this.delay!= null) {
++            policy.setMinBackOffPeriod(this.delay);
++        }
++        if (this.delaySupplier!= null) {
++            policy.minBackOffPeriodSupplier(this.delaySupplier);
++        }
++        if (this.maxDelay!= null) {
++            policy.setMaxBackOffPeriod(this.maxDelay);
++        }
++        if (this.maxDelaySupplier!= null) {
++            policy.maxBackOffPeriodSupplier(this.maxDelaySupplier);
++        }
++        if (this.sleeper!= null) {
++            policy.setSleeper(this.sleeper);
++        }
++        return policy;
++    }
+     if (this.multiplier!= null && this.multiplier > 0 || this.multiplierSupplier!= null) {
+         ExponentialBackOffPolicy policy;
+         if (Boolean.TRUE.equals(this.random)) {
+             policy = new ExponentialRandomBackOffPolicy();
+         }
+         else {
+             policy = new ExponentialBackOffPolicy();
+         }
+         if (this.delay!= null) {
+             policy.setInitialInterval(this.delay);
+         }
+         if (this.delaySupplier!= null) {
+             policy.initialIntervalSupplier(this.delaySupplier);
+         }
+         if (this.multiplier!= null) {
+             policy.setMultiplier(this.multiplier);
+         }
+         if (this.multiplierSupplier!= null) {
+             policy.multiplierSupplier(this.multiplierSupplier);
+         }
+         if (this.maxDelay!= null && this.delay!= null) {
+             policy.setMaxInterval(
+                     this.maxDelay > this.delay? this.maxDelay : ExponentialBackOffPolicy.DEFAULT_MAX_INTERVAL);
+         }
+         if (this.maxDelaySupplier!= null) {
+             policy.maxIntervalSupplier(this.maxDelaySupplier);
+         }
+         if (this.sleeper!= null) {
+             policy.setSleeper(this.sleeper);
+         }
+         return policy;
+     }
+-		if (this.maxDelay != null && this.delay != null && this.maxDelay > this.delay) {
+-			UniformRandomBackOffPolicy policy = new UniformRandomBackOffPolicy();
+-			if (this.delay != null) {
+-				policy.setMinBackOffPeriod(this.delay);
+-			}
+-			if (this.delaySupplier != null) {
+-				policy.minBackOffPeriodSupplier(this.delaySupplier);
+-			}
+-			if (this.maxDelay != null) {
+-				policy.setMaxBackOffPeriod(this.maxDelay);
+-			}
+-			if (this.maxDelaySupplier != null) {
+-				policy.maxBackOffPeriodSupplier(this.maxDelaySupplier);
+-			}
+-			if (this.sleeper != null) {
+-				policy.setSleeper(this.sleeper);
+-			}
+-			return policy;
+-		}
+     FixedBackOffPolicy policy = new FixedBackOffPolicy();
+     if (this.delay!= null) {
+         policy.setBackOffPeriod(this.delay);
+     }
+     if (this.sleeper!= null) {
+         policy.setSleeper(this.sleeper);
+     }
+     return policy;
+ }
+\ No newline at end of file

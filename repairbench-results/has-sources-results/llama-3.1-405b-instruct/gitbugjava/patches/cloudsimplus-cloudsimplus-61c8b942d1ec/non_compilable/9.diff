@@ -1,0 +1,25 @@
+diff --git a/tmp/fc293895-9d34-462b-9efb-deb721b1a2eb_buggy.java b/tmp/54f665e9-c433-4e5f-b150-00bc2b58bff9_fixed.java
+index a2af134..347f5a4 100644
+--- a/tmp/fc293895-9d34-462b-9efb-deb721b1a2eb_buggy.java
++++ b/tmp/54f665e9-c433-4e5f-b150-00bc2b58bff9_fixed.java
+@@ -1,3 +1,19 @@
+ public HostAbstract(final List<Pe> peList, final boolean activate) {
+-        this(defaultBwCapacity, defaultStorageCapacity, new HarddriveStorage(defaultRamCapacity), peList, activate);
++    long defaultStorageCapacity = DEFAULT_STORAGE;
++    long defaultRamCapacity = DEFAULT_RAM;
++    long defaultBwCapacity = DEFAULT_BANDWIDTH;
++
++    Storage hdStorage = new HarddriveStorage(defaultRamCapacity, defaultStorageCapacity);
++    
++    setStorage(hdStorage);
++
++    // Confirm activation directly
++    if (activate) {
++        setActive();
+     }
++
++    // peList and setting the CPUs
++    CPUs cpuCores = setCpuParams(peList, null); // assuming helper method `setCpuParams`
++    setPCpuProvisioner(cpucParams);
++}
++// However that is incorrect method lets start again from new one based on initial conditions 

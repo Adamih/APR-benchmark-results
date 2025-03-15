@@ -1,0 +1,41 @@
+diff --git a/tmp/38bd9486-c281-4ffa-a043-94d241ab8e9f_buggy.java b/tmp/5d829127-db27-4a29-8f06-aa04476e729b_fixed.java
+index 19fe1b4..59f9ad5 100644
+--- a/tmp/38bd9486-c281-4ffa-a043-94d241ab8e9f_buggy.java
++++ b/tmp/5d829127-db27-4a29-8f06-aa04476e729b_fixed.java
+@@ -1,17 +1,31 @@
+ public static boolean isJSIdentifier(String s) {
+     int length = s.length();
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++    if (length == 0) {
++        return false;
++    }
++
++    char firstChar = s.charAt(0);
++    if (!isJSIdentifierStart(firstChar)) {
+         return false;
+     }
+ 
+     for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++        if (!isJSIdentifierPart(s.charAt(i))) {
+             return false;
+         }
+     }
+ 
+     return true;
+ }
++
++private static boolean isJSIdentifierStart(char c) {
++    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '$' || c == '_' ||
++           (c >= '\u0080' && Character.isUnicodeIdentifierStart(c));
++}
++
++private static boolean isJSIdentifierPart(char c) {
++    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') ||
++           c == '$' || c == '_' || c == '\u200C' || c == '\u200D' ||
++           (c >= '\u0080' && Character.isUnicodeIdentifierPart(c));
++}
+\ No newline at end of file

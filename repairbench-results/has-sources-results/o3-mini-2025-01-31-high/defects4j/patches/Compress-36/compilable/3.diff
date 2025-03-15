@@ -1,0 +1,25 @@
+diff --git a/tmp/7c95d86e-391e-4be7-9daa-24c5b77b9737_buggy.java b/tmp/92c0c47b-7b55-4a48-a35d-a6fadbdee6b0_fixed.java
+index d357c7e..29ace86 100644
+--- a/tmp/7c95d86e-391e-4be7-9daa-24c5b77b9737_buggy.java
++++ b/tmp/92c0c47b-7b55-4a48-a35d-a6fadbdee6b0_fixed.java
+@@ -1,16 +1,17 @@
+ private InputStream getCurrentStream() throws IOException {
+     if (deferredBlockStreams.isEmpty()) {
+-            throw new IllegalStateException("No current 7z entry (call getNextEntry() first).");
++        // For entries that have no content (size 0), return an empty stream.
++        return new ByteArrayInputStream(new byte[0]);
+     }
+     
+     while (deferredBlockStreams.size() > 1) {
+-            // In solid compression mode we need to decompress all leading folder'
++        // In solid compression mode we need to decompress all leading folder
+         // streams to get access to an entry. We defer this until really needed
+         // so that entire blocks can be skipped without wasting time for decompression.
+         final InputStream stream = deferredBlockStreams.remove(0);
+         IOUtils.skip(stream, Long.MAX_VALUE);
+         stream.close();
+     }
+     
+     return deferredBlockStreams.get(0);
+ }
+\ No newline at end of file

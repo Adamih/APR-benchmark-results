@@ -1,0 +1,22 @@
+diff --git a/tmp/a3f2c73f-8118-4c3a-8566-702c7b8974e4_buggy.java b/tmp/ec957ff9-3307-415f-bb76-d8acc31b9c0d_fixed.java
+index dc93be3..24965af 100644
+--- a/tmp/a3f2c73f-8118-4c3a-8566-702c7b8974e4_buggy.java
++++ b/tmp/ec957ff9-3307-415f-bb76-d8acc31b9c0d_fixed.java
+@@ -1,14 +1,16 @@
+ Element insert(Token.StartTag startTag) {
+     // handle empty unknown tags
+     // when the spec expects an empty tag, will directly hit insertEmpty, so won't generate this fake end tag.
+     if (startTag.isSelfClosing()) {
+         Element el = insertEmpty(startTag);
+         stack.add(el);
++        if (!el.isBlock()) {
+             tokeniser.emit(new Token.EndTag(el.tagName()));  // ensure we get out of whatever state we are in. emitted for yielded processing
++        }
+         return el;
+     }
+     
+     Element el = new Element(Tag.valueOf(startTag.name()), baseUri, startTag.attributes);
+     insert(el);
+     return el;
+ }
+\ No newline at end of file

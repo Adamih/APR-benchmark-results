@@ -1,0 +1,42 @@
+diff --git a/tmp/58da77be-f1bd-4fd0-bdc0-2adb5c1478fb_buggy.java b/tmp/d61e2f18-61fb-4c75-ad36-71f98d6ffb8e_fixed.java
+index c9c2b44..5185f7d 100644
+--- a/tmp/58da77be-f1bd-4fd0-bdc0-2adb5c1478fb_buggy.java
++++ b/tmp/d61e2f18-61fb-4c75-ad36-71f98d6ffb8e_fixed.java
+@@ -1,13 +1,34 @@
+ @Override
+ public boolean matches(Element root, Element element) {
++    // Ensure that 'element' is a descendant of 'root'
++    if (!isDescendantOf(root, element)) {
++        return false;
++    }
++
+     // evaluate from last to first
+     for (int i = evaluators.size() -1; i >= 0; --i) {
+-                if (element == null)
++        if (element == null) {
+             return false;
++        }
+         Evaluator eval = evaluators.get(i);
+-                if (!eval.matches(root, element))
++        if (!eval.matches(root, element)) {
+             return false;
++        }
+         element = element.parent();
++        // Ensure that 'element' remains within the 'root' context
++        if (element != null && !isDescendantOf(root, element)) {
++            return false;
+         }
++    }
++    return true;
++}
++
++private boolean isDescendantOf(Element ancestor, Element descendant) {
++    while (descendant != null) {
++        if (descendant.equals(ancestor)) {
+             return true;
+         }
++        descendant = descendant.parent();
++    }
++    return false;
++}
+\ No newline at end of file

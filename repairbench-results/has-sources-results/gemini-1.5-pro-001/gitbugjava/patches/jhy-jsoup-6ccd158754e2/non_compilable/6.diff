@@ -1,0 +1,20 @@
+diff --git a/tmp/37b1d321-9b9a-425f-ae5c-af28c1987f25_buggy.java b/tmp/12dca83a-ad54-4e94-a9b3-14b762cb912c_fixed.java
+index 23f078d..b1a4ce9 100644
+--- a/tmp/37b1d321-9b9a-425f-ae5c-af28c1987f25_buggy.java
++++ b/tmp/12dca83a-ad54-4e94-a9b3-14b762cb912c_fixed.java
+@@ -1,14 +1,14 @@
+     private static void appendToAscii(String s, boolean spaceAsPlus, StringBuilder sb) throws UnsupportedEncodingException {
+         // minimal normalization of Unicode -> Ascii, and space normal. Existing escapes are left as-is.
+         for (int i = 0; i < s.length(); i++) {
+             int c = s.codePointAt(i);
+             if (c == ' ') {
+                 sb.append(spaceAsPlus ? '+' : "%20");
+             } else if (c > 127) { // out of ascii range
+-                sb.append(URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name()));
++                sb.append(URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name()).replace("+", "%20"));
+                 // ^^ is a bit heavy-handed - if perf critical, we could optimize
+             } else {
+                 sb.append((char) c);
+             }
+         }
+     }

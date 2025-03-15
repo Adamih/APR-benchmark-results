@@ -1,0 +1,41 @@
+diff --git a/tmp/86f6c98a-5105-4816-8e0d-193598368d85_buggy.java b/tmp/bafe0b1a-ece6-4fbc-853e-df69d157e2b6_fixed.java
+index 4b7f469..2f35e37 100644
+--- a/tmp/86f6c98a-5105-4816-8e0d-193598368d85_buggy.java
++++ b/tmp/bafe0b1a-ece6-4fbc-853e-df69d157e2b6_fixed.java
+@@ -1,10 +1,32 @@
+ static boolean isSimpleNumber(String s) {
+-    int len = s.length();
+-    for (int index = 0; index < len; index++) {
++  // Check for numeric literals (decimal, octal, hexadecimal)
++  if (s.length() > 2 && s.substring(0, 2).equals("0x")) { // hexadecimal
++    for (int index = 2; index < s.length(); index++) {
++      char c = s.charAt(index);
++      if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
++        return false;
++      }
++    }
++    return true;
++  } else if (s.length() > 1 && s.charAt(0) == '0' && s.charAt(1)!= '.') { // octal
++    for (int index = 1; index < s.length(); index++) {
++      char c = s.charAt(index);
++      if (c < '0' || c > '7') {
++        return false;
++      }
++    }
++    return true;
++  } else { // decimal (also matches decimal part of float literals starting with '0.')
++    int index = 0;
++    if (s.charAt(0) == '0' && s.length() > 1 && s.charAt(1) == '.') {
++      index = 2; // skip "0." for float literals
++    }
++    for (; index < s.length(); index++) {
+       char c = s.charAt(index);
+       if (c < '0' || c > '9') {
+         return false;
+       }
+     }
+-    return len > 0;
++    return s.length() > (index == 2? 1 : 0); // ensure at least one digit
++  }
+ }
+\ No newline at end of file

@@ -1,0 +1,29 @@
+diff --git a/tmp/c73765be-2572-4d2c-a63a-69c2299c5473_buggy.java b/tmp/55513d0c-f3dd-498f-96f5-675dc2c81341_fixed.java
+index 46817a7..990fc32 100644
+--- a/tmp/c73765be-2572-4d2c-a63a-69c2299c5473_buggy.java
++++ b/tmp/55513d0c-f3dd-498f-96f5-675dc2c81341_fixed.java
+@@ -1,16 +1,18 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+     for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++        if (that.toMaybeRecordType().hasProperty(property)) {
++            builder.addProperty(property, getPropertyType(property), getPropertyNode(property));
++        }
++    }
++    for (String property : that.toMaybeRecordType().getProperties().keySet()) {
++        if (!properties.containsKey(property)) {
++            builder.addProperty(property, that.toMaybeRecordType().getPropertyType(property), that.toMaybeRecordType().getPropertyNode(property));
+         }
+     }
+     return builder.build();
+ }
+\ No newline at end of file

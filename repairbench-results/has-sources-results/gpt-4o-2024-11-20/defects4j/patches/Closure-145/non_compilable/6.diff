@@ -1,0 +1,29 @@
+diff --git a/tmp/c829cefc-c7bc-46f7-a852-6661b3632b69_buggy.java b/tmp/342a5065-f580-462f-9aea-17f804c4c5cf_fixed.java
+index 57f69c5..074bc35 100644
+--- a/tmp/c829cefc-c7bc-46f7-a852-6661b3632b69_buggy.java
++++ b/tmp/342a5065-f580-462f-9aea-17f804c4c5cf_fixed.java
+@@ -1,12 +1,15 @@
+   /**
+-   * @return Whether the Node is a DO or FUNCTION (with or without
+-   * labels).
++   * @return Whether the Node is a FUNCTION or DO that needs special handling
++   * when within a label or control structure.
+    */
+   private boolean isOneExactlyFunctionOrDo(Node n) {
+-        // For labels with block children, we need to ensure that a
+-        // labeled FUNCTION or DO isn't generated when extraneous BLOCKs 
+-        // are skipped. 
+-          // Either a empty statement or an block with more than one child,
+-          // way it isn't a FUNCTION or DO.
+-      return (n.getType() == Token.FUNCTION || n.getType() == Token.DO);
++        // Ensure that the node is either a FUNCTION or DO and is not
++        // wrapped in extraneous blocks which can lead to invalid syntax
++        // when skipping those blocks in certain contexts.
++        if (n.getType() == Token.FUNCTION || n.getType() == Token.DO) {
++            return !(n.getParent() != null && n.getParent().isLabel()
++                     && n.getParent().getParent() != null
++                     && n.getParent().getParent().isBlock());
++        }
++        return false;
+   }
+\ No newline at end of file

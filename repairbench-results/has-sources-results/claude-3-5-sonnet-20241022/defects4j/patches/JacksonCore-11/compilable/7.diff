@@ -1,0 +1,25 @@
+diff --git a/tmp/aa950cfd-421d-400a-bffc-30aad7b8f535_buggy.java b/tmp/4e5b26f5-6637-412d-936e-8e048faf9ed2_fixed.java
+index 29d025a..d71e8de 100644
+--- a/tmp/aa950cfd-421d-400a-bffc-30aad7b8f535_buggy.java
++++ b/tmp/4e5b26f5-6637-412d-936e-8e048faf9ed2_fixed.java
+@@ -1,13 +1,16 @@
+     private void _verifySharing()
+     {
+         if (_hashShared) {
+-            _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
++            int len = _hashArea.length;
++            _hashArea = Arrays.copyOf(_hashArea, len);
+             _names = Arrays.copyOf(_names, _names.length);
++            // Since hash area gets copied but its contents still refer to 'parent' table,
++            // need to trigger rehash; but need to do it AFTER unsharing (to avoid writing
++            // to shared area)
+             _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
++            _needRehash = true;
+         }
+         if (_needRehash) {
+             rehash();
+         }
+     }
+\ No newline at end of file

@@ -1,0 +1,54 @@
+diff --git a/tmp/7e5bfaba-e718-4278-aa70-12e0c7defc2f_buggy.java b/tmp/021445fa-8041-4e45-b05f-7daac56b131e_fixed.java
+index b98f0a7..4a557c4 100644
+--- a/tmp/7e5bfaba-e718-4278-aa70-12e0c7defc2f_buggy.java
++++ b/tmp/021445fa-8041-4e45-b05f-7daac56b131e_fixed.java
+@@ -1,29 +1,45 @@
+ private FlowScope traverseNew(Node n, FlowScope scope) {
+-
+   Node constructor = n.getFirstChild();
+   scope = traverse(constructor, scope);
+   JSType constructorType = constructor.getJSType();
+   JSType type = null;
++  FunctionType ct = null;
+   if (constructorType != null) {
+     constructorType = constructorType.restrictByNotNullOrUndefined();
+     if (constructorType.isUnknownType()) {
+       type = getNativeType(UNKNOWN_TYPE);
+     } else {
+-        FunctionType ct = constructorType.toMaybeFunctionType();
++      ct = constructorType.toMaybeFunctionType();
+       if (ct == null && constructorType instanceof FunctionType) {
+         // If constructorType is a NoObjectType, then toMaybeFunctionType will
+         // return null. But NoObjectType implements the FunctionType
+         // interface, precisely because it can validly construct objects.
+         ct = (FunctionType) constructorType;
+       }
+       if (ct != null && ct.isConstructor()) {
+         type = ct.getInstanceType();
+       }
+     }
+   }
+   n.setJSType(type);
+-    for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
++
++  // Propagate formal parameter types backwards into the arguments.
++  Node arg = constructor.getNext();
++  int i = 0;
++  while (arg != null) {
++    JSType expectedType = null;
++    if (ct != null && ct.isConstructor()) {
++      expectedType = ct.getParameterType(i);
++    }
++    if (expectedType != null) {
++      // Traverse the argument with the expected type so that, for instance,
++      // y in "new F(y)" receives F’s parameter type.
++      scope = traverse(arg, scope, expectedType);
++    } else {
+       scope = traverse(arg, scope);
+     }
++    i++;
++    arg = arg.getNext();
++  }
+   return scope;
+ }
+\ No newline at end of file

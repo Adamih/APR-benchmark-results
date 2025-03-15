@@ -1,0 +1,37 @@
+diff --git a/tmp/d8f067f0-0fdb-4c08-9c25-8b347a4469ed_buggy.java b/tmp/3a2ae335-a6f9-4119-81bd-3215105d949c_fixed.java
+index d4e6d48..057cad7 100644
+--- a/tmp/d8f067f0-0fdb-4c08-9c25-8b347a4469ed_buggy.java
++++ b/tmp/3a2ae335-a6f9-4119-81bd-3215105d949c_fixed.java
+@@ -1,23 +1,30 @@
+   private Node tryFoldSimpleFunctionCall(Node n) {
+     Preconditions.checkState(n.isCall());
+     Node callTarget = n.getFirstChild();
+     if (callTarget != null && callTarget.isName() &&
+           callTarget.getString().equals("String")) {
+       // Fold String(a) to '' + (a) on immutable literals,
+       // which allows further optimizations
+       //
+       // We can't do this in the general case, because String(a) has
+       // slightly different semantics than '' + (a). See
+       // http://code.google.com/p/closure-compiler/issues/detail?id=759
++      if (n.getChildCount() == 2) { // Ensure there is exactly one argument
+         Node value = callTarget.getNext();
+-      if (value != null) {
++        if (value != null && isSafeToFold(value)) { 
+           Node addition = IR.add(
+               IR.string("").srcref(callTarget),
+               value.detachFromParent());
+           n.getParent().replaceChild(n, addition);
+           reportCodeChange();
+           return addition;
+         }
+       }
++    }
+     return n;
+   }
++
++  private boolean isSafeToFold(Node value) {
++    // Only fold constants (strings, numbers, boolean literals, etc.)
++    return value.isString() || value.isNumber() || value.isBoolean();
++  }
+\ No newline at end of file

@@ -1,0 +1,26 @@
+diff --git a/tmp/c5111701-9d67-4f19-ac51-daf1594eaec8_buggy.java b/tmp/15a289b9-1c85-42a8-8328-ba6005c1f40a_fixed.java
+index 22640dd..d4066ba 100644
+--- a/tmp/c5111701-9d67-4f19-ac51-daf1594eaec8_buggy.java
++++ b/tmp/15a289b9-1c85-42a8-8328-ba6005c1f40a_fixed.java
+@@ -1,3 +1,20 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++  for (Node ancestor = cfgNode.getParent();
++       ancestor != null;
++       ancestor = ancestor.getParent()) {
++    if (ancestor.isTry()) {
++      // Check if the try node has any catch clauses.
++      for (Node child = ancestor.getFirstChild();
++           child != null;
++           child = child.getNextSibling()) {
++        if (child.isCatch()) {
++          return true;
++        }
++      }
++      // If no catch clauses are found, return false.
++      return false;
++    }
++  }
++  // If no try node is found in ancestors, return false.
+   return false;
+ }
+\ No newline at end of file

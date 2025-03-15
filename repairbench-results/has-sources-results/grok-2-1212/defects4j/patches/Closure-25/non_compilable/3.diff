@@ -1,0 +1,51 @@
+diff --git a/tmp/1dc579ef-69d6-4a67-b875-8f37c63c9795_buggy.java b/tmp/45fbea87-28b2-48b2-89e9-53b8352c331a_fixed.java
+index b98f0a7..74efea9 100644
+--- a/tmp/1dc579ef-69d6-4a67-b875-8f37c63c9795_buggy.java
++++ b/tmp/45fbea87-28b2-48b2-89e9-53b8352c331a_fixed.java
+@@ -1,29 +1,44 @@
+ private FlowScope traverseNew(Node n, FlowScope scope) {
+-
+     Node constructor = n.getFirstChild();
+     scope = traverse(constructor, scope);
+     JSType constructorType = constructor.getJSType();
+     JSType type = null;
+     if (constructorType != null) {
+         constructorType = constructorType.restrictByNotNullOrUndefined();
+         if (constructorType.isUnknownType()) {
+             type = getNativeType(UNKNOWN_TYPE);
+         } else {
+             FunctionType ct = constructorType.toMaybeFunctionType();
+             if (ct == null && constructorType instanceof FunctionType) {
+                 // If constructorType is a NoObjectType, then toMaybeFunctionType will
+                 // return null. But NoObjectType implements the FunctionType
+                 // interface, precisely because it can validly construct objects.
+                 ct = (FunctionType) constructorType;
+             }
+             if (ct != null && ct.isConstructor()) {
+                 type = ct.getInstanceType();
++                
++                // Backward type inference for constructor arguments
++                Node arg = constructor.getNext();
++                for (int i = 0; arg != null && i < ct.getParametersCount(); i++, arg = arg.getNext()) {
++                    JSType paramType = ct.getParameterType(i);
++                    if (paramType != null) {
++                        arg.setJSType(paramType);
++                        scope.inferType(arg, paramType);
++                    }
++                    scope = traverse(arg, scope);
++                }
+             }
+         }
+     }
+     n.setJSType(type);
++    
++    // Process any remaining arguments not covered by the constructor parameters
+     for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
++        if (arg.getJSType() == null) {
+             scope = traverse(arg, scope);
+         }
++    }
++    
+     return scope;
+ }
+\ No newline at end of file

@@ -1,0 +1,30 @@
+diff --git a/tmp/7013f886-d881-4191-9c1a-ecd547592373_buggy.java b/tmp/1ea4256b-ecee-4c98-8c75-ac4707763d98_fixed.java
+index 23f078d..067bc9a 100644
+--- a/tmp/7013f886-d881-4191-9c1a-ecd547592373_buggy.java
++++ b/tmp/1ea4256b-ecee-4c98-8c75-ac4707763d98_fixed.java
+@@ -1,14 +1,22 @@
+ private static void appendToAscii(String s, boolean spaceAsPlus, StringBuilder sb) throws UnsupportedEncodingException {
+     // minimal normalization of Unicode -> Ascii, and space normal. Existing escapes are left as-is.
+     for (int i = 0; i < s.length(); i++) {
+         int c = s.codePointAt(i);
++        if (Character.isBmpCodePoint(c)) {
++            // Handle single code point characters
+             if (c == ' ') {
+                 sb.append(spaceAsPlus ? '+' : "%20");
+             } else if (c > 127) { // out of ascii range
+-                sb.append(URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name()));
+-                // ^^ is a bit heavy-handed - if perf critical, we could optimize
++                sb.append(URLEncoder.encode(Character.toString((char) c), "UTF-8"));
+             } else {
+                 sb.append((char) c);
+             }
++            i += Character.charCount(c) - 1; // Move past any trailing surrogate
++        } else {
++            // Handle supplementary characters (non-BMP)
++            String charString = new String(Character.toChars(c));
++            sb.append(URLEncoder.encode(charString, "UTF-8"));
++            i += Character.charCount(c) - 1; // Move past the surrogate pair
++        }
+     }
+ }
+\ No newline at end of file

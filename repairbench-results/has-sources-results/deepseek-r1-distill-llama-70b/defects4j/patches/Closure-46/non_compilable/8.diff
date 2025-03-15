@@ -1,0 +1,42 @@
+diff --git a/tmp/936ad5cc-771a-467a-9067-4ac487caa6cc_buggy.java b/tmp/f31b31fd-b180-45e0-91e3-ebca04ad1ffb_fixed.java
+index 46817a7..af7f40b 100644
+--- a/tmp/936ad5cc-771a-467a-9067-4ac487caa6cc_buggy.java
++++ b/tmp/f31b31fd-b180-45e0-91e3-ebca04ad1ffb_fixed.java
+@@ -1,16 +1,30 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
++
++    RecordType thisRecord = this.toMaybeRecordType().orElseThrow();
++    RecordType thatRecord = that.toMaybeRecordType().orElseThrow();
++
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++
++    // Add all properties from both records where types are equivalent
++    for (String property : thisRecord.getProperties().keySet()) {
++        JSType thisType = thisRecord.getPropertyType(property);
++        JSType thatType = thatRecord.getPropertyType(property);
++        if (thatType != null && thisType.isEquivalentTo(thatType)) {
++            builder.addProperty(property, thisType, thisRecord.getPropertyNode(property));
+         }
+     }
++
++    // Add properties from 'that' not present in 'this'
++    for (String property : thatRecord.getProperties().keySet()) {
++        if (!thisRecord.hasProperty(property)) {
++            JSType thatType = thatRecord.getPropertyType(property);
++            builder.addProperty(property, thatType, thatRecord.getPropertyNode(property));
++        }
++    }
++
+     return builder.build();
+ }
+\ No newline at end of file

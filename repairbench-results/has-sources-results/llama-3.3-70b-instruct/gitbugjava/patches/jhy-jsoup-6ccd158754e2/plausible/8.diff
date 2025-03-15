@@ -1,0 +1,28 @@
+diff --git a/tmp/56486623-18bf-417c-add5-adc51dea7ac9_buggy.java b/tmp/03f8d8f6-b9b4-4e74-b131-6316213a2120_fixed.java
+index 23f078d..b3cf605 100644
+--- a/tmp/56486623-18bf-417c-add5-adc51dea7ac9_buggy.java
++++ b/tmp/03f8d8f6-b9b4-4e74-b131-6316213a2120_fixed.java
+@@ -1,14 +1,20 @@
+ private static void appendToAscii(String s, boolean spaceAsPlus, StringBuilder sb) throws UnsupportedEncodingException {
+     // minimal normalization of Unicode -> Ascii, and space normal. Existing escapes are left as-is.
+     for (int i = 0; i < s.length(); i++) {
+         int c = s.codePointAt(i);
+         if (c == ' ') {
+             sb.append(spaceAsPlus? '+' : "%20");
+         } else if (c > 127) { // out of ascii range
+-                sb.append(URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name()));
+-                // ^^ is a bit heavy-handed - if perf critical, we could optimize
++            String encodedString = URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name());
++            // Remove the trailing '?' if it exists
++            if (encodedString.endsWith("?")) {
++                encodedString = encodedString.substring(0, encodedString.length() - 1);
++            }
++            sb.append(encodedString);
+         } else {
+             sb.append((char) c);
+         }
++        // Increment by the number of bytes the code point occupies
++        i += Character.charCount(c) - 1;
+     }
+ }
+\ No newline at end of file

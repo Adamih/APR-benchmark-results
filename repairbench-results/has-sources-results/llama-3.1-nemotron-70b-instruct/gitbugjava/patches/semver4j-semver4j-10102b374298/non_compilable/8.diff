@@ -1,0 +1,16 @@
+diff --git a/tmp/a5dfff6f-7aa6-4777-9100-0cb271709e18_buggy.java b/tmp/2ad0baf6-2588-4652-907d-dc0b208035e0_fixed.java
+index 593602f..e725ef6 100644
+--- a/tmp/a5dfff6f-7aa6-4777-9100-0cb271709e18_buggy.java
++++ b/tmp/2ad0baf6-2588-4652-907d-dc0b208035e0_fixed.java
+@@ -1,6 +1,8 @@
+ @Override
+ public String toString() {
+-        return rangesList.stream()
++    String rangesString = rangesList.stream()
+        .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++       .collect(joining(" and "));
++    return rangesString.contains("^") || rangesString.contains("~")? 
++           rangesString : rangesString.replaceAll("^\\(|\\)$", "");
+ }
+\ No newline at end of file

@@ -1,0 +1,28 @@
+diff --git a/tmp/ced08cf5-504c-4dd5-bce6-e2fb17caa3b6_buggy.java b/tmp/c79ac2d9-b7c6-4589-9acd-80d5243a3d1e_fixed.java
+index 42d4174..2b5f0e9 100644
+--- a/tmp/ced08cf5-504c-4dd5-bce6-e2fb17caa3b6_buggy.java
++++ b/tmp/c79ac2d9-b7c6-4589-9acd-80d5243a3d1e_fixed.java
+@@ -1,7 +1,17 @@
+-  /**
+-   * Returns the remainder of the line.
+-   */
+ private String getRemainingJSDocLine() {
+-    String result = stream.getRemainingJSDocLine();
+-    return result;
++  String line = stream.getRemainingJSDocLine();
++  // If the line begins with the typical JSDoc asterisk,
++  // remove that marker as well as any following space.
++  if (!line.isEmpty() && line.charAt(0) == '*') {
++    line = line.substring(1);
++    if (!line.isEmpty() && line.charAt(0) == ' ') {
++      line = line.substring(1);
++    }
++  }
++  // If this is the last JSDoc line and it ends with the closing "*/",
++  // trim off the terminator so that recorded positions stay in sync.
++  if (line.endsWith("*/")) {
++    line = line.substring(0, line.length() - 2);
++  }
++  return line;
+ }
+\ No newline at end of file

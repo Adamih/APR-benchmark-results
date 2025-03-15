@@ -1,0 +1,65 @@
+diff --git a/tmp/92a4601c-e80e-4245-96b5-0b3d7dd81288_buggy.java b/tmp/623d0eb9-f5bd-41c6-b4ed-05da3438ee9a_fixed.java
+index 670114d..39cf9aa 100644
+--- a/tmp/92a4601c-e80e-4245-96b5-0b3d7dd81288_buggy.java
++++ b/tmp/623d0eb9-f5bd-41c6-b4ed-05da3438ee9a_fixed.java
+@@ -1,48 +1,58 @@
+ @Override
+ public void visit(NodeTraversal t, Node n, Node parent) {
+ 
+   // Record global variable and function declarations
+   if (t.inGlobalScope()) {
+     if (NodeUtil.isVarDeclaration(n)) {
+       NameInformation ns = createNameInformation(t, n, parent);
+       Preconditions.checkNotNull(ns);
+       recordSet(ns.name, n);
+     } else if (NodeUtil.isFunctionDeclaration(n)) {
+       Node nameNode = n.getFirstChild();
+       NameInformation ns = createNameInformation(t, nameNode, n);
+       if (ns != null) {
+         JsName nameInfo = getName(nameNode.getString(), true);
+         recordSet(nameInfo.name, nameNode);
+       }
+     } else if (NodeUtil.isObjectLitKey(n, parent)) {
+       NameInformation ns = createNameInformation(t, n, parent);
+       if (ns != null) {
+         recordSet(ns.name, n);
+       }
+     }
+   }
+ 
+   // Record assignments and call sites
+   if (n.isAssign()) {
+     Node nameNode = n.getFirstChild();
+-
+     NameInformation ns = createNameInformation(t, nameNode, n);
+     if (ns != null) {
+       if (ns.isPrototype) {
+         recordPrototypeSet(ns.prototypeClass, ns.prototypeProperty, n);
+       } else {
+         recordSet(ns.name, nameNode);
+       }
+     }
+   } else if (n.isCall()) {
+     Node nameNode = n.getFirstChild();
+     NameInformation ns = createNameInformation(t, nameNode, n);
+     if (ns != null && ns.onlyAffectsClassDef) {
+       JsName name = getName(ns.name, false);
+       if (name != null) {
+         refNodes.add(new ClassDefiningFunctionNode(
+             name, n, parent, parent.getParent()));
+       }
++    } else if (nameNode != null && nameNode.isGetProp() &&
++               nameNode.getLastChild().getString().equals("inherits")) {
++      // Handle goog.inherits calls
++      Node childNode = nameNode.getFirstChild();
++      if (childNode != null && childNode.getString().equals("goog")) {
++        Node subclass = n.getChildAtIndex(1);
++        Node superclass = n.getChildAtIndex(2);
++        if (subclass != null && superclass != null) {
++          recordInheritance(subclass, superclass);
++        }
++      }
+     }
+   }
+ }
+\ No newline at end of file

@@ -1,0 +1,32 @@
+diff --git a/tmp/f1a32406-e689-435a-9a20-444377140336_buggy.java b/tmp/0fc1d561-3ff7-4a31-812c-889710d09f1c_fixed.java
+index 7dc89ed..43b0845 100644
+--- a/tmp/f1a32406-e689-435a-9a20-444377140336_buggy.java
++++ b/tmp/0fc1d561-3ff7-4a31-812c-889710d09f1c_fixed.java
+@@ -1,20 +1,7 @@
+-        boolean anyOtherEndTag(Token t, HtmlTreeBuilder tb) {
+-            String name = t.asEndTag().normalName();
+-            ArrayList<Element> stack = tb.getStack();
+-            for (int pos = stack.size() -1; pos >= 0; pos--) {
+-                Element node = stack.get(pos);
+-                if (node.nodeName().equals(name)) {
+-                    tb.generateImpliedEndTags(name);
+-                    if (!name.equals(tb.currentElement().nodeName()))
+-                        tb.error(this);
+-                    tb.popStackToClose(name);
+-                    break;
+-                } else {
+-                    if (tb.isSpecial(node)) {
+-                        tb.error(this);
+-                        return false;
+-                    }
+-                }
+-            }
+-            return true;
++@Test public void caseSensitiveParseTree() {
++    String html = "<r><X>A</X><y>B</y></r>";
++    Parser parser = Parser.htmlParser();
++    parser.settings(ParseSettings.preserveCase);
++    Document doc = parser.parseInput(html, "");
++    assertEquals("<r> <X> A </X> <y> B </y> </r>", StringUtil.normaliseWhitespace(doc.body().html()));
+ }
+\ No newline at end of file

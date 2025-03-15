@@ -1,0 +1,61 @@
+diff --git a/tmp/532c125c-0481-4094-b931-ce033d435372_buggy.java b/tmp/453cb924-9543-48de-a26a-38a3e7cc69c0_fixed.java
+index 4b7f469..929a49d 100644
+--- a/tmp/532c125c-0481-4094-b931-ce033d435372_buggy.java
++++ b/tmp/453cb924-9543-48de-a26a-38a3e7cc69c0_fixed.java
+@@ -1,10 +1,52 @@
+ static boolean isSimpleNumber(String s) {
++    if (s.isEmpty()) {
++        return false;
++    }
+     int len = s.length();
+-    for (int index = 0; index < len; index++) {
++    int index = 0;
++
++    // Check for leading zeros and special cases
++    if (s.charAt(0) == '0') {
++        if (len == 1) return true; // Just "0"
++        if (len > 2 && (s.charAt(1) == 'x' || s.charAt(1) == 'X')) {
++            // Check for hexadecimal number
++            index = 2;
++            if (index >= len) return false;
++            while (index < len) {
+                 char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++                if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
+                     return false;
+                 }
++                index++;
+             }
+-    return len > 0;
++            return true;
++        } else if (s.charAt(1) >= '0' && s.charAt(1) <= '7') {
++            // Check for octal number
++            while (index < len) {
++                char c = s.charAt(index);
++                if (c < '0' || c > '7') {
++                    return false;
++                }
++                index++;
++            }
++            return true;
++        } else {
++            return false; // Leading zero without octal or hexadecimal format
++        }
++    }
++
++    // Check for floating point or regular integers
++    boolean hasDecimal = false;
++    while (index < len) {
++        char c = s.charAt(index);
++        if (c == '.') {
++            if (hasDecimal) return false; // More than one decimal point
++            hasDecimal = true;
++        } else if (c < '0' || c > '9') {
++            return false;
++        }
++        index++;
++    }
++
++    return true;
+ }
+\ No newline at end of file

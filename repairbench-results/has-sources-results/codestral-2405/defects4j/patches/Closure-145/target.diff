@@ -1,0 +1,30 @@
+diff --git a/tmp/67ca7229-7379-4f80-a5d8-d9fddc1d1edf_buggy.java b/tmp/06aeef7f-bd5b-4327-8122-97bf5d652947_fixed.java
+index 57f69c5..79ec9ae 100644
+--- a/tmp/67ca7229-7379-4f80-a5d8-d9fddc1d1edf_buggy.java
++++ b/tmp/06aeef7f-bd5b-4327-8122-97bf5d652947_fixed.java
+@@ -1,12 +1,25 @@
+   /**
+    * @return Whether the Node is a DO or FUNCTION (with or without
+    * labels).
+    */
+   private boolean isOneExactlyFunctionOrDo(Node n) {
++    if (n.getType() == Token.LABEL) {
++      Node labeledStatement = n.getLastChild();
++      if (labeledStatement.getType() != Token.BLOCK) {
++        return isOneExactlyFunctionOrDo(labeledStatement);
++      } else {
+         // For labels with block children, we need to ensure that a
+         // labeled FUNCTION or DO isn't generated when extraneous BLOCKs 
+         // are skipped. 
++        if (getNonEmptyChildCount(n, 2) == 1) { 
++          return isOneExactlyFunctionOrDo(getFirstNonEmptyChild(n));
++        } else {
+           // Either a empty statement or an block with more than one child,
+           // way it isn't a FUNCTION or DO.
++          return false;
++        }
++      }
++    } else {
+       return (n.getType() == Token.FUNCTION || n.getType() == Token.DO);
+     }
++  }

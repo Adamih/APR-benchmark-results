@@ -1,0 +1,46 @@
+diff --git a/tmp/af45215c-768c-4423-83f6-dc6c525d83b2_buggy.java b/tmp/0eff5080-286a-4b7a-82fa-6e1716aaf661_fixed.java
+index 98dde53..3a2cef0 100644
+--- a/tmp/af45215c-768c-4423-83f6-dc6c525d83b2_buggy.java
++++ b/tmp/0eff5080-286a-4b7a-82fa-6e1716aaf661_fixed.java
+@@ -1,34 +1,38 @@
+ public void head(org.jsoup.nodes.Node source, int depth) {
+     namespacesStack.push(new HashMap<>(namespacesStack.peek())); // inherit from above on the stack
+     if (source instanceof org.jsoup.nodes.Element) {
+         org.jsoup.nodes.Element sourceEl = (org.jsoup.nodes.Element) source;
+ 
+         String prefix = updateNamespaces(sourceEl);
+         String namespace = namespacesStack.peek().get(prefix);
+         String tagName = sourceEl.tagName();
+ 
+-                Element el =
+-                    doc.createElementNS(namespace, tagName);
++        Element el;
++        if (namespace == null) {
++            el = doc.createElement(tagName); // Create element without namespace if not found
++        } else {
++            el = doc.createElementNS(namespace, tagName); // Create element with namespace if found
++        }
+         copyAttributes(sourceEl, el);
+         if (dest == null) { // sets up the root
+             doc.appendChild(el);
+         } else {
+             dest.appendChild(el);
+         }
+         dest = el; // descend
+     } else if (source instanceof org.jsoup.nodes.TextNode) {
+         org.jsoup.nodes.TextNode sourceText = (org.jsoup.nodes.TextNode) source;
+         Text text = doc.createTextNode(sourceText.getWholeText());
+         dest.appendChild(text);
+     } else if (source instanceof org.jsoup.nodes.Comment) {
+         org.jsoup.nodes.Comment sourceComment = (org.jsoup.nodes.Comment) source;
+         Comment comment = doc.createComment(sourceComment.getData());
+         dest.appendChild(comment);
+     } else if (source instanceof org.jsoup.nodes.DataNode) {
+         org.jsoup.nodes.DataNode sourceData = (org.jsoup.nodes.DataNode) source;
+         Text node = doc.createTextNode(sourceData.getWholeData());
+         dest.appendChild(node);
+     } else {
+         // unhandled
+     }
+ }
+\ No newline at end of file

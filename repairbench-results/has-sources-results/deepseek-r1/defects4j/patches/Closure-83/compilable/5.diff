@@ -1,0 +1,27 @@
+diff --git a/tmp/267c2d8a-63d0-48cf-afb8-7ad17698aaa5_buggy.java b/tmp/61902181-c497-43fd-9b2c-4d1b491ff2ee_fixed.java
+index 072c672..a2d7b5f 100644
+--- a/tmp/267c2d8a-63d0-48cf-afb8-7ad17698aaa5_buggy.java
++++ b/tmp/61902181-c497-43fd-9b2c-4d1b491ff2ee_fixed.java
+@@ -1,20 +1,19 @@
+       @Override
+       public int parseArguments(Parameters params) throws CmdLineException {
+         String param = params.getParameter(0);
+ 
+         if (param == null) {
+           setter.addValue(true);
+           return 0;
+         } else {
+           String lowerParam = param.toLowerCase();
+           if (TRUES.contains(lowerParam)) {
+             setter.addValue(true);
+           } else if (FALSES.contains(lowerParam)) {
+             setter.addValue(false);
+           } else {
+-            setter.addValue(true);
+-            return 0;
++            throw new CmdLineException("Invalid boolean value: " + param);
+           }
+           return 1;
+         }
+       }
+\ No newline at end of file

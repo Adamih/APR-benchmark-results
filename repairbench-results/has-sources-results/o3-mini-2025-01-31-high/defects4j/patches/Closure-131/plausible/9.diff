@@ -1,0 +1,36 @@
+diff --git a/tmp/a8646ca2-5c8c-494d-98c3-68ad7164f9f0_buggy.java b/tmp/2477776e-a176-49d7-a44e-e10db7f10810_fixed.java
+index 19fe1b4..32bf329 100644
+--- a/tmp/a8646ca2-5c8c-494d-98c3-68ad7164f9f0_buggy.java
++++ b/tmp/2477776e-a176-49d7-a44e-e10db7f10810_fixed.java
+@@ -1,17 +1,21 @@
+ public static boolean isJSIdentifier(String s) {
+-      int length = s.length();
+-
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++  if (s == null || s.length() == 0) {
+     return false;
+   }
+-
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++  char first = s.charAt(0);
++  if (!((first >= 'a' && first <= 'z') ||
++        (first >= 'A' && first <= 'Z') ||
++         first == '$' || first == '_')) {
++    return false;
++  }
++  for (int i = 1; i < s.length(); i++) {
++    char ch = s.charAt(i);
++    if (!((ch >= 'a' && ch <= 'z') ||
++          (ch >= 'A' && ch <= 'Z') ||
++          (ch >= '0' && ch <= '9') ||
++           ch == '$' || ch == '_')) {
+       return false;
+     }
+   }
+-
+   return true;
+ }
+\ No newline at end of file

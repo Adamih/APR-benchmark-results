@@ -1,0 +1,21 @@
+diff --git a/tmp/7a06f41d-9de0-4d6d-afb8-4281e7efe4fe_buggy.java b/tmp/9d6dba30-45bd-4880-9973-d801cc19bd65_fixed.java
+index 1186509..13ed4c3 100644
+--- a/tmp/7a06f41d-9de0-4d6d-afb8-4281e7efe4fe_buggy.java
++++ b/tmp/9d6dba30-45bd-4880-9973-d801cc19bd65_fixed.java
+@@ -1,7 +1,14 @@
++/**
++ * Fixes the printRow function to include the GAV (Group, Artifact, Version) in the table row.
++ * 
++ * @param table the Help.TextTable to add the row to
++ * @param doc the SearchResponse.Response.Doc containing the GAV information
++ */
+ private void printRow(final Help.TextTable table, final SearchResponse.Response.Doc doc) {
+     var lastUpdated = DATE_TIME_FORMATTER.format(
+             Instant.ofEpochMilli(doc.timestamp()).atZone(ZoneId.systemDefault())
+     );
++    var gav = String.format("%s:%s:%s", doc.groupId(), doc.artifactId(), doc.version());
+ 
+-        table.addRowValues(doc.id(), lastUpdated);
++    table.addRowValues(doc.id(), gav, lastUpdated); // Added GAV to the table row
+ }
+\ No newline at end of file

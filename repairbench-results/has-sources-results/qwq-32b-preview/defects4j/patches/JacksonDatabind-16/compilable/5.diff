@@ -1,0 +1,17 @@
+diff --git a/tmp/49331835-13ad-4323-aece-c194a4eebc87_buggy.java b/tmp/4e295f7c-8471-473f-bca3-6284aece3a73_fixed.java
+index 27520a0..c62e668 100644
+--- a/tmp/49331835-13ad-4323-aece-c194a4eebc87_buggy.java
++++ b/tmp/4e295f7c-8471-473f-bca3-6284aece3a73_fixed.java
+@@ -1,7 +1,10 @@
+ protected final boolean _add(Annotation ann) {
+     if (_annotations == null) {
+         _annotations = new HashMap<Class<? extends Annotation>, Annotation>();
+     }
+     Annotation previous = _annotations.put(ann.annotationType(), ann);
+-        return (previous != null) && previous.equals(ann);
++    // Instead of checking equality, we should consider if the annotation type is already present
++    // and potentially handle it differently based on the context.
++    // For now, just return whether there was a previous annotation of the same type.
++    return previous != null;
+ }
+\ No newline at end of file

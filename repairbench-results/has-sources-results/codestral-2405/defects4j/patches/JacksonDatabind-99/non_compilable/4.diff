@@ -1,0 +1,28 @@
+diff --git a/tmp/897093ed-85cc-406e-b865-8784c104c924_buggy.java b/tmp/94031b1b-78e7-48f5-a17e-6f816dca0c40_fixed.java
+index ee836e4..a4792a3 100644
+--- a/tmp/897093ed-85cc-406e-b865-8784c104c924_buggy.java
++++ b/tmp/94031b1b-78e7-48f5-a17e-6f816dca0c40_fixed.java
+@@ -1,9 +1,21 @@
+     @Override
+     protected String buildCanonicalName()
+     {
+         StringBuilder sb = new StringBuilder();
+         sb.append(_class.getName());
+         sb.append('<');
+-        sb.append(_referencedType.toCanonical());
++        JavaType[] typeArgs = _referencedType.typeParameters();
++        for(int i=0; i<typeArgs.length; i++) {
++            if(i > 0) {
++                sb.append(',');
++            }
++            if(typeArgs[i].hasRawClass(Class.class)) {
++                // Special handling for Class, as it's an array in Java
++                sb.append("java.lang.Class<?>")
++            } else {
++                sb.append(typeArgs[i].toCanonical());
++            }
++        }
++        sb.append('>');
+         return sb.toString();
+     }
+\ No newline at end of file

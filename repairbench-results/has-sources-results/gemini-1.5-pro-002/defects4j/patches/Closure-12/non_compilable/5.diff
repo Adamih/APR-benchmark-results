@@ -1,0 +1,15 @@
+diff --git a/tmp/a7093b90-941c-4a12-a400-8070528fde3d_buggy.java b/tmp/b1fac1d2-ce04-43b5-8e41-4b32ae565c59_fixed.java
+index 22640dd..e0fbdc6 100644
+--- a/tmp/a7093b90-941c-4a12-a400-8070528fde3d_buggy.java
++++ b/tmp/b1fac1d2-ce04-43b5-8e41-4b32ae565c59_fixed.java
+@@ -1,3 +1,10 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
++    List<DiGraphEdge<Node, ControlFlowGraph.Branch>> outEdges =
++        cfg.getOutEdges(cfgNode);
++    for (DiGraphEdge<Node, ControlFlowGraph.Branch> outEdge : outEdges) {
++      if (outEdge.getValue() == ControlFlowGraph.Branch.ON_EX) {
++        return true;
++      }
++    }
+     return false;
+   }

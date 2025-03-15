@@ -1,0 +1,15 @@
+diff --git a/tmp/e79a15ed-55d6-4c0a-9378-9a42ace8150b_buggy.java b/tmp/e8dc3cf4-edd0-43be-8013-c7bbd79d91ee_fixed.java
+index 1186509..6d2d327 100644
+--- a/tmp/e79a15ed-55d6-4c0a-9378-9a42ace8150b_buggy.java
++++ b/tmp/e8dc3cf4-edd0-43be-8013-c7bbd79d91ee_fixed.java
+@@ -1,7 +1,8 @@
+ private void printRow(final Help.TextTable table, final SearchResponse.Response.Doc doc) {
+     var lastUpdated = DATE_TIME_FORMATTER.format(
+             Instant.ofEpochMilli(doc.timestamp()).atZone(ZoneId.systemDefault())
+     );
+ 
+-        table.addRowValues(doc.id(), lastUpdated);
++    // Include the version in the row values
++    table.addRowValues(doc.id(), doc.version(), lastUpdated);
+ }
+\ No newline at end of file

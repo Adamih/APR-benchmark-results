@@ -1,0 +1,54 @@
+diff --git a/tmp/397e978c-d8b6-44f8-a8b0-a93889e7e788_buggy.java b/tmp/e95a199c-b3ad-453f-a510-91afe1e077fd_fixed.java
+index f47d784..43d22a6 100644
+--- a/tmp/397e978c-d8b6-44f8-a8b0-a93889e7e788_buggy.java
++++ b/tmp/e95a199c-b3ad-453f-a510-91afe1e077fd_fixed.java
+@@ -1,12 +1,48 @@
+   @Override
+   public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
++
++    // Additional step to ensure 'arguments' is correctly handled within function scopes
++    processFunctionScopes(root);
++  }
++
++  private void processFunctionScopes(Node root) {
++    NodeTraversal.traverse(compiler, root,
++        new NodeTraversal.AbstractNodeVisitor() {
++          @Override
++          public void visit(NodeTraversal t, Node n, Node parent) {
++            if (n.isFunction()) {
++              Node functionBody = n.getLastChild();
++              handleArgumentsVariable(functionBody);
++            }
++          }
++    });
++  }
++
++  private void handleArgumentsVariable(Node functionBody) {
++    if (functionBody != null) {
++      NodeTraversal.traverse(compiler, functionBody,
++          new NodeTraversal.AbstractNodeVisitor() {
++            boolean argumentsDeclared = false;
++
++            @Override
++            public void visit(NodeTraversal t, Node n, Node parent) {
++              if (n.isName() && "arguments".equals(n.getString())) {
++                if (parent != null && parent.isVar()) {
++                  argumentsDeclared = true;
++                } else if (!argumentsDeclared) {
++                  compiler.report(JSError.make(n, VarCheck.VAR_MULTIPLY_DECLARED_ERROR));
++                }
++              }
++            }
++      });
++    }
+   }
+\ No newline at end of file

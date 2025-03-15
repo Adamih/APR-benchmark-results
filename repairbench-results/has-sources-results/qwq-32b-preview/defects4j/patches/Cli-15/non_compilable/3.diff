@@ -1,0 +1,43 @@
+diff --git a/tmp/db267b8f-a0db-4d87-aa3e-f71a08704195_buggy.java b/tmp/a083f9c6-47aa-4f25-977d-39e6d6a2a75b_fixed.java
+index 4e8b037..e601c8d 100644
+--- a/tmp/db267b8f-a0db-4d87-aa3e-f71a08704195_buggy.java
++++ b/tmp/a083f9c6-47aa-4f25-977d-39e6d6a2a75b_fixed.java
+@@ -1,20 +1,25 @@
+-    public List getValues(final Option option,
+-                          List defaultValues) {
++public List getValues(final Option option, List defaultValues) {
+     // initialize the return list
+     List valueList = (List) values.get(option);
+ 
+-        // grab the correct default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = defaultValues;
+-        }
++    // If no values are provided, use the default values
++    if (valueList == null || valueList.isEmpty()) {
++        valueList = new ArrayList<>(defaultValues);
++    } else {
++        // If values are provided, check if more default values need to be added
++        int min = option.getArgument().getMinimum();
++        int max = option.getArgument().getMaximum();
++        int provided = valueList.size();
+ 
+-        // augment the list with the default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = (List) this.defaultValues.get(option);
++        if (provided < min) {
++            // If provided values are fewer than the minimum, append defaults
++            List defaultsToAppend = defaultValues.subList(0, min - provided);
++            valueList.addAll(defaultsToAppend);
++        } else if (provided > max) {
++            // If provided values exceed the maximum, truncate the list
++            valueList = valueList.subList(0, max);
++        }
+     }
+-                // if there are more default values as specified, add them to
+-                // the list.
+-                    // copy the list first
+ 
+     return valueList == null ? Collections.EMPTY_LIST : valueList;
+ }
+\ No newline at end of file

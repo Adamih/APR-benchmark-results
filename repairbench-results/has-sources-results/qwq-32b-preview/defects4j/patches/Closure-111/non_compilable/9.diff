@@ -1,0 +1,15 @@
+diff --git a/tmp/9c71e17a-c568-41cb-9ef5-422ceffa994b_buggy.java b/tmp/adec123c-3750-4daa-a348-ea50de49d9f7_fixed.java
+index f1d02c1..9e133e0 100644
+--- a/tmp/9c71e17a-c568-41cb-9ef5-422ceffa994b_buggy.java
++++ b/tmp/adec123c-3750-4daa-a348-ea50de49d9f7_fixed.java
+@@ -1,4 +1,9 @@
+ @Override
+ protected JSType caseTopType(JSType topType) {
++  // Check if the topType could be an array
++  if (topType.isNullable() || topType.isObjectType()) {
++    // If it's nullable or an object type, it could be an array
++    return typeRegistry.getNativeArray().union(topType);
++  }
+   return topType;
+ }
+\ No newline at end of file

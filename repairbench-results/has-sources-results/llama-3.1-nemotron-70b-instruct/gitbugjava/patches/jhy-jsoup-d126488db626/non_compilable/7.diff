@@ -1,0 +1,40 @@
+diff --git a/tmp/30a3b287-a27f-40f5-94d9-41b34b0dcf56_buggy.java b/tmp/c1be98e7-44ad-4c93-8ab2-88e7e9621087_fixed.java
+index 5bf31b1..9b094c7 100644
+--- a/tmp/30a3b287-a27f-40f5-94d9-41b34b0dcf56_buggy.java
++++ b/tmp/c1be98e7-44ad-4c93-8ab2-88e7e9621087_fixed.java
+@@ -1,17 +1,29 @@
++/**
++ * Consume a sub-query from the token queue, handling nested queries and combinators.
++ * 
++ * @return the consumed sub-query as a string
++ */
+ private String consumeSubQuery() {
+     StringBuilder sq = StringUtil.borrowBuilder();
+-        while (!tq.isEmpty()) {
++    int initialSize = tq.size(); // track initial queue size
++    boolean combinatorEncountered = false; // flag to track if a combinator is encountered at the start
++
++    while (!tq.isEmpty() && sq.length() > 0 || initialSize!= tq.size()) {
+         if (tq.matches("("))
+             sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+         else if (tq.matches("["))
+             sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++        else if (tq.matchesAny(Combinators)) {
++            if (sq.length() > 0) {
++                if (!combinatorEncountered) { // only break if not the first token
+                     break;
+-                else
++                }
++            } else {
++                combinatorEncountered = true; // mark as encountered if at the start
+                 tq.consume();
+-            else
++            }
++        } else
+             sq.append(tq.consume());
+     }
+     return StringUtil.releaseBuilder(sq);
+ }
+\ No newline at end of file

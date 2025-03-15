@@ -1,0 +1,23 @@
+diff --git a/tmp/e09331e5-f52e-4797-be3e-3030d47d0459_buggy.java b/tmp/be52c723-fdc5-4fb9-89f1-e7c23f34599d_fixed.java
+index f86a1bd..58249fb 100644
+--- a/tmp/e09331e5-f52e-4797-be3e-3030d47d0459_buggy.java
++++ b/tmp/be52c723-fdc5-4fb9-89f1-e7c23f34599d_fixed.java
+@@ -1,11 +1,13 @@
+ @Override
+ public String constructUrlFromEndpointPortDatabase(String endpoint, String port, String dbname) {
+-        String url = "jdbc:postgresql://" + endpoint;
++    StringBuilder url = new StringBuilder("jdbc:postgresql://").append(endpoint);
+     if (!StringUtils.isNullOrEmpty(port)) {
+-            url += ":" + port;
++        url.append(":").append(port);
+     }
+     if (!StringUtils.isNullOrEmpty(dbname)) {
+-            url += "/" + dbname;
++        url.append("/").append(dbname);
++    } else {
++        url.append("/");
+     }
+-        return url;
++    return url.toString();
+ }
+\ No newline at end of file

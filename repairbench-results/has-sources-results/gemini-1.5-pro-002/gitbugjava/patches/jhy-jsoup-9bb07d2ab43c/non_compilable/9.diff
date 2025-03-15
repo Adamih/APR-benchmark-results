@@ -1,0 +1,20 @@
+diff --git a/tmp/843f7386-3610-4d71-8bd8-c991d323323d_buggy.java b/tmp/a1cdde24-7dbd-4474-ae78-2dd23f8b995d_fixed.java
+index dcc36a4..e6e8b29 100644
+--- a/tmp/843f7386-3610-4d71-8bd8-c991d323323d_buggy.java
++++ b/tmp/a1cdde24-7dbd-4474-ae78-2dd23f8b995d_fixed.java
+@@ -1,12 +1,13 @@
+     protected void replaceChild(Node out, Node in) {
+         Validate.isTrue(out.parentNode == this);
+         Validate.notNull(in);
+-        if (in.parentNode != null)
+-            in.parentNode.removeChild(in);
++        if (in.parentNode != null) {
++            in.remove(); // to properly remove siblings
++        }
+ 
+         final int index = out.siblingIndex;
+         ensureChildNodes().set(index, in);
+         in.parentNode = this;
+         in.setSiblingIndex(index);
+         out.parentNode = null;
+     }

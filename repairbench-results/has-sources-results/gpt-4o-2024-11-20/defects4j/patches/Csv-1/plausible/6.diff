@@ -1,0 +1,18 @@
+diff --git a/tmp/0233ec1b-b90c-4692-91c3-6c16cf03488e_buggy.java b/tmp/f3de1d8d-2fdc-490b-b7e9-52c9a4c22cd4_fixed.java
+index 3ba614a..d6db92a 100644
+--- a/tmp/0233ec1b-b90c-4692-91c3-6c16cf03488e_buggy.java
++++ b/tmp/f3de1d8d-2fdc-490b-b7e9-52c9a4c22cd4_fixed.java
+@@ -1,9 +1,11 @@
+ @Override
+ public int read() throws IOException {
+     int current = super.read();
+-        if (current == '\n') {
++    if (current == '\n' || current == '\r') {
++        if (current != '\n' || lastChar != '\r') { // Avoid double counting for CRLF (carriage return + line feed).
+             lineCounter++;
+         }
++    }
+     lastChar = current;
+     return lastChar;
+ }
+\ No newline at end of file

@@ -1,0 +1,21 @@
+diff --git a/tmp/74da9376-c37e-4710-9549-d48c9482777a_buggy.java b/tmp/ef4da775-e36e-4992-9d3b-4630227344ad_fixed.java
+index c9c2b44..5e7383c 100644
+--- a/tmp/74da9376-c37e-4710-9549-d48c9482777a_buggy.java
++++ b/tmp/ef4da775-e36e-4992-9d3b-4630227344ad_fixed.java
+@@ -1,13 +1,13 @@
+         @Override
+         public boolean matches(Element root, Element element) {
+             // evaluate from last to first
+             for (int i = evaluators.size() -1; i >= 0; --i) {
+-                if (element == null)
+-                    return false;
+                 Evaluator eval = evaluators.get(i);
+                 if (!eval.matches(root, element))
+                     return false;
+                 element = element.parent();
++                if (element == null && i > 0) // if more evaluators, and no parent, then fails
++                    return false;
+             }
+             return true;
+         }
+\ No newline at end of file

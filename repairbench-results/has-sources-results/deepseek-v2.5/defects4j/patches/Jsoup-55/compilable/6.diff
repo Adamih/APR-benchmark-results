@@ -1,0 +1,28 @@
+diff --git a/tmp/35043d34-a6f1-41f3-9e4c-77d433e21639_buggy.java b/tmp/fa3c5637-16e3-4e0a-8e7e-0d5f4b455e5f_fixed.java
+index ef76662..7788385 100644
+--- a/tmp/35043d34-a6f1-41f3-9e4c-77d433e21639_buggy.java
++++ b/tmp/fa3c5637-16e3-4e0a-8e7e-0d5f4b455e5f_fixed.java
+@@ -1,17 +1,22 @@
+ void read(Tokeniser t, CharacterReader r) {
+     char c = r.consume();
+     switch (c) {
+         case '>':
+             t.tagPending.selfClosing = true;
+             t.emitTagPending();
+             t.transition(Data);
+             break;
+         case eof:
+             t.eofError(this);
+             t.transition(Data);
+             break;
+         default:
++            // Handle the case where the first character is a slash, e.g., in <img /onerror='doMyJob'/>
++            if (c == '/') {
++                c = r.consume();
++            }
+             t.error(this);
+             t.transition(BeforeAttributeName);
++            break;
+     }
+ }
+\ No newline at end of file

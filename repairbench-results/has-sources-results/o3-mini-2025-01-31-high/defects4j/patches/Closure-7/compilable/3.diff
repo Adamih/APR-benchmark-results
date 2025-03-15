@@ -1,0 +1,21 @@
+diff --git a/tmp/a9bd88ba-540e-4f8a-9c0b-9d4c9869d3bd_buggy.java b/tmp/e600157f-09d2-40e2-b16e-2f5e24100538_fixed.java
+index a38ec6d..85069a0 100644
+--- a/tmp/a9bd88ba-540e-4f8a-9c0b-9d4c9869d3bd_buggy.java
++++ b/tmp/e600157f-09d2-40e2-b16e-2f5e24100538_fixed.java
+@@ -1,10 +1,11 @@
+ @Override
+ public JSType caseObjectType(ObjectType type) {
++  // When doing a typeof test for "function", we must narrow the object type according
++  // to whether the outcome of the test (resultEqualsValue) is true or false. In the
++  // true‐case we keep only the function part (that is, the native constructor type),
++  // while in the false‐case we remove that part.
+   if (value.equals("function")) {
+-        JSType ctorType = getNativeType(U2U_CONSTRUCTOR_TYPE);
+-        return resultEqualsValue && ctorType.isSubtype(type) ? ctorType : null;
+-          // Objects are restricted to "Function", subtypes are left
+-          // Only filter out subtypes of "function"
++    return type.getRestrictedTypeGivenToBooleanOutcome(resultEqualsValue);
+   }
+   return matchesExpectation("object") ? type : null;
+ }
+\ No newline at end of file

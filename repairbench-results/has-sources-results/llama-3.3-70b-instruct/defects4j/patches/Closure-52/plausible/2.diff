@@ -1,0 +1,30 @@
+diff --git a/tmp/d3877137-f507-4c8b-b72f-ff0742fbb52d_buggy.java b/tmp/eb537dd0-7535-4146-a424-a81e6e7d5269_fixed.java
+index 4b7f469..93029f4 100644
+--- a/tmp/d3877137-f507-4c8b-b72f-ff0742fbb52d_buggy.java
++++ b/tmp/eb537dd0-7535-4146-a424-a81e6e7d5269_fixed.java
+@@ -1,10 +1,23 @@
+ static boolean isSimpleNumber(String s) {
+   int len = s.length();
++  if (len == 0) {
++    return false;
++  }
++  boolean isOctal = len > 1 && s.charAt(0) == '0' && s.charAt(1)!= '.';
++  boolean isHex = len > 2 && s.substring(0, 2).equals("0x");
++  if (isOctal || isHex) {
++    return false;
++  }
+   for (int index = 0; index < len; index++) {
+     char c = s.charAt(index);
+     if (c < '0' || c > '9') {
++      if (c == '.') {
++        // decimal number
++        break;
++      } else {
+         return false;
+       }
+     }
+-    return len > 0;
++  }
++  return true;
+ }
+\ No newline at end of file

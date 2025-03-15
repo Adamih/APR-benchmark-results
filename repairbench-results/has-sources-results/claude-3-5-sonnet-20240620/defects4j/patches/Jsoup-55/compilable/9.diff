@@ -1,0 +1,27 @@
+diff --git a/tmp/cad89fb6-0419-4a19-8c71-c078411faa0e_buggy.java b/tmp/d67f3efb-a076-4976-9e09-7e75c8054dd6_fixed.java
+index ef76662..059f7b6 100644
+--- a/tmp/cad89fb6-0419-4a19-8c71-c078411faa0e_buggy.java
++++ b/tmp/d67f3efb-a076-4976-9e09-7e75c8054dd6_fixed.java
+@@ -1,17 +1,21 @@
+ void read(Tokeniser t, CharacterReader r) {
+     char c = r.consume();
+     switch (c) {
++        case '/':
++            t.error(this);
++            t.transition(BeforeAttributeName);
++            break;
+         case '>':
+             t.tagPending.selfClosing = true;
+             t.emitTagPending();
+             t.transition(Data);
+             break;
+         case eof:
+             t.eofError(this);
+             t.transition(Data);
+             break;
+         default:
+             t.error(this);
+             t.transition(BeforeAttributeName);
+     }
+ }
+\ No newline at end of file

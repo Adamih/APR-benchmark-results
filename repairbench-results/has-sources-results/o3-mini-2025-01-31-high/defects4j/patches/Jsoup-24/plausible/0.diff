@@ -1,0 +1,49 @@
+diff --git a/tmp/7b368aac-fca0-4748-85f0-a83732393955_buggy.java b/tmp/08f1b7ce-f672-48da-8710-b3565b62a21c_fixed.java
+index b2d53db..59af0fa 100644
+--- a/tmp/7b368aac-fca0-4748-85f0-a83732393955_buggy.java
++++ b/tmp/08f1b7ce-f672-48da-8710-b3565b62a21c_fixed.java
+@@ -1,34 +1,35 @@
+ void read(Tokeniser t, CharacterReader r) {
++    // Only process a letter as part of an end tag name if the token is appropriate.
++    if (t.isAppropriateEndTagToken()) {
+         if (r.matchesLetter()) {
+             String name = r.consumeLetterSequence();
+             t.tagPending.appendTagName(name.toLowerCase());
+             t.dataBuffer.append(name);
+             r.advance();
+             return;
+         }
+-
+-            if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
++        if (!r.isEmpty()) {
+             char c = r.consume();
+             switch (c) {
+                 case '\t':
+                 case '\n':
+                 case '\f':
+                 case ' ':
+                     t.transition(BeforeAttributeName);
+-                        break;
++                    return;
+                 case '/':
+                     t.transition(SelfClosingStartTag);
+-                        break;
++                    return;
+                 case '>':
+                     t.emitTagPending();
+                     t.transition(Data);
+-                        break;
++                    return;
+                 default:
+                     t.dataBuffer.append(c);
+                     anythingElse(t, r);
+-                        break;
++                    return;
++            }
++        }
+     }
+-            } else {
+     anythingElse(t, r);
+ }
+\ No newline at end of file
+-        }

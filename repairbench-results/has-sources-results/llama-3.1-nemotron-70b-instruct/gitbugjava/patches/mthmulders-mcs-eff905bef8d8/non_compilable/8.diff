@@ -1,0 +1,18 @@
+diff --git a/tmp/0d54673d-858b-425d-ab9a-096c1aa003ed_buggy.java b/tmp/a1aa739d-173b-4b67-9ba9-96e0c933098b_fixed.java
+index 1186509..921ad04 100644
+--- a/tmp/0d54673d-858b-425d-ab9a-096c1aa003ed_buggy.java
++++ b/tmp/a1aa739d-173b-4b67-9ba9-96e0c933098b_fixed.java
+@@ -1,7 +1,11 @@
++/**
++ * Fixes: Added GAV (Group, Artifact, Version) to the printed table row.
++ */
+ private void printRow(final Help.TextTable table, final SearchResponse.Response.Doc doc) {
+     var lastUpdated = DATE_TIME_FORMATTER.format(
+             Instant.ofEpochMilli(doc.timestamp()).atZone(ZoneId.systemDefault())
+     );
++    var gav = String.format("%s:%s:%s", doc.groupId(), doc.artifactId(), doc.version());
+ 
+-        table.addRowValues(doc.id(), lastUpdated);
++    table.addRowValues(doc.id(), gav, lastUpdated);
+ }
+\ No newline at end of file

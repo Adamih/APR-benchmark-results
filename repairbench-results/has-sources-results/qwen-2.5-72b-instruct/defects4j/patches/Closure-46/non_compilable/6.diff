@@ -1,0 +1,33 @@
+diff --git a/tmp/b48c4674-6c44-40b2-8c26-c0669b69c57a_buggy.java b/tmp/04b2070d-0af2-4908-a19c-e7779c19952f_fixed.java
+index 46817a7..f58cce3 100644
+--- a/tmp/b48c4674-6c44-40b2-8c26-c0669b69c57a_buggy.java
++++ b/tmp/04b2070d-0af2-4908-a19c-e7779c19952f_fixed.java
+@@ -1,16 +1,21 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+   if (!that.isRecordType()) {
+     return super.getLeastSupertype(that);
+   }
+   RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++  Set<String> allProperties = new HashSet<>(properties.keySet());
++  allProperties.addAll(that.toMaybeRecordType().getProperties());
++
++  for (String property : allProperties) {
++    if (properties.containsKey(property) && that.toMaybeRecordType().hasProperty(property)) {
++      JSType thisType = getPropertyType(property);
++      JSType thatType = that.toMaybeRecordType().getPropertyType(property);
++      JSType leastSupertype = thisType.getLeastSupertype(thatType);
++      if (leastSupertype != null) {
++        builder.addProperty(property, leastSupertype, getPropertyNode(property));
++      }
+     }
+   }
+   return builder.build();
+ }
+\ No newline at end of file

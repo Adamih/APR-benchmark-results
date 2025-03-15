@@ -1,0 +1,27 @@
+diff --git a/tmp/5b544a9a-2e78-4c46-b015-cda98eb500f6_buggy.java b/tmp/bf7636b8-cdcb-4a97-9f4e-2669e4c7cec3_fixed.java
+index 5f96616..e5cc58f 100644
+--- a/tmp/5b544a9a-2e78-4c46-b015-cda98eb500f6_buggy.java
++++ b/tmp/bf7636b8-cdcb-4a97-9f4e-2669e4c7cec3_fixed.java
+@@ -1,20 +1,20 @@
+   @Override
+   public void matchConstraint(JSType constraint) {
+     // We only want to match constraints on anonymous types.
+     if (hasReferenceName()) {
+       return;
+     }
+ 
+     // Handle the case where the constraint object is a record type.
+     //
+     // param constraint {{prop: (number|undefined)}}
+     // function f(constraint) {}
+     // f({});
+     //
+     // We want to modify the object literal to match the constraint, by
+     // taking any each property on the record and trying to match
+     // properties on this object.
+     if (constraint.isRecordType()) {
+-      matchRecordTypeConstraint(constraint.toObjectType());
++      matchRecordTypeConstraint(constraint.toRecordType());
+     }
+   }
+\ No newline at end of file

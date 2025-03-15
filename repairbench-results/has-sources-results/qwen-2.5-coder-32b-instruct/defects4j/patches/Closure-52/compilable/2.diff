@@ -1,0 +1,42 @@
+diff --git a/tmp/540b10ba-b715-4057-83da-fd33d930304c_buggy.java b/tmp/8fd99742-26de-4f0f-86d1-4c8f2a49b659_fixed.java
+index 4b7f469..b56d5cd 100644
+--- a/tmp/540b10ba-b715-4057-83da-fd33d930304c_buggy.java
++++ b/tmp/8fd99742-26de-4f0f-86d1-4c8f2a49b659_fixed.java
+@@ -1,10 +1,32 @@
+ static boolean isSimpleNumber(String s) {
+-    int len = s.length();
+-    for (int index = 0; index < len; index++) {
++    if (s == null || s.isEmpty()) {
++        return false;
++    }
++    
++    // Check for hexadecimal numbers
++    if (s.length() > 2 && s.charAt(0) == '0' && (s.charAt(1) == 'x' || s.charAt(1) == 'X')) {
++        for (int index = 2; index < s.length(); index++) {
++            char c = s.charAt(index);
++            if ((c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F')) {
++                return false;
++            }
++        }
++        return true;
++    }
++    
++    // Check for decimal numbers
++    boolean hasDecimalPoint = false;
++    for (int index = 0; index < s.length(); index++) {
+         char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++        if (c == '.') {
++            if (hasDecimalPoint) {
++                return false; // More than one decimal point
++            }
++            hasDecimalPoint = true;
++        } else if (c < '0' || c > '9') {
+             return false;
+         }
+     }
+-    return len > 0;
++    
++    return true;
+ }
+\ No newline at end of file

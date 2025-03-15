@@ -1,0 +1,28 @@
+diff --git a/tmp/3ed901ad-0da0-475c-92da-dc16bfbc6bac_buggy.java b/tmp/24e68903-d3d7-4890-9e61-db94d48fc536_fixed.java
+index 6e45f80..2e18068 100644
+--- a/tmp/3ed901ad-0da0-475c-92da-dc16bfbc6bac_buggy.java
++++ b/tmp/24e68903-d3d7-4890-9e61-db94d48fc536_fixed.java
+@@ -1,21 +1,20 @@
+   /**
+    * Returns a factory for all subtypes of {@code typeAdapter}. We do a runtime check to confirm
+    * that the deserialized type matches the type requested.
+    */
+   public static <T1> TypeAdapterFactory newTypeHierarchyFactory(
+       final Class<T1> clazz, final TypeAdapter<T1> typeAdapter) {
+     return new TypeAdapterFactory() {
+       @SuppressWarnings("unchecked")
+       public <T2> TypeAdapter<T2> create(Gson gson, TypeToken<T2> typeToken) {
+         final Class<? super T2> requestedType = typeToken.getRawType();
+         if (!clazz.isAssignableFrom(requestedType)) {
+           return null;
+         }
+-        return (TypeAdapter<T2>) typeAdapter;
+-
++        return (TypeAdapter<T2>) typeAdapter.nullSafe();
+       }
+       @Override public String toString() {
+         return "Factory[typeHierarchy=" + clazz.getName() + ",adapter=" + typeAdapter + "]";
+       }
+     };
+   }
+\ No newline at end of file

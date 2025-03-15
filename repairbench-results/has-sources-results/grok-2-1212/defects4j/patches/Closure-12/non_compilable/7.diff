@@ -1,0 +1,22 @@
+diff --git a/tmp/98213f78-e51d-47a3-834e-433a63644936_buggy.java b/tmp/74665d5b-2546-4b2d-b099-01cdb1857361_fixed.java
+index 22640dd..943c452 100644
+--- a/tmp/98213f78-e51d-47a3-834e-433a63644936_buggy.java
++++ b/tmp/74665d5b-2546-4b2d-b099-01cdb1857361_fixed.java
+@@ -1,3 +1,15 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
+-    return false;
++    // Traverse up the CFG to check for try-catch blocks
++    Node current = cfgNode;
++    while (current != null) {
++        if (current.isTry()) {
++            // Check if the current node is a TRY node
++            Node catchBlock = current.getSecondChild();
++            if (catchBlock != null && catchBlock.isCatch()) {
++                return true; // Found a catch block
++            }
++        }
++        current = current.getParent();
++    }
++    return false; // No exception handler found
+ }
+\ No newline at end of file

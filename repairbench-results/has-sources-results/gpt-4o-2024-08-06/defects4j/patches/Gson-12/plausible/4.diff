@@ -1,0 +1,26 @@
+diff --git a/tmp/7238a471-4a50-4590-8551-03b0b0f538eb_buggy.java b/tmp/3cebc331-d55d-4b23-b0aa-06c5711fbcd8_fixed.java
+index 6e155da..217c34e 100644
+--- a/tmp/7238a471-4a50-4590-8551-03b0b0f538eb_buggy.java
++++ b/tmp/3cebc331-d55d-4b23-b0aa-06c5711fbcd8_fixed.java
+@@ -1,10 +1,20 @@
+ @Override public void skipValue() throws IOException {
++    if (stackSize == 0) {
++        throw new IllegalStateException("JsonTreeReader is already at the end of input and cannot skip further.");
++    }
++    
+     if (peek() == JsonToken.NAME) {
+         nextName();
++        if (stackSize >= 2) {
+             pathNames[stackSize - 2] = "null";
++        }
+     } else {
+         popStack();
++        if (stackSize > 0) {
+             pathNames[stackSize - 1] = "null";
+         }
++    }
++    if (stackSize > 0) {
+         pathIndices[stackSize - 1]++;
+     }
++}
+\ No newline at end of file

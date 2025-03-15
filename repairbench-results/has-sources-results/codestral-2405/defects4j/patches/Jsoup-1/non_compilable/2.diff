@@ -1,0 +1,40 @@
+diff --git a/tmp/b10715fe-9234-413a-9c3e-ce0fc31794c0_buggy.java b/tmp/c64110f8-a738-47ef-b694-5be5e0dd8b1d_fixed.java
+index 00914da..691528a 100644
+--- a/tmp/b10715fe-9234-413a-9c3e-ce0fc31794c0_buggy.java
++++ b/tmp/c64110f8-a738-47ef-b694-5be5e0dd8b1d_fixed.java
+@@ -1,17 +1,28 @@
+-    // does not recurse.
+-    private void normalise(Element element) {
++private void normalise(Document document) {
+     List<Node> toMove = new ArrayList<Node>();
+-        for (Node node: element.childNodes) {
++    // Check direct children of `element`
++    for (Node node: document.body().childNodes) {
+         if (node instanceof TextNode) {
+             TextNode tn = (TextNode) node;
+             if (!tn.isBlank())
+                 toMove.add(tn);
+         }
+     }
+ 
++    // Check direct children of document root
++    for (Node node: document.childNodes()) {
++        if (node instanceof Element && !node.equals(document.body())) {
++            normalise((Element) node);
++        } else if (node instanceof TextNode) {
++            TextNode tn = (TextNode) node;
++            if (!tn.isBlank())
++                toMove.add(tn);
++        }
++    }
++
+     for (Node node: toMove) {
+-            element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++        document.body().removeChild(node);
++        document.body().prependChild(new TextNode(" ", ""));
++        document.body().prependChild(node);
+     }
+ }
+\ No newline at end of file

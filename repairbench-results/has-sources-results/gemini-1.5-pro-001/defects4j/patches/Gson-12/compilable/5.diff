@@ -1,0 +1,20 @@
+diff --git a/tmp/cdba0dee-e641-4614-8cf2-47ebf5925e37_buggy.java b/tmp/209acd6b-b605-45b0-8baa-128d23e79b42_fixed.java
+index 6e155da..63721e0 100644
+--- a/tmp/cdba0dee-e641-4614-8cf2-47ebf5925e37_buggy.java
++++ b/tmp/209acd6b-b605-45b0-8baa-128d23e79b42_fixed.java
+@@ -1,10 +1,14 @@
+   @Override public void skipValue() throws IOException {
+     if (peek() == JsonToken.NAME) {
+       nextName();
+-      pathNames[stackSize - 2] = "null";
++      pathNames[stackSize - 1] = "null";
+     } else {
+       popStack();
++      if (stackSize > 0) {
+         pathNames[stackSize - 1] = "null";
+       }
++    }
++    if (stackSize > 0) {
+       pathIndices[stackSize - 1]++;
+     }
++  }

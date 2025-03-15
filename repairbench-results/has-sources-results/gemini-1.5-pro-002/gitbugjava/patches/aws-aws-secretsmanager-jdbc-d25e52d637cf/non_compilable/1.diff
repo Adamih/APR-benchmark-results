@@ -1,0 +1,18 @@
+diff --git a/tmp/52c64e2f-a8fd-4e0f-bc4f-41846fbd2889_buggy.java b/tmp/2f22ba28-b2fe-4406-967a-46e4387dd728_fixed.java
+index f86a1bd..0ccfe9b 100644
+--- a/tmp/52c64e2f-a8fd-4e0f-bc4f-41846fbd2889_buggy.java
++++ b/tmp/2f22ba28-b2fe-4406-967a-46e4387dd728_fixed.java
+@@ -1,11 +1,13 @@
+     @Override
+     public String constructUrlFromEndpointPortDatabase(String endpoint, String port, String dbname) {
+         String url = "jdbc:postgresql://" + endpoint;
+         if (!StringUtils.isNullOrEmpty(port)) {
+             url += ":" + port;
+         }
+         if (!StringUtils.isNullOrEmpty(dbname)) {
+             url += "/" + dbname;
++        } else if (StringUtils.isNullOrEmpty(port)){
++            url += "/";
+         }
+         return url;
+     }

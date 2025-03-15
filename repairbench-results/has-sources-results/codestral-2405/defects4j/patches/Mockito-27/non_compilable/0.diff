@@ -1,0 +1,19 @@
+diff --git a/tmp/cd58cd7d-9176-45d2-b6cc-04f66095f965_buggy.java b/tmp/1619e3cb-bca2-40fb-87b2-dfd03aaac341_fixed.java
+index 5c5286c..1ab72c3 100644
+--- a/tmp/cd58cd7d-9176-45d2-b6cc-04f66095f965_buggy.java
++++ b/tmp/1619e3cb-bca2-40fb-87b2-dfd03aaac341_fixed.java
+@@ -1,6 +1,11 @@
+ public <T> void resetMock(T mock) {
+     MockHandlerInterface<T> oldMockHandler = getMockHandler(mock);
+-        MockHandler<T> newMockHandler = new MockHandler<T>(oldMockHandler);
+-        MethodInterceptorFilter newFilter = new MethodInterceptorFilter(newMockHandler, (MockSettingsImpl) org.mockito.Mockito.withSettings().defaultAnswer(org.mockito.Mockito.RETURNS_DEFAULTS));
++    if (oldMockHandler instanceof MockHandler) {
++        MockSettings oldMockSettings = (((MockHandler<T>) oldMockHandler).getMockSettings());
++        MockHandler<T> newMockHandler = new MockHandler<T>(oldMockSettings);
++        MethodInterceptorFilter newFilter = new MethodInterceptorFilter(newMockHandler, oldMockSettings.getDefaultAnswer());
+         ((Factory) mock).setCallback(0, newFilter);
++    } else {
++        throw new RuntimeException("Unsupported mock handler type");
++    }
+ }
+\ No newline at end of file

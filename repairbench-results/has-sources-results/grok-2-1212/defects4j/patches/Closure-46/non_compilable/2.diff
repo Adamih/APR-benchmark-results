@@ -1,0 +1,45 @@
+diff --git a/tmp/da7d550e-d122-4090-94ee-47480e8b3621_buggy.java b/tmp/1def74be-efc3-40a9-9eb4-82f7fc044c60_fixed.java
+index 46817a7..4aaf0eb 100644
+--- a/tmp/da7d550e-d122-4090-94ee-47480e8b3621_buggy.java
++++ b/tmp/1def74be-efc3-40a9-9eb4-82f7fc044c60_fixed.java
+@@ -1,16 +1,32 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
++    
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++    Set<String> allProperties = new HashSet<>(properties.keySet());
++    allProperties.addAll(that.toMaybeRecordType().getOwnPropertyNames());
++
++    for (String property : allProperties) {
++        if (hasProperty(property) && that.toMaybeRecordType().hasProperty(property)) {
++            JSType thisPropertyType = getPropertyType(property);
++            JSType thatPropertyType = that.toMaybeRecordType().getPropertyType(property);
++            if (thisPropertyType.isEquivalentTo(thatPropertyType)) {
++                builder.addProperty(property, thisPropertyType, getPropertyNode(property));
++            } else {
++                builder.addProperty(property, registry.createUnionType(thisPropertyType, thatPropertyType), getPropertyNode(property));
+             }
++        } else if (hasProperty(property)) {
++            builder.addProperty(property, getPropertyType(property), getPropertyNode(property));
++        } else if (that.toMaybeRecordType().hasProperty(property)) {
++            builder.addProperty(property, that.toMaybeRecordType().getPropertyType(property), that.toMaybeRecordType().getPropertyNode(property));
+         }
+-    return builder.build();
++    }
++    
++    JSType result = builder.build();
++    if (result.isEquivalentTo(this) || result.isEquivalentTo(that)) {
++        return registry.createUnionType(this, that);
++    }
++    return registry.createUnionType(this, that, result);
+ }
+\ No newline at end of file

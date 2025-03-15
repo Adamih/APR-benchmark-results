@@ -1,0 +1,31 @@
+diff --git a/tmp/1b0bc204-e26b-49d9-bc2d-ace8358c097c_buggy.java b/tmp/1cd7a383-3170-4bcc-8d0f-171d7236b27e_fixed.java
+index 46817a7..f9cee53 100644
+--- a/tmp/1b0bc204-e26b-49d9-bc2d-ace8358c097c_buggy.java
++++ b/tmp/1cd7a383-3170-4bcc-8d0f-171d7236b27e_fixed.java
+@@ -1,16 +1,23 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+       return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
++    RecordType thatRecord = that.toMaybeRecordType();
+     for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
++      if (thatRecord.hasProperty(property) &&
++          thatRecord.getPropertyType(property).isEquivalentTo(
+               getPropertyType(property))) {
+         builder.addProperty(property, getPropertyType(property),
+             getPropertyNode(property));
+       }
+     }
+-    return builder.build();
++    for (String property : thatRecord.getProperties()) {
++      if (!properties.containsKey(property)) {
++          return registry.createUnionType(this, that);
++      }
++    }
++
++    return builder.build().isEquivalentTo(this) ? this : builder.build();
+   }

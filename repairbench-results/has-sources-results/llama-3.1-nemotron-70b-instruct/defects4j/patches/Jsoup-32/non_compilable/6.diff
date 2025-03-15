@@ -1,0 +1,14 @@
+diff --git a/tmp/1d802af1-a34b-4b71-b870-3c76c87a6ff5_buggy.java b/tmp/0333e5bb-d698-4d67-9114-69f4ec158701_fixed.java
+index 91469b4..857b5ed 100644
+--- a/tmp/1d802af1-a34b-4b71-b870-3c76c87a6ff5_buggy.java
++++ b/tmp/0333e5bb-d698-4d67-9114-69f4ec158701_fixed.java
+@@ -1,6 +1,7 @@
+ @Override
+ public Element clone() {
+     Element clone = (Element) super.clone();
+-        clone.classNames();
++    // Create a defensive copy of the classNames set to ensure changes to the clone don't affect the original
++    clone.setClassNames(new LinkedHashSet<>(clone.classNames()));
+     return clone;
+ }
+\ No newline at end of file

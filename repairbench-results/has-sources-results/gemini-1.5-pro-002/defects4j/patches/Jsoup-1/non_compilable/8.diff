@@ -1,0 +1,24 @@
+diff --git a/tmp/154b372e-3deb-421e-9c66-58c4c596a793_buggy.java b/tmp/e7aa6ca8-8389-4f9f-8ddf-eb8c0cf6eae3_fixed.java
+index 00914da..e307b40 100644
+--- a/tmp/154b372e-3deb-421e-9c66-58c4c596a793_buggy.java
++++ b/tmp/e7aa6ca8-8389-4f9f-8ddf-eb8c0cf6eae3_fixed.java
+@@ -1,17 +1,16 @@
+     // does not recurse.
+     private void normalise(Element element) {
+         List<Node> toMove = new ArrayList<Node>();
+-        for (Node node: element.childNodes) {
++        for (Node node: element.childNodesCopy()) { // use childNodesCopy to avoid concurrent modification issues
+             if (node instanceof TextNode) {
+                 TextNode tn = (TextNode) node;
+                 if (!tn.isBlank())
+                     toMove.add(tn);
+             }
+         }
+ 
+         for (Node node: toMove) {
+             element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++            body().prependChild(node); // prepend to body instead of appending
+         }
+     }

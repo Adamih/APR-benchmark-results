@@ -1,0 +1,22 @@
+diff --git a/tmp/c49be3da-48c5-47e6-96f5-7c89b221f0e7_buggy.java b/tmp/6ff5458f-4eb5-421c-9fa9-ecb05969cf75_fixed.java
+index 6c3142f..5af42bb 100644
+--- a/tmp/c49be3da-48c5-47e6-96f5-7c89b221f0e7_buggy.java
++++ b/tmp/6ff5458f-4eb5-421c-9fa9-ecb05969cf75_fixed.java
+@@ -1,10 +1,15 @@
+ static boolean isSimpleNumber(String s) {
++    // Adjusted to accommodate for property names in object literals, 
++    // which can be numeric but should not be simplified if enclosed in brackets
++    if (s.startsWith("[") && s.endsWith("]")) {
++        return false;
++    }
+     int len = s.length();
+     for (int index = 0; index < len; index++) {
+       char c = s.charAt(index);
+       if (c < '0' || c > '9') {
+         return false;
+       }
+     }
+-    return len > 0 && s.charAt(0) != '0';
++    return len > 0 && (len == 1 || s.charAt(0)!= '0');
+ }
+\ No newline at end of file

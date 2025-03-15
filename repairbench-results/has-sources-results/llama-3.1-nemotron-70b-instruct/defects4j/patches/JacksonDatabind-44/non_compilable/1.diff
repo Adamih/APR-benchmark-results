@@ -1,0 +1,36 @@
+diff --git a/tmp/6343228e-f902-4a14-8afe-ad9b4dcba851_buggy.java b/tmp/aa67c704-5af6-47fa-b96d-cbd1259dda40_fixed.java
+index 1a63a66..9078862 100644
+--- a/tmp/6343228e-f902-4a14-8afe-ad9b4dcba851_buggy.java
++++ b/tmp/aa67c704-5af6-47fa-b96d-cbd1259dda40_fixed.java
+@@ -1,21 +1,22 @@
+ @Override
+ @Deprecated
+ protected JavaType _narrow(Class<?> subclass)
+ {
+     if (_class == subclass) {
+         return this;
+     }
+-        // Should we check that there is a sub-class relationship?
+-        // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+-        //    placeholder values (`Void`, `NoClass`), so can not quite do yet.
+-        // TODO: fix in 2.8
+-            /*
++    // Check if subclass is a sub-type of _class, excluding placeholder values
++    if (Void.class.isAssignableFrom(_class) || NoClass.class.isAssignableFrom(_class)) {
++        return new SimpleType(subclass, _bindings, this, _superInterfaces,
++                _valueHandler, _typeHandler, _asStatic);
++    } else if (_class.isAssignableFrom(subclass)) {
++        return new SimpleType(subclass, _bindings, this, _superInterfaces,
++                _valueHandler, _typeHandler, _asStatic);
++    } else {
+         throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+                 +_class.getName());
+-                    */
+-            return new SimpleType(subclass, _bindings, this, _superInterfaces,
+-                    _valueHandler, _typeHandler, _asStatic);
++    }
+     // Otherwise, stitch together the hierarchy. First, super-class
+     // if not found, try a super-interface
+     // should not get here but...
+ }
+\ No newline at end of file

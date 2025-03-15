@@ -1,0 +1,54 @@
+diff --git a/tmp/2fb63fe2-bb32-4e7e-9629-427f5f903666_buggy.java b/tmp/fb2d2ec8-f180-4033-be19-343da3975ab9_fixed.java
+index 07b0792..ed30c5d 100644
+--- a/tmp/2fb63fe2-bb32-4e7e-9629-427f5f903666_buggy.java
++++ b/tmp/fb2d2ec8-f180-4033-be19-343da3975ab9_fixed.java
+@@ -1,22 +1,46 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+       // Make sure this assignment is not in a loop.
+-      for (BasicBlock block = ref.getBasicBlock();
+-           block != null; block = block.getParent()) {
++      BasicBlock block = ref.getBasicBlock();
++      while (block != null) {
+         if (block.isFunction) {
+           break;
+         } else if (block.isLoop) {
+           return false;
+         }
++        block = block.getParent();
+       }
+ 
++      List<Reference> allRefs = getReferences(getScope());
++      if (allRefs.size() == 1) {
++        return true;
++      }
++
++      for (Reference other : allRefs) {
++        if (other == ref) {
++          continue;
++        }
++
++        BasicBlock otherBlock = other.getBasicBlock();
++        while (otherBlock != null) {
++          if (otherBlock.isFunction) {
++            break;
++          }
++
++          if (otherBlock == block && !other.isDeclaration()) {
++            return false;
++          }
++          otherBlock = otherBlock.getParent();
++        }
++
++      }
+       return true;
+     }
+\ No newline at end of file

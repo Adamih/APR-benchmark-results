@@ -1,0 +1,25 @@
+diff --git a/tmp/98fafd45-5141-4de7-ad22-d6bf7ac8e33d_buggy.java b/tmp/81f3e0fd-b469-4a35-a63f-ca6cf0ee590f_fixed.java
+index ee836e4..3b631aa 100644
+--- a/tmp/98fafd45-5141-4de7-ad22-d6bf7ac8e33d_buggy.java
++++ b/tmp/81f3e0fd-b469-4a35-a63f-ca6cf0ee590f_fixed.java
+@@ -1,9 +1,19 @@
+ @Override
+ protected String buildCanonicalName()
+ {
+     StringBuilder sb = new StringBuilder();
+     sb.append(_class.getName());
+     sb.append('<');
+     sb.append(_referencedType.toCanonical());
++    if (_referencedType.isArrayType()) {
++        sb.append('>');
++    } else {
++        sb.append('>');
++    }
++    // Add this condition to properly close the canonical name when the contained type is an array type
++    if (_referencedType.isArrayType()) {
++        return sb.toString().replace(">>", ">");
++    } else {
+         return sb.toString();
+     }
++}
+\ No newline at end of file

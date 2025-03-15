@@ -1,0 +1,19 @@
+diff --git a/tmp/17124642-9e97-4ebc-9ddd-91b1154c9cfb_buggy.java b/tmp/b3f97004-d094-4420-839a-0e7e31dc9ef1_fixed.java
+index 4d0be80..0f311c9 100644
+--- a/tmp/17124642-9e97-4ebc-9ddd-91b1154c9cfb_buggy.java
++++ b/tmp/b3f97004-d094-4420-839a-0e7e31dc9ef1_fixed.java
+@@ -1,10 +1,12 @@
+     @Override
+     Node processForInLoop(ForInLoop loopNode) {
+ 
+         // Return the bare minimum to put the AST in a valid state.
++      Node inop = newNode(Token.IN);
++      inop.addChildToFront(transform(loopNode.getIterator()));
++      inop.addChildToBack(transform(loopNode.getIteratedObject()));
+       return newNode(
+           Token.FOR,
+-          transform(loopNode.getIterator()),
+-          transform(loopNode.getIteratedObject()),
++          inop,
+           transformBlock(loopNode.getBody()));
+     }

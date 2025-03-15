@@ -1,0 +1,25 @@
+diff --git a/tmp/48d7ee72-aec7-49a1-bb04-c084167d38fe_buggy.java b/tmp/7e13673b-a128-4617-ab79-f6cb8eb88956_fixed.java
+index 6f49dcb..afc8123 100644
+--- a/tmp/48d7ee72-aec7-49a1-bb04-c084167d38fe_buggy.java
++++ b/tmp/7e13673b-a128-4617-ab79-f6cb8eb88956_fixed.java
+@@ -1,9 +1,19 @@
+ @Override
+ public StringBuilder getGenericSignature(StringBuilder sb)
+ {
+     _classSignature(_class, sb, false);
+     sb.append('<');
++
++    if (_referencedType instanceof ParameterizedType) {
++        ParameterizedType pType = (ParameterizedType) _referencedType;
++        Type[] actualTypeArguments = pType.getActualTypeArguments();
++        for (Type actualTypeArgument : actualTypeArguments) {
++            sb = TypeFactory.defaultInstance().constructType(actualTypeArgument).getGenericSignature(sb);
++        }
++    } else {
+         sb = _referencedType.getGenericSignature(sb);
++    }
++
+     sb.append(';');
+     return sb;
+ }
+\ No newline at end of file

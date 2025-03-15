@@ -1,0 +1,15 @@
+diff --git a/tmp/a08d63e9-5a95-47f9-8516-88932cbee703_buggy.java b/tmp/e075ef0b-57a5-49aa-a1ba-ccdb75d3b868_fixed.java
+index 22640dd..fff72fb 100644
+--- a/tmp/a08d63e9-5a95-47f9-8516-88932cbee703_buggy.java
++++ b/tmp/e075ef0b-57a5-49aa-a1ba-ccdb75d3b868_fixed.java
+@@ -1,3 +1,9 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++    // Traverse up the AST to find if the node is within a try block
++    for (Node parent = cfgNode.getParent(); parent != null; parent = parent.getParent()) {
++        if (parent.isTry()) {
++            return true;
++        }
++    }
+     return false;
+ }
+\ No newline at end of file

@@ -1,0 +1,45 @@
+diff --git a/tmp/6dea532d-c75c-4a0f-8f88-6b3d765996ab_buggy.java b/tmp/785d5865-588c-4b70-95aa-e9330ee41c63_fixed.java
+index 1530b34..a546cad 100644
+--- a/tmp/6dea532d-c75c-4a0f-8f88-6b3d765996ab_buggy.java
++++ b/tmp/785d5865-588c-4b70-95aa-e9330ee41c63_fixed.java
+@@ -1,23 +1,37 @@
+ /**
+  * Declares all of a function's arguments.
+  */
+ private void declareArguments(Node functionNode) {
+   Node astParameters = functionNode.getFirstChild().getNext();
+   Node body = astParameters.getNext();
+   FunctionType functionType = (FunctionType) functionNode.getJSType();
+   if (functionType!= null) {
+     Node jsDocParameters = functionType.getParametersNode();
+     if (jsDocParameters!= null) {
+       Node jsDocParameter = jsDocParameters.getFirstChild();
+       for (Node astParameter : astParameters.children()) {
+         if (jsDocParameter!= null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++          JSType declaredType = jsDocParameter.getJSType();
++          // Check if the parameter is redeclared in the function body
++          Node maybeRedeclaredParam = body.getNextmatchesName(astParameter.getString());
++          if (maybeRedeclaredParam!= null) {
++            JSType redeclaredType = maybeRedeclaredParam.getJSType();
++            if (!declaredType.isEquivalentTo(redeclaredType)) {
++              // Report error for redeclaration with different type
++              report(JSError.make(functionNode, 
++                  JSC_DUP_VAR_DECLARATION, 
++                  "variable " + astParameter.getString() + 
++                  " redefined with type " + redeclaredType + 
++                  ", original definition at " + functionNode.getLineno() + 
++                  " with type " + declaredType));
++            }
++          }
++          defineSlot(astParameter, functionNode, declaredType, true);
+           jsDocParameter = jsDocParameter.getNext();
+         } else {
+           defineSlot(astParameter, functionNode, null, true);
+         }
+       }
+     }
+   }
+ } // end declareArguments
+\ No newline at end of file

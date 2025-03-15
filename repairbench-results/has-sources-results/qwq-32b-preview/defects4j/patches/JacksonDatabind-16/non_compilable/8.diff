@@ -1,0 +1,28 @@
+diff --git a/tmp/9f15c285-b383-4adb-8cdf-d5d84fb5677c_buggy.java b/tmp/833db236-4bf0-46c6-945b-f2844866e599_fixed.java
+index 27520a0..643210e 100644
+--- a/tmp/9f15c285-b383-4adb-8cdf-d5d84fb5677c_buggy.java
++++ b/tmp/833db236-4bf0-46c6-945b-f2844866e599_fixed.java
+@@ -1,7 +1,17 @@
+-    protected final boolean _add(Annotation ann) {
+-        if (_annotations == null) {
+-            _annotations = new HashMap<Class<? extends Annotation>,Annotation>();
++private boolean annotationsEqual(Annotation a1, Annotation a2) {
++    if (a1.annotationType() != a2.annotationType()) {
++        return false;
+     }
+-        Annotation previous = _annotations.put(ann.annotationType(), ann);
+-        return (previous != null) && previous.equals(ann);
++    for (Method method : a1.annotationType().getDeclaredMethods()) {
++        try {
++            Object val1 = method.invoke(a1);
++            Object val2 = method.invoke(a2);
++            if (!Objects.equals(val1, val2)) {
++                return false;
++            }
++        } catch (IllegalAccessException | InvocationTargetException e) {
++            throw new RuntimeException("Unable to access annotation element: " + method, e);
++        }
++    }
++    return true;
+ }
+\ No newline at end of file

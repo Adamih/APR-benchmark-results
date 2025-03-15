@@ -1,0 +1,44 @@
+diff --git a/tmp/b15f9624-bd70-4b9c-9e14-7bcd318e4736_buggy.java b/tmp/846765c5-b8cf-4db6-b2ce-d29d8c28f19e_fixed.java
+index 46817a7..4a2006a 100644
+--- a/tmp/b15f9624-bd70-4b9c-9e14-7bcd318e4736_buggy.java
++++ b/tmp/846765c5-b8cf-4db6-b2ce-d29d8c28f19e_fixed.java
+@@ -1,16 +1,31 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+-    if (!that.isRecordType()) {
++    if (!that.isRecordType() || that.isUnknownType()) {
+       return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++    JSType thisRecord = this.toMaybeRecordType();
++    JSType thatRecord = that.toMaybeRecordType();
++    for (String property : thisRecord.getProperties().keySet()) {
++      if (thatRecord.hasProperty(property)) {
++        JSType thisPropType = thisRecord.getPropertyType(property);
++        JSType thatPropType = thatRecord.getPropertyType(property);
++        if (thisPropType.isEquivalentTo(thatPropType)) {
++          builder.addProperty(property, thisPropType, thisRecord.getPropertyNode(property));
++        } else {
++          builder.addProperty(property, registry.createUnionType(thisPropType, thatPropType),
++              thisPropType.toMaybeRecordType().getPropertyNode(property));
++        }
++      } else {
++        builder.addProperty(property, thisRecord.getPropertyType(property),
++            thisRecord.getPropertyNode(property));
++      }
++    }
++    for (String property : thatRecord.getProperties().keySet()) {
++      if (!thisRecord.hasProperty(property)) {
++        builder.addProperty(property, thatRecord.getPropertyType(property),
++            thatRecord.getPropertyNode(property));
+       }
+     }
+     return builder.build();
+   }
+\ No newline at end of file

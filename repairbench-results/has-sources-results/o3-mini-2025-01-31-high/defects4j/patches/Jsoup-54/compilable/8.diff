@@ -1,0 +1,28 @@
+diff --git a/tmp/8d3a40ad-ee9e-4032-ba74-ae61d117efc2_buggy.java b/tmp/49eb1b37-4ef3-4d31-8f12-80621194d78f_fixed.java
+index d5b3da9..071e250 100644
+--- a/tmp/8d3a40ad-ee9e-4032-ba74-ae61d117efc2_buggy.java
++++ b/tmp/49eb1b37-4ef3-4d31-8f12-80621194d78f_fixed.java
+@@ -1,7 +1,19 @@
+ private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
++    int counter = 0;
+     for (Attribute attribute : source.attributes()) {
+-                // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+-                String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
+-                    el.setAttribute(key, attribute.getValue());
++        String originalKey = attribute.getKey();
++        // Remove any characters that aren’t allowed in an XML attribute name.
++        String key = originalKey.replaceAll("[^-a-zA-Z0-9_:.]", "");
++        // Ensure the key isn’t empty and starts with a valid XML name-start character.
++        if (key.isEmpty() || !key.substring(0, 1).matches("[a-zA-Z_:]")) {
++            key = "a" + key;
++        }
++        // If the key already exists on the element, add a suffix to ensure uniqueness.
++        String uniqueKey = key;
++        while (el.hasAttribute(uniqueKey)) {
++            uniqueKey = key + "_" + counter;
++            counter++;
++        }
++        el.setAttribute(uniqueKey, attribute.getValue());
+     }
+ }
+\ No newline at end of file

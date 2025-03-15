@@ -1,0 +1,33 @@
+diff --git a/tmp/86168163-258d-40dd-94ea-d8c560d0d4a0_buggy.java b/tmp/08479cd2-2c69-46a8-942c-c611a055cb48_fixed.java
+index 46817a7..5547976 100644
+--- a/tmp/86168163-258d-40dd-94ea-d8c560d0d4a0_buggy.java
++++ b/tmp/08479cd2-2c69-46a8-942c-c611a055cb48_fixed.java
+@@ -1,16 +1,27 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+   if (!that.isRecordType()) {
+     return super.getLeastSupertype(that);
+   }
+   RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+   for (String property : properties.keySet()) {
+     if (that.toMaybeRecordType().hasProperty(property) &&
+         that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+             getPropertyType(property))) {
+       builder.addProperty(property, getPropertyType(property),
+           getPropertyNode(property));
++    } else if (that.toMaybeRecordType().hasProperty(property)) {
++      // If the property exists in both types but has different types,
++      // the least supertype is the union of the two types.
++      return registry.createUnionType(this, that);
++    }
++  }
++  for (String property : that.toMaybeRecordType().getProperties().keySet()) {
++    if (!properties.containsKey(property)) {
++      // If the property only exists in one of the types,
++      // the least supertype is the union of the two types.
++      return registry.createUnionType(this, that);
+     }
+   }
+   return builder.build();
+ }
+\ No newline at end of file

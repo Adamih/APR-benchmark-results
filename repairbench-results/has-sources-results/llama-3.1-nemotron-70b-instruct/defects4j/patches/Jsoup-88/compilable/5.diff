@@ -1,0 +1,30 @@
+diff --git a/tmp/20c04256-10e6-4ffb-924f-7583e08ba928_buggy.java b/tmp/438f9357-693c-489c-acae-289269eb71dd_fixed.java
+index a68ccd7..d8ef234 100644
+--- a/tmp/20c04256-10e6-4ffb-924f-7583e08ba928_buggy.java
++++ b/tmp/438f9357-693c-489c-acae-289269eb71dd_fixed.java
+@@ -1,7 +1,21 @@
+ /**
+-     Get the attribute value.
+-     @return the attribute value
++ * Get the attribute value. Returns an empty string for boolean attributes.
++ * @return the attribute value
+  */
+ public String getValue() {
+-        return val;
++    return isBooleanAttribute()? "" : val;
+ }
++
++// Assuming the method `isBooleanAttribute()` exists in the same class, 
++// checking if the attribute is a boolean one (e.g., "hidden", "disabled", etc.).
++// If not, you would need to implement or inject this method as well.
++
++// Alternative implementation without relying on `isBooleanAttribute()`:
++// public String getValue() {
++//     return key.equals(val)? "" : val; // Boolean attributes often have key==value
++// }
++// or
++// public String getValue() {
++//     return BOOLEAN_ATTRIBUTES.contains(key)? "" : val;
++//     // Where BOOLEAN_ATTRIBUTES is a predefined set/list of known boolean attribute keys
++// }
+\ No newline at end of file

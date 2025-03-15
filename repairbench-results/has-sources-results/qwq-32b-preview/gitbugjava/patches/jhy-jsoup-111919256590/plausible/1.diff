@@ -1,0 +1,17 @@
+diff --git a/tmp/e9f698a0-0eb6-4174-9122-de35b71147a9_buggy.java b/tmp/ad6f4d94-26c5-4dca-afe1-fcbf9331fc7f_fixed.java
+index e807cbf..2605c95 100644
+--- a/tmp/e9f698a0-0eb6-4174-9122-de35b71147a9_buggy.java
++++ b/tmp/ad6f4d94-26c5-4dca-afe1-fcbf9331fc7f_fixed.java
+@@ -1,7 +1,10 @@
+ private boolean isInlineable(Document.OutputSettings out) {
+     if (!tag.isInline())
+         return false;
++    // Check if parent is block-level or null, and current element is not effectively first, and outline is false
+     return (parent() == null || parent().isBlock())
+         && !isEffectivelyFirst()
+-            && !out.outline();
++        && !out.outline()
++        // Additional condition to handle <br> tags specifically
++        && !tag.getName().equals("br");
+ }
+\ No newline at end of file

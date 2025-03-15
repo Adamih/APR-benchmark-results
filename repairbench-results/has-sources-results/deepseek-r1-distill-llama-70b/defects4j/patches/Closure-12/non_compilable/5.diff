@@ -1,0 +1,16 @@
+diff --git a/tmp/3eb1aef2-5c3b-43d2-a10c-58d4db5ab232_buggy.java b/tmp/1828bf30-db87-4709-a3dc-5ec3a160cd06_fixed.java
+index 22640dd..cddaa52 100644
+--- a/tmp/3eb1aef2-5c3b-43d2-a10c-58d4db5ab232_buggy.java
++++ b/tmp/1828bf30-db87-4709-a3dc-5ec3a160cd06_fixed.java
+@@ -1,3 +1,10 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
++    Node current = cfgNode;
++    while (current != null) {
++      if (current.getParent() != null && current.getParent()._isCatch()) {
++        return true;
++      }
++      current = current.getParent();
++    }
+     return false;
+   }
+\ No newline at end of file

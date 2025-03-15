@@ -1,0 +1,33 @@
+diff --git a/tmp/644750e7-dfc1-4df2-82de-a22f67e8ec42_buggy.java b/tmp/d0446d23-7d32-4a34-8070-40f4d82b2ffa_fixed.java
+index 39c4220..a509547 100644
+--- a/tmp/644750e7-dfc1-4df2-82de-a22f67e8ec42_buggy.java
++++ b/tmp/d0446d23-7d32-4a34-8070-40f4d82b2ffa_fixed.java
+@@ -1,21 +1,21 @@
+     private final static int _parseIndex(String str) {
+         final int len = str.length();
+         // [Issue#133]: beware of super long indexes; assume we never
+         // have arrays over 2 billion entries so ints are fine.
+         if (len == 0 || len > 10) {
+             return -1;
+         }
+         for (int i = 0; i < len; ++i) {
+-            char c = str.charAt(i++);
++            char c = str.charAt(i); // Fixed the increment issue
+             if (c > '9' || c < '0') {
+                 return -1;
+             }
+         }
+-        if (len == 10) {
+-            long l = NumberInput.parseLong(str);
+-            if (l > Integer.MAX_VALUE) {
++        // Check if the string contains only digit characters before parsing
++        try {
++            int value = NumberInput.parseInt(str);
++            return value;
++        } catch (NumberFormatException e) {
+             return -1;
+         }
+     }
+\ No newline at end of file
+-        return NumberInput.parseInt(str);
+-    }

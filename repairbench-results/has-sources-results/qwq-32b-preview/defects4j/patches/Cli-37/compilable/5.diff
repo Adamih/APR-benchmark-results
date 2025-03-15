@@ -1,0 +1,37 @@
+diff --git a/tmp/3237113c-e42b-43fb-a0e0-5c4da9fb9fa2_buggy.java b/tmp/e18eb38b-2db4-4679-987a-a8d1c30ee50b_fixed.java
+index a7e6997..bb03365 100644
+--- a/tmp/3237113c-e42b-43fb-a0e0-5c4da9fb9fa2_buggy.java
++++ b/tmp/e18eb38b-2db4-4679-987a-a8d1c30ee50b_fixed.java
+@@ -1,12 +1,20 @@
+-    /**
+-     * Tells if the token looks like a short option.
+-     * 
+-     * @param token
+-     */
+-    private boolean isShortOption(String token)
+-    {
+-        // short options (-S, -SV, -S=V, -SV1=V2, -S1S2)
+-        return token.startsWith("-") && token.length() >= 2 && options.hasShortOption(token.substring(1, 2));
+-
+-        // remove leading "-" and "=value"
++private boolean isShortOption(String token) {
++    // Check if the token starts with "-"
++    if (token.startsWith("-") && token.length() >= 2) {
++        // Check if the first character after "-" is a valid short option
++        String firstChar = token.substring(1, 2);
++        if (options.hasShortOption(firstChar)) {
++            // If the token has more characters, check if they are also valid short options
++            for (int i = 2; i < token.length(); i++) {
++                String charAtI = token.substring(i, i + 1);
++                if (!options.hasShortOption(charAtI)) {
++                    // If any character is not a valid short option, it's not a short option token
++                    return false;
++                }
++            }
++            // All characters after "-" are valid short options
++            return true;
++        }
++    }
++    return false;
+ }
+\ No newline at end of file

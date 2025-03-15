@@ -1,0 +1,33 @@
+diff --git a/tmp/4aed68ba-802f-4591-a170-a7f1ea68bbe3_buggy.java b/tmp/c3acd99e-d523-489f-b90a-8432c93ecfb2_fixed.java
+index 19fe1b4..084774a 100644
+--- a/tmp/4aed68ba-802f-4591-a170-a7f1ea68bbe3_buggy.java
++++ b/tmp/c3acd99e-d523-489f-b90a-8432c93ecfb2_fixed.java
+@@ -1,17 +1,22 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+       
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++      if (length == 0) {
+         return false;
+       }
+       
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++      // Only allow ASCII identifiers, as this function does
++      // not cover full Unicode JS identifier rules
++      for (int i = 0; i < length; i++) {
++        char c = s.charAt(i);
++        // Check if each character is a valid ASCII JavaScript identifier part.
++        if (!(c == '$' || c == '_' || 
++              (c >= 'a' && c <= 'z') || 
++              (c >= 'A' && c <= 'Z') || 
++              (c >= '0' && c <= '9' && i > 0))) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }
+\ No newline at end of file

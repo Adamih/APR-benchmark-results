@@ -1,0 +1,60 @@
+diff --git a/tmp/eb4f54cd-4d5c-4cd3-a5b0-ad165164f07d_buggy.java b/tmp/f4d11057-31bc-47ec-b42d-2450f1f846ca_fixed.java
+index 4e8b037..de704e5 100644
+--- a/tmp/eb4f54cd-4d5c-4cd3-a5b0-ad165164f07d_buggy.java
++++ b/tmp/f4d11057-31bc-47ec-b42d-2450f1f846ca_fixed.java
+@@ -1,20 +1,42 @@
+-    public List getValues(final Option option,
+-                          List defaultValues) {
+-        // initialize the return list
+-        List valueList = (List) values.get(option);
+ 
+-        // grab the correct default values
+-        if ((valueList == null) || valueList.isEmpty()) {
++List valueList = values.get(option);
++
++if (valueList == null || valueList.isEmpty()) {
++
+     valueList = defaultValues;
++
++}
++
++if (valueList == null || valueList.isEmpty()) {
++
++    valueList = this.defaultValues.get(option);
++
++}
++
++int providedCount = valueList == null ? 0 : valueList.size();
++
++int maximumAllowed = option.getMaximumArguments();
++
++if (providedCount < maximumAllowed) {
++
++    List defaults = this.defaultValues.get(option);
++
++    for (int i = providedCount; i < maximumAllowed; i++) {
++
++        if (defaults != null && i < defaults.size()) {
++
++            valueList.add(defaults.get(i));
++
++        } else {
++
++            // No more defaults, break or continue?
++
++            break;
++
+         }
+ 
+-        // augment the list with the default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = (List) this.defaultValues.get(option);
+     }
+-                // if there are more default values as specified, add them to
+-                // the list.
+-                    // copy the list first
+ 
+-        return valueList == null ? Collections.EMPTY_LIST : valueList;
+ }
++
++return valueList != null ? valueList : Collections.EMPTY_LIST;

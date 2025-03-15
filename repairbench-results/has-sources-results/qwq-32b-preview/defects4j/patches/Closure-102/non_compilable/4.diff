@@ -1,0 +1,19 @@
+diff --git a/tmp/7670d408-e108-49a1-ac65-ea1f7c4873f0_buggy.java b/tmp/3fb80f26-5f96-4e4b-a133-beaebe2748d0_fixed.java
+index f47d784..57849c1 100644
+--- a/tmp/7670d408-e108-49a1-ac65-ea1f7c4873f0_buggy.java
++++ b/tmp/3fb80f26-5f96-4e4b-a133-beaebe2748d0_fixed.java
+@@ -1,12 +1,11 @@
+ @Override
+ public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+         MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+         NodeTraversal t = new NodeTraversal(compiler, renamer);
+         t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+-    new PropogateConstantAnnotations(compiler, assertOnChange)
+-        .process(externs, root);
++    new PropagateConstantAnnotations(compiler, assertOnChange).process(externs, root);
+ }
+\ No newline at end of file

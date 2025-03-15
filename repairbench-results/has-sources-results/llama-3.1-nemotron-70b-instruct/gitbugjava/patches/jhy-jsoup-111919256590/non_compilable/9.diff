@@ -1,0 +1,20 @@
+diff --git a/tmp/4631729f-dac6-44ef-bf0f-65e831f0c4c6_buggy.java b/tmp/593a1aea-2db8-4a8a-ad28-71e6c9745011_fixed.java
+index e807cbf..42af72b 100644
+--- a/tmp/4631729f-dac6-44ef-bf0f-65e831f0c4c6_buggy.java
++++ b/tmp/593a1aea-2db8-4a8a-ad28-71e6c9745011_fixed.java
+@@ -1,7 +1,13 @@
++/**
++ * Checks if an element is eligible for inline rendering.
++ * 
++ * @param out The current output settings.
++ * @return True if the element can be rendered inline, false otherwise.
++ */
+ private boolean isInlineable(Document.OutputSettings out) {
+     if (!tag.isInline())
+         return false;
+-        return (parent() == null || parent().isBlock())
++    return (parent() == null || parent().isBlock() || (parent().tag().equals(Tagemu.DIV) && parent().children().size() > 1))
+         &&!isEffectivelyFirst()
+         &&!out.outline();
+ }
+\ No newline at end of file

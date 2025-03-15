@@ -1,0 +1,26 @@
+diff --git a/tmp/940f162f-08e4-4e73-b1ba-9e5cde209ea1_buggy.java b/tmp/78b459f1-680e-44cf-9b2a-aca8a99bf018_fixed.java
+index 6fecc90..33a78ed 100644
+--- a/tmp/940f162f-08e4-4e73-b1ba-9e5cde209ea1_buggy.java
++++ b/tmp/78b459f1-680e-44cf-9b2a-aca8a99bf018_fixed.java
+@@ -1,7 +1,20 @@
+   static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+       return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+     } else {
++      switch (n.getToken()) {
++        case ADD:
++          // If either operand of an ADD is a string, the result may be a string.
++          return NodeUtil.mayBeString(n.getFirstChild()) || NodeUtil.mayBeString(n.getSecondChild());
++        case OR:
++        case AND:
++          // For logical OR and AND, we need to check both children recursively.
++          return mayBeString(n.getFirstChild(), true) || mayBeString(n.getSecondChild(), true);
++        case HOOK:
++          // For ternary operator, check both the true and false branches.
++          return mayBeString(n.getSecondChild(), true) || mayBeString(n.getThirdChild(), true);
++        default:
+           return mayBeStringHelper(n);
+       }
+     }
++  }
+\ No newline at end of file

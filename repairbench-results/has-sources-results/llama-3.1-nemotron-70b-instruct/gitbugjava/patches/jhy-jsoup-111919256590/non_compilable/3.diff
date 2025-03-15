@@ -1,0 +1,25 @@
+diff --git a/tmp/343d6843-bcf6-4d8b-8de7-71251183c813_buggy.java b/tmp/9f12f7f0-81d8-4b94-88cd-ca5c5f1cc373_fixed.java
+index e807cbf..90e2669 100644
+--- a/tmp/343d6843-bcf6-4d8b-8de7-71251183c813_buggy.java
++++ b/tmp/9f12f7f0-81d8-4b94-88cd-ca5c5f1cc373_fixed.java
+@@ -1,7 +1,18 @@
++/**
++ * Checks if an element is inlineable based on its tag, parent, position, and output settings.
++ * 
++ * @param out the Document output settings
++ * @return true if the element is inlineable, false otherwise
++ */
+ private boolean isInlineable(Document.OutputSettings out) {
+     if (!tag.isInline())
+         return false;
+     return (parent() == null || parent().isBlock())
+-            && !isEffectivelyFirst()
++        && (parent() == null ||!isEffectivelyFirstInBlockParent()) // Fix: Check if first in block parent
+         &&!out.outline();
+ }
++
++// Additional helper method (may need to be added if not already present)
++private boolean isEffectivelyFirstInBlockParent() {
++    return parent()!= null && parent().isBlock() && parent().childNodes().first() == this;
++}
+\ No newline at end of file

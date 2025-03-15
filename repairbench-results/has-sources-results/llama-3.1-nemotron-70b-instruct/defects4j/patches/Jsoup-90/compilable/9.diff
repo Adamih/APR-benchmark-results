@@ -1,0 +1,54 @@
+diff --git a/tmp/da610bf3-4d2a-4ae9-8e93-722cc2a1dfc5_buggy.java b/tmp/57d43ff9-ba0a-4afd-8c12-d5b986b8fac3_fixed.java
+index 373b1e8..0791a66 100644
+--- a/tmp/da610bf3-4d2a-4ae9-8e93-722cc2a1dfc5_buggy.java
++++ b/tmp/57d43ff9-ba0a-4afd-8c12-d5b986b8fac3_fixed.java
+@@ -1,37 +1,40 @@
+ private static boolean looksLikeUtf8(byte[] input) {
+     int i = 0;
+     // BOM:
+     if (input.length >= 3 && (input[0] & 0xFF) == 0xEF
+-                && (input[1] & 0xFF) == 0xBB & (input[2] & 0xFF) == 0xBF) {
++        && (input[1] & 0xFF) == 0xBB && (input[2] & 0xFF) == 0xBF) {
+         i = 3;
+     }
+ 
+-            int end;
+-            for (int j = input.length; i < j; ++i) {
++    for (; i < input.length; ++i) {
+         int o = input[i];
+         if ((o & 0x80) == 0) {
+             continue; // ASCII
+         }
+ 
+         // UTF-8 leading:
++        int end;
+         if ((o & 0xE0) == 0xC0) {
+-                    end = i + 1;
++            end = i + 2; // Fixed off-by-one error
+         } else if ((o & 0xF0) == 0xE0) {
+-                    end = i + 2;
+-                } else if ((o & 0xF8) == 0xF0) {
+             end = i + 3;
++        } else if ((o & 0xF8) == 0xF0) {
++            end = i + 4; // Fixed off-by-one error
+         } else {
+             return false;
+         }
+ 
++        // Check if end index is within bounds before iterating
++        if (end > input.length) {
++            return false;
++        }
+ 
+-                while (i < end) {
+-                    i++;
++        while (++i < end) { // Changed to pre-increment to avoid off-by-one
+             o = input[i];
+             if ((o & 0xC0)!= 0x80) {
+                 return false;
+             }
+         }
+     }
+     return true;
+ }
+\ No newline at end of file

@@ -1,0 +1,46 @@
+diff --git a/tmp/e624ce30-195b-4c45-a724-12f4755baa3d_buggy.java b/tmp/9df8f391-b301-4e99-a92a-6a2f01fad122_fixed.java
+index b2db1d6..bfe1373 100644
+--- a/tmp/e624ce30-195b-4c45-a724-12f4755baa3d_buggy.java
++++ b/tmp/9df8f391-b301-4e99-a92a-6a2f01fad122_fixed.java
+@@ -1,29 +1,31 @@
+ protected void _addMethodMixIns(Class<?> targetClass, AnnotatedMethodMap methods,
+         Class<?> mixInCls, AnnotatedMethodMap mixIns)
+ {
+     List<Class<?>> parents = new ArrayList<Class<?>>();
+     parents.add(mixInCls);
+     ClassUtil.findSuperTypes(mixInCls, targetClass, parents);
+     for (Class<?> mixin : parents) {
+         for (Method m : mixin.getDeclaredMethods()) {
+             if (!_isIncludableMemberMethod(m)) {
+                 continue;
+             }
+             AnnotatedMethod am = methods.find(m);
+-                /* Do we already have a method to augment (from sub-class
+-                 * that will mask this mixIn)? If so, add if visible
+-                 * without masking (no such annotation)
+-                 */
+             if (am != null) {
+                 _addMixUnders(m, am);
+-                    /* Otherwise will have precedence, but must wait
+-                     * until we find the real method (mixIn methods are
+-                     * just placeholder, can't be called)
+-                     */
+             } else {
+-                    // Well, or, as per [Issue#515], multi-level merge within mixins...
++                // Check if the method already exists in mixIns
++                AnnotatedMethod existingMixIn = mixIns.find(m);
++                if (existingMixIn != null) {
++                    // If it exists, we need to merge the annotations
++                    AnnotatedMethod newMixIn = _constructMethod(m);
++                    _addMixUnders(m, newMixIn);
++                    mixIns.remove(m);
++                    mixIns.add(newMixIn);
++                } else {
++                    // If it doesn't exist, simply add it
+                     mixIns.add(_constructMethod(m));
+                 }
+             }
+         }
+     }
++}
+\ No newline at end of file

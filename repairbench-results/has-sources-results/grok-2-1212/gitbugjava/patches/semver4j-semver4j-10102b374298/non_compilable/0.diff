@@ -1,0 +1,20 @@
+diff --git a/tmp/b4cdf33b-e7c9-4faa-9a78-f30ee7d229a3_buggy.java b/tmp/0a6b0d56-063d-400d-8fe9-04e1e3ccd5b3_fixed.java
+index 593602f..623ea84 100644
+--- a/tmp/b4cdf33b-e7c9-4faa-9a78-f30ee7d229a3_buggy.java
++++ b/tmp/0a6b0d56-063d-400d-8fe9-04e1e3ccd5b3_fixed.java
+@@ -1,6 +1,12 @@
+     @Override
+     public String toString() {
+-        return rangesList.stream()
++        List<String> formattedRanges = rangesList.stream()
+             .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++            .collect(Collectors.toList());
++        
++        if (formattedRanges.size() == 1) {
++            return formattedRanges.get(0);
++        }
++        
++        return String.join(OR_JOINER, formattedRanges);
+     }
+\ No newline at end of file

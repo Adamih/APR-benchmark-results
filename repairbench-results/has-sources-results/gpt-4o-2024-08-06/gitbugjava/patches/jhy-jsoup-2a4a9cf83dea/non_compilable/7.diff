@@ -1,0 +1,26 @@
+diff --git a/tmp/c69d8b41-1d01-4835-9e42-e5b425622097_buggy.java b/tmp/d2ebff6b-80d1-4f1d-831f-cabbba9e996a_fixed.java
+index c9c2b44..868e02d 100644
+--- a/tmp/c69d8b41-1d01-4835-9e42-e5b425622097_buggy.java
++++ b/tmp/d2ebff6b-80d1-4f1d-831f-cabbba9e996a_fixed.java
+@@ -1,13 +1,19 @@
+         @Override
+         public boolean matches(Element root, Element element) {
+             // evaluate from last to first
+             for (int i = evaluators.size() -1; i >= 0; --i) {
+                 if (element == null)
+                     return false;
+                 Evaluator eval = evaluators.get(i);
+                 if (!eval.matches(root, element))
+                     return false;
+-                element = element.parent();
++                
++                // Change to use the correct context element, not just parent
++                Element parent = element.parent();
++                if(parent == null || !parent.equals(root))
++                    return false;
++                
++                element = parent;
+             }
+             return true;
+         }
+\ No newline at end of file

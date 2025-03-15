@@ -1,0 +1,17 @@
+diff --git a/tmp/db8c5b59-b386-44f6-9b7d-a3972bb584cb_buggy.java b/tmp/b597f837-9ecf-40e8-b975-936025e84eb0_fixed.java
+index 3ba614a..82eedbe 100644
+--- a/tmp/db8c5b59-b386-44f6-9b7d-a3972bb584cb_buggy.java
++++ b/tmp/b597f837-9ecf-40e8-b975-936025e84eb0_fixed.java
+@@ -1,9 +1,10 @@
+ @Override
+ public int read() throws IOException {
+     int current = super.read();
+-        if (current == '\n') {
++    String lineSep = getCSVFormat().getLineSeparator(); // Assume getCSVFormat() returns the CSVFormat being used
++    if (lineSep != null && current == lineSep.charAt(0)) {
+         lineCounter++;
+     }
+     lastChar = current;
+     return lastChar;
+ }
+\ No newline at end of file

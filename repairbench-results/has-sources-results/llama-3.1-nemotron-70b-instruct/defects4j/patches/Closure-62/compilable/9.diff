@@ -1,0 +1,55 @@
+diff --git a/tmp/75fc8305-3cf5-454f-bb06-63fb72955937_buggy.java b/tmp/ba0984cd-8a91-4a31-92a9-aaf9301b4a16_fixed.java
+index 904dba7..49b3a7d 100644
+--- a/tmp/75fc8305-3cf5-454f-bb06-63fb72955937_buggy.java
++++ b/tmp/ba0984cd-8a91-4a31-92a9-aaf9301b4a16_fixed.java
+@@ -1,46 +1,46 @@
+ private String format(JSError error, boolean warning) {
+     // extract source excerpt
+     SourceExcerptProvider source = getSource();
+     String sourceExcerpt = source == null? null :
+         excerpt.get(
+             source, error.sourceName, error.lineNumber, excerptFormatter);
+ 
+     // formatting the message
+     StringBuilder b = new StringBuilder();
+     if (error.sourceName!= null) {
+       b.append(error.sourceName);
+       if (error.lineNumber > 0) {
+         b.append(':');
+         b.append(error.lineNumber);
+       }
+       b.append(": ");
+     }
+ 
+     b.append(getLevelName(warning? CheckLevel.WARNING : CheckLevel.ERROR));
+     b.append(" - ");
+ 
+-    b.append(error.description);
+-    b.append('\n');
++    b.append(error.description); // do not append newline here
+     if (sourceExcerpt!= null) {
++      b.append('\n');
+       b.append(sourceExcerpt);
+       b.append('\n');
+       int charno = error.getCharno();
+ 
+       // padding equal to the excerpt and arrow at the end
+       // charno == sourceExpert.length() means something is missing
+       // at the end of the line
+       if (excerpt.equals(LINE)
+-          && 0 <= charno && charno < sourceExcerpt.length()) {
++          && 0 <= charno && charno <= sourceExcerpt.length()) { // fixed off-by-one error
+         for (int i = 0; i < charno; i++) {
+           char c = sourceExcerpt.charAt(i);
+           if (Character.isWhitespace(c)) {
+             b.append(c);
+           } else {
+             b.append(' ');
+           }
+         }
+         b.append("^\n");
+       }
+     }
+     return b.toString();
+ }
+\ No newline at end of file

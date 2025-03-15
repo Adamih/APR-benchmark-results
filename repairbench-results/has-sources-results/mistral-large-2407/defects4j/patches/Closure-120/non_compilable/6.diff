@@ -1,0 +1,30 @@
+diff --git a/tmp/4e6aaa3a-7b1e-4493-8c79-c4d93ca66f1c_buggy.java b/tmp/00c9f8bb-fd47-473d-ad84-54268764f6c8_fixed.java
+index 07b0792..98fbf00 100644
+--- a/tmp/4e6aaa3a-7b1e-4493-8c79-c4d93ca66f1c_buggy.java
++++ b/tmp/00c9f8bb-fd47-473d-ad84-54268764f6c8_fixed.java
+@@ -1,22 +1,22 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+       // Make sure this assignment is not in a loop.
+       for (BasicBlock block = ref.getBasicBlock();
+            block != null; block = block.getParent()) {
+-        if (block.isFunction) {
++        if (block.isFunction()) {
+           break;
+-        } else if (block.isLoop) {
++        } else if (block.isLoop()) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }
+\ No newline at end of file

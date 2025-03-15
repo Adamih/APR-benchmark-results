@@ -1,0 +1,27 @@
+diff --git a/tmp/d1029f81-bf01-405c-9d68-9619bfd9658b_buggy.java b/tmp/797666a7-337f-422c-b1f7-1632c9077605_fixed.java
+index 072c672..fa07d0e 100644
+--- a/tmp/d1029f81-bf01-405c-9d68-9619bfd9658b_buggy.java
++++ b/tmp/797666a7-337f-422c-b1f7-1632c9077605_fixed.java
+@@ -1,20 +1,19 @@
+ @Override
+ public int parseArguments(Parameters params) throws CmdLineException {
+     String param = params.getParameter(0);
+ 
+     if (param == null) {
+         setter.addValue(true);
+         return 0;
+     } else {
+         String lowerParam = param.toLowerCase();
+         if (TRUES.contains(lowerParam)) {
+             setter.addValue(true);
+         } else if (FALSES.contains(lowerParam)) {
+             setter.addValue(false);
+         } else {
+-            setter.addValue(true);
+-            return 0;
++            throw new CmdLineException("Invalid parameter: " + param);
+         }
+         return 1;
+     }
+ }
+\ No newline at end of file

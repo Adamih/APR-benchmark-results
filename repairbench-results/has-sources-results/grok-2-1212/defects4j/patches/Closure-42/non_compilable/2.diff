@@ -1,0 +1,28 @@
+diff --git a/tmp/55613c04-6d14-4c60-b6d0-2c3528d3795c_buggy.java b/tmp/c53859d8-9db6-4501-9bd9-708de0714a44_fixed.java
+index 4d0be80..d1bd98a 100644
+--- a/tmp/55613c04-6d14-4c60-b6d0-2c3528d3795c_buggy.java
++++ b/tmp/c53859d8-9db6-4501-9bd9-708de0714a44_fixed.java
+@@ -1,10 +1,19 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
++    Token loopType = loopNode.isForEach() ? Token.FOR : Token.FOR_IN;
+     
+-        // Return the bare minimum to put the AST in a valid state.
+-      return newNode(
+-          Token.FOR,
++    // Create a new node based on whether it's a 'for...in' or 'for each...in' loop
++    Node result = newNode(
++        loopType,
+         transform(loopNode.getIterator()),
++        loopNode.isForEach() ? createStringNode("each") : null,
+         transform(loopNode.getIteratedObject()),
+         transformBlock(loopNode.getBody()));
++    
++    // If it's not a 'for each' loop, remove the null 'each' node
++    if (!loopNode.isForEach()) {
++        result.removeChild(result.getChildAtIndex(2));
++    }
++    
++    return result;
+ }
+\ No newline at end of file

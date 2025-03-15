@@ -1,0 +1,56 @@
+diff --git a/tmp/c65c36ac-6d1f-4ea3-bab7-da77bb7a9da8_buggy.java b/tmp/85748185-7bba-4b3c-8b96-b561fafe3fc3_fixed.java
+index 58a1651..d99651f 100644
+--- a/tmp/c65c36ac-6d1f-4ea3-bab7-da77bb7a9da8_buggy.java
++++ b/tmp/85748185-7bba-4b3c-8b96-b561fafe3fc3_fixed.java
+@@ -1,32 +1,49 @@
+ @Override
+ JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+   setResolvedTypeInternal(this);
+ 
+   call = (ArrowType) safeResolve(call, t, scope);
+   prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+   // Warning about typeOfThis if it doesn't resolve to an ObjectType
+   // is handled further upstream.
+   // TODO(nicksantos): Handle this correctly if we have a UnionType.
+-    typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
++  JSType resolvedTypeOfThis = safeResolve(typeOfThis, t, scope);
++  if (resolvedTypeOfThis instanceof ObjectType) {
++    typeOfThis = (ObjectType) resolvedTypeOfThis;
++  } else if (resolvedTypeOfThis instanceof UnionType) {
++    // Handle UnionType case by checking if it contains an ObjectType
++    boolean containsObjectType = false;
++    for (JSType type : ((UnionType) resolvedTypeOfThis).getAlternates()) {
++      if (type instanceof ObjectType) {
++        containsObjectType = true;
++        break;
++      }
++    }
++    if (!containsObjectType) {
++      t.warning("typeOfThis must be an object");
++    }
++  } else {
++    t.warning("typeOfThis must be an object");
++  }
+ 
+   boolean changed = false;
+   ImmutableList.Builder<ObjectType> resolvedInterfaces =
+       ImmutableList.builder();
+   for (ObjectType iface : implementedInterfaces) {
+     ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+     resolvedInterfaces.add(resolvedIface);
+     changed |= (resolvedIface != iface);
+   }
+   if (changed) {
+     implementedInterfaces = resolvedInterfaces.build();
+   }
+ 
+   if (subTypes != null) {
+     for (int i = 0; i < subTypes.size(); i++) {
+       subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+     }
+   }
+ 
+   return super.resolveInternal(t, scope);
+ }
+\ No newline at end of file

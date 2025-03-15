@@ -1,0 +1,15 @@
+diff --git a/tmp/3301aea8-e016-49ab-afb2-5b0480dbad00_buggy.java b/tmp/8e57d43a-449d-492c-bb75-94acd1e55b24_fixed.java
+index 22640dd..cd908fc 100644
+--- a/tmp/3301aea8-e016-49ab-afb2-5b0480dbad00_buggy.java
++++ b/tmp/8e57d43a-449d-492c-bb75-94acd1e55b24_fixed.java
+@@ -1,3 +1,9 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++    if (cfgNode.isControlStructure()) {
++        ControlStructure controlStructure = cfgNode.getControlStructure();
++        if (controlStructure.getType() == ControlStructure.Type.TRY) {
++            return true;
++        }
++    }
+     return false;
+ }
+\ No newline at end of file

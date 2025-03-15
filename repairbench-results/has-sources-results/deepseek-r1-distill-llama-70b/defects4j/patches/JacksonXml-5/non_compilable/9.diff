@@ -1,0 +1,17 @@
+diff --git a/tmp/6d9bb722-e482-41a7-8ea3-2cc4b3a9f576_buggy.java b/tmp/d64731b6-9dfa-49bf-b5b9-19ba7d3a6641_fixed.java
+index 1ed78d0..938a649 100644
+--- a/tmp/6d9bb722-e482-41a7-8ea3-2cc4b3a9f576_buggy.java
++++ b/tmp/d64731b6-9dfa-49bf-b5b9-19ba7d3a6641_fixed.java
+@@ -1,9 +1,5 @@
+-    /**
+-     * @since 2.8.9
+-     */
+ protected XmlSerializerProvider(XmlSerializerProvider src) {
+     super(src);
+-        // 21-May-2018, tatu: As per [dataformat-xml#282], should NOT really copy
+-        //    root name lookup as that may link back to diff version, configuration
+-        _rootNameLookup = src._rootNameLookup;
++    // Ensure rootNameLookup is reinitialized to avoid referencing the source's configuration
++    _rootNameLookup = new RootNameLookup(src._rootNameLookup.entryFor Democrats());
+ }
+\ No newline at end of file

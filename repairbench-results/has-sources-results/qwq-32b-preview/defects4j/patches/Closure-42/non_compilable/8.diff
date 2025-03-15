@@ -1,0 +1,31 @@
+diff --git a/tmp/f878e573-b478-468b-8ea0-217266693205_buggy.java b/tmp/3c53e130-9622-4f57-9487-7dda395cf29b_fixed.java
+index 4d0be80..b60d3ec 100644
+--- a/tmp/f878e573-b478-468b-8ea0-217266693205_buggy.java
++++ b/tmp/3c53e130-9622-4f57-9487-7dda395cf29b_fixed.java
+@@ -1,10 +1,19 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
++    // Create a FOR_IN node
++    Node forInNode = newNode(Token.FOR_IN);
+ 
+-        // Return the bare minimum to put the AST in a valid state.
+-      return newNode(
+-          Token.FOR,
+-          transform(loopNode.getIterator()),
+-          transform(loopNode.getIteratedObject()),
+-          transformBlock(loopNode.getBody()));
++    // Set the left-hand side (the iteration variable)
++    Node lhs = transform(loopNode.getIterator());
++    forInNode.addChildToBack(lhs);
++
++    // Set the right-hand side (the object to iterate over)
++    Node rhs = transform(loopNode.getIteratedObject());
++    forInNode.addChildToBack(rhs);
++
++    // Set the loop body
++    Node body = transformBlock(loopNode.getBody());
++    forInNode.addChildToBack(body);
++
++    return forInNode;
+ }
+\ No newline at end of file

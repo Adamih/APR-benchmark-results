@@ -1,0 +1,30 @@
+diff --git a/tmp/8852b9d8-99dc-46e1-9f41-f3f2c7eeba84_buggy.java b/tmp/1e73968e-d051-4397-8ecf-406ec0565425_fixed.java
+index 50f3e2e..ea50f92 100644
+--- a/tmp/8852b9d8-99dc-46e1-9f41-f3f2c7eeba84_buggy.java
++++ b/tmp/1e73968e-d051-4397-8ecf-406ec0565425_fixed.java
+@@ -1,7 +1,18 @@
+-    /** Get a line with reversed direction.
+-     * @return a new instance, with reversed direction
+-     */
+-    public Line revert() {
+-        final Line reverted = new Line(zero, zero.subtract(direction));
+-        return reverted;
++    @Test
++    public void testRevert() {
++
++        // setup
++        Line line = new Line(new Vector3D(1653345.6696423641, 6170370.041579291, 90000),
++                             new Vector3D(1650757.5050732433, 6160710.879908984, 0.9));
++        Vector3D expected = line.getDirection().negate();
++        double epsilon = 1e-15; // You can adjust this value based on your specific tolerance to precision
++
++        // action
++        Line reverted = line.revert();
++
++        // verify
++        Assert.assertEquals(expected.getX(), reverted.getDirection().getX(), epsilon);
++        Assert.assertEquals(expected.getY(), reverted.getDirection().getY(), epsilon);
++        Assert.assertEquals(expected.getZ(), reverted.getDirection().getZ(), epsilon);
++
+     }
+\ No newline at end of file

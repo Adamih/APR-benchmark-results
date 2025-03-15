@@ -1,0 +1,27 @@
+diff --git a/tmp/d6e49f81-9e76-4335-b630-3983578710f8_buggy.java b/tmp/26be2960-def3-4e53-bb24-6c50cf8ef568_fixed.java
+index 00914da..e7b79b7 100644
+--- a/tmp/d6e49f81-9e76-4335-b630-3983578710f8_buggy.java
++++ b/tmp/26be2960-def3-4e53-bb24-6c50cf8ef568_fixed.java
+@@ -1,17 +1,19 @@
+-    // does not recurse.
+ private void normalise(Element element) {
+     List<Node> toMove = new ArrayList<Node>();
+     for (Node node: element.childNodes) {
+         if (node instanceof TextNode) {
+             TextNode tn = (TextNode) node;
+             if (!tn.isBlank())
+                 toMove.add(tn);
+         }
+     }
+ 
+     for (Node node: toMove) {
+         element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
++    }
++
++    for (Node node: toMove) {
+         body().appendChild(node);
++        body().appendChild(new TextNode(" ", ""));
+     }
+ }
+\ No newline at end of file

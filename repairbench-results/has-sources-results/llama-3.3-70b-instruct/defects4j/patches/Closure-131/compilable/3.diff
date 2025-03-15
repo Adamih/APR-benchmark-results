@@ -1,0 +1,40 @@
+diff --git a/tmp/1c06143c-2263-43e5-ae8a-217e9065613b_buggy.java b/tmp/47a41836-0d1a-41d6-8824-c8d3600f128f_fixed.java
+index 19fe1b4..db906dc 100644
+--- a/tmp/1c06143c-2263-43e5-ae8a-217e9065613b_buggy.java
++++ b/tmp/47a41836-0d1a-41d6-8824-c8d3600f128f_fixed.java
+@@ -1,17 +1,33 @@
+ public static boolean isJSIdentifier(String s) {
+   int length = s.length();
+ 
+   if (length == 0 ||
+      !Character.isJavaIdentifierStart(s.charAt(0))) {
+     return false;
+   }
+ 
+   for (int i = 1; i < length; i++) {
+     if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++       !Character.isJavaIdentifierPart(s.charAt(i)) || 
++        Character.getType(s.charAt(i)) == Character.SURROGATE) {
+       return false;
+     }
+   }
+ 
++  // In JavaScript, identifiers cannot contain escape sequences that form a surrogate pair
++  // So, we need to check for surrogate pairs and reject them
++  return!containsSurrogatePair(s);
++}
++
++// Helper function to check if a string contains a surrogate pair
++private static boolean containsSurrogatePair(String s) {
++  int length = s.length();
++  for (int i = 0; i < length - 1; i++) {
++    char c1 = s.charAt(i);
++    char c2 = s.charAt(i + 1);
++    if (Character.isHighSurrogate(c1) && Character.isLowSurrogate(c2)) {
+       return true;
+     }
++  }
++  return false;
++}
+\ No newline at end of file

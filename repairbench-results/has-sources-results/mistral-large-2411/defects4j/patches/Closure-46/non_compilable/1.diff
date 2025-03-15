@@ -1,0 +1,36 @@
+diff --git a/tmp/e2f7bcee-b6b0-4594-8fbc-5d6a5d51ab45_buggy.java b/tmp/df578535-4abb-4edd-9ccb-53b66e6dfbfc_fixed.java
+index 46817a7..d9b9ad7 100644
+--- a/tmp/e2f7bcee-b6b0-4594-8fbc-5d6a5d51ab45_buggy.java
++++ b/tmp/df578535-4abb-4edd-9ccb-53b66e6dfbfc_fixed.java
+@@ -1,16 +1,26 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+       return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
++    RecordType otherRecordType = that.toMaybeRecordType();
++
++    Set<String> commonProperties = new HashSet<>(properties.keySet());
++    commonProperties.retainAll(otherRecordType.getPropertyNames());
++
++    for (String property : commonProperties) {
++      if (otherRecordType.getPropertyType(property).isEquivalentTo(
+           getPropertyType(property))) {
+         builder.addProperty(property, getPropertyType(property),
+             getPropertyNode(property));
+       }
+     }
+-    return builder.build();
++
++    JSType commonType = builder.build();
++    if (!commonType.isEmptyType()) {
++      return registry.createUnionType(this, otherRecordType);
++    }
++
++    return commonType;
+   }
+\ No newline at end of file

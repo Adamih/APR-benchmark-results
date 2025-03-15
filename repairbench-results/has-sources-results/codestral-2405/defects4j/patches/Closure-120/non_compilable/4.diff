@@ -1,0 +1,37 @@
+diff --git a/tmp/3f7002cd-8317-4c27-a13a-86ba9ccadc69_buggy.java b/tmp/1b36ed8c-cace-4043-816e-3c8d3efac1ac_fixed.java
+index 07b0792..8114820 100644
+--- a/tmp/3f7002cd-8317-4c27-a13a-86ba9ccadc69_buggy.java
++++ b/tmp/1b36ed8c-cace-4043-816e-3c8d3efac1ac_fixed.java
+@@ -1,22 +1,24 @@
+ /**
+  * @return Whether the variable is only assigned a value once for its
+  *     lifetime.
+  */
+ boolean isAssignedOnceInLifetime() {
+   Reference ref = getOneAndOnlyAssignment();
+   if (ref == null) {
+     return false;
+   }
+ 
+-      // Make sure this assignment is not in a loop.
+-      for (BasicBlock block = ref.getBasicBlock();
+-           block != null; block = block.getParent()) {
+-        if (block.isFunction) {
+-          break;
+-        } else if (block.isLoop) {
+-          return false;
++  Set<Function> visitedFunctions = new HashSet<>();
++  for (BasicBlock block = ref.getBasicBlock(); block != null; block = block.getParent()) {
++    if (block.isFunction()) {
++      if (visitedFunctions.contains(block.getFunction())) {
++        return false; // Recursive assignment found
++      }
++      visitedFunctions.add(block.getFunction());
++    } else if (block.isLoop()) {
++      return false; // Assignment in a loop found
+     }
+   }
+ 
+   return true;
+ }
+\ No newline at end of file

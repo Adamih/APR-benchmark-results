@@ -1,0 +1,22 @@
+diff --git a/tmp/1d5155fa-ceb7-47a9-b9f1-77d61a537e16_buggy.java b/tmp/21c98a2f-ab20-4135-8c03-c758e729c65d_fixed.java
+index c9c2b44..b7b2cd8 100644
+--- a/tmp/1d5155fa-ceb7-47a9-b9f1-77d61a537e16_buggy.java
++++ b/tmp/21c98a2f-ab20-4135-8c03-c758e729c65d_fixed.java
+@@ -1,13 +1,15 @@
+ @Override
+ public boolean matches(Element root, Element element) {
+     // evaluate from last to first
+     for (int i = evaluators.size() - 1; i >= 0; --i) {
+         if (element == null)
+             return false;
+         Evaluator eval = evaluators.get(i);
+         if (!eval.matches(root, element))
+             return false;
+         element = element.parent();
+     }
+-            return true;
++    // Only succeed if climbing exactly the
++    // required number of levels lands you at the context root.
++    return element == root;
+ }
+\ No newline at end of file

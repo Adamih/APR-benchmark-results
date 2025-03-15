@@ -1,0 +1,40 @@
+diff --git a/tmp/dc0b6b46-f422-4184-b60a-89d4c042f6ba_buggy.java b/tmp/dd7b4975-214c-4725-b3b4-321b769eaf4d_fixed.java
+index b2db1d6..86213c3 100644
+--- a/tmp/dc0b6b46-f422-4184-b60a-89d4c042f6ba_buggy.java
++++ b/tmp/dd7b4975-214c-4725-b3b4-321b769eaf4d_fixed.java
+@@ -1,29 +1,29 @@
+ protected void _addMethodMixIns(Class<?> targetClass, AnnotatedMethodMap methods,
+         Class<?> mixInCls, AnnotatedMethodMap mixIns)
+ {
+     List<Class<?>> parents = new ArrayList<Class<?>>();
+     parents.add(mixInCls);
+     ClassUtil.findSuperTypes(mixInCls, targetClass, parents);
+     for (Class<?> mixin : parents) {
+         for (Method m : mixin.getDeclaredMethods()) {
+             if (!_isIncludableMemberMethod(m)) {
+                 continue;
+             }
+             AnnotatedMethod am = methods.find(m);
+             /* Do we already have a method to augment (from sub-class
+              * that will mask this mixIn)? If so, add if visible
+              * without masking (no such annotation)
+              */
+             if (am != null) {
+                 _addMixUnders(m, am);
+-                    /* Otherwise will have precedence, but must wait
+-                     * until we find the real method (mixIn methods are
+-                     * just placeholder, can't be called)
+-                     */
+             } else {
+-                    // Well, or, as per [Issue#515], multi-level merge within mixins...
++                /* Check if the method is already in the mixIns map before adding it.
++                 * This ensures that only valid mixin methods are added.
++                 */
++                if (!mixIns.contains(m)) {
+                     mixIns.add(_constructMethod(m));
+                 }
+             }
+         }
+     }
++}
+\ No newline at end of file

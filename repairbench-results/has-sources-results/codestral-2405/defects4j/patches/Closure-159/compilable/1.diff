@@ -1,0 +1,38 @@
+diff --git a/tmp/cabf25a8-91e8-44ac-ace2-821f85a44046_buggy.java b/tmp/61c0bf3e-7f92-4d07-8d9a-a65e036fee4e_fixed.java
+index de9af32..b8072c3 100644
+--- a/tmp/cabf25a8-91e8-44ac-ace2-821f85a44046_buggy.java
++++ b/tmp/61c0bf3e-7f92-4d07-8d9a-a65e036fee4e_fixed.java
+@@ -1,18 +1,26 @@
+-  /**
+-   * @see #findCalledFunctions(Node)
+-   */
+ private void findCalledFunctions(
+       Node node, Set<String> changed) {
+     Preconditions.checkArgument(changed != null);
+     // For each referenced function, add a new reference
+     if (node.getType() == Token.CALL) {
+-      Node child = node.getFirstChild();
+-      if (child.getType() == Token.NAME) {
+-        changed.add(child.getString());
++      Node functionName = getFunctionNameNode(node);
++      if (functionName != null) {
++        changed.add(functionName.getString());
+       }
+     }
+ 
+     for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+       findCalledFunctions(c, changed);
+     }
+   }
++
++  private Node getFunctionNameNode(Node node) {
++    Node child = node.getFirstChild();
++    if (child.getType() == Token.NAME && child.getParent().getType() != Token.GETPROP) {
++      return child;
++    }
++    if (child.getType() == Token.GETPROP) {
++      return child.getLastChild();
++    }
++    return null;
++  }
+\ No newline at end of file

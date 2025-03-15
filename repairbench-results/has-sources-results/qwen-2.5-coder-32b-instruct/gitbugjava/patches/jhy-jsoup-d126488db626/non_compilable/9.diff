@@ -1,0 +1,36 @@
+diff --git a/tmp/2fcb1ad8-4205-436b-8281-9c1c7f68c088_buggy.java b/tmp/3ff9564e-cf25-4b1f-8d18-c116a28fba15_fixed.java
+index 5bf31b1..f433a9c 100644
+--- a/tmp/2fcb1ad8-4205-436b-8281-9c1c7f68c088_buggy.java
++++ b/tmp/3ff9564e-cf25-4b1f-8d18-c116a28fba15_fixed.java
+@@ -1,17 +1,24 @@
+ private String consumeSubQuery() {
+     StringBuilder sq = StringUtil.borrowBuilder();
++    boolean first = true;
+     while (!tq.isEmpty()) {
+-            if (tq.matches("("))
++        if (tq.matches("(")) {
++            if (!first) sq.append(", "); // Add separator between top-level subqueries
+             sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+-            else if (tq.matches("["))
++        } else if (tq.matches("[")) {
++            if (!first) sq.append(", "); // Add separator between top-level subqueries
+             sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++        } else if (tq.matchesAny(Combinators)) {
++            if (sq.length() > 0) {
+                 break;
+-                else
++            } else {
+                 tq.consume();
+-            else
++            }
++        } else {
++            if (!first) sq.append(", "); // Add separator between top-level subqueries
+             sq.append(tq.consume());
+         }
++        first = false; // After the first element, we need to add separators
++    }
+     return StringUtil.releaseBuilder(sq);
+ }
+\ No newline at end of file

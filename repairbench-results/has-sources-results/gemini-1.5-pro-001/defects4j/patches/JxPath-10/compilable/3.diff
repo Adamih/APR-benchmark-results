@@ -1,0 +1,15 @@
+diff --git a/tmp/aa98038b-3a32-4743-a79c-8209b59e60be_buggy.java b/tmp/a644a7c0-26e3-487f-b61c-1d3869438c30_fixed.java
+index b86b44d..cbd0bab 100644
+--- a/tmp/aa98038b-3a32-4743-a79c-8209b59e60be_buggy.java
++++ b/tmp/a644a7c0-26e3-487f-b61c-1d3869438c30_fixed.java
+@@ -1,4 +1,8 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        Object lhs = args[0].computeValue(context);
++        Object rhs = args[1].computeValue(context);
++        if (lhs == null || rhs == null) {
++            return Boolean.FALSE;
++        }
++        return compute(lhs, rhs) ? Boolean.TRUE : Boolean.FALSE;
+     }

@@ -1,0 +1,51 @@
+diff --git a/tmp/9353c86a-fdff-41f6-9c87-b4012c10b845_buggy.java b/tmp/b9370591-09cc-4da3-ad85-af1f20c2d3b6_fixed.java
+index b2d53db..69da33e 100644
+--- a/tmp/9353c86a-fdff-41f6-9c87-b4012c10b845_buggy.java
++++ b/tmp/b9370591-09cc-4da3-ad85-af1f20c2d3b6_fixed.java
+@@ -1,34 +1,45 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+         t.dataBuffer.append(name);
+         r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
+             default:
+                 t.dataBuffer.append(c);
+                 anythingElse(t, r);
+                 break;
+         }
++    } else {
++        // Ensure that we correctly handle content within <script> tags
++        if (t.getTagPending().toString().equalsIgnoreCase("script") && !t.isScripting()) {
++            t.setScripting(true);
++        }
++        if (t.isScripting()) {
++            t.dataBuffer.append(r.consumeTo("</script>", false));
++            t.emit(new Token.Character().data(t.dataBuffer.toString()));
++            t.dataBuffer.setLength(0);
++            t.transition(Data);
+         } else {
+             anythingElse(t, r);
+         }
+     }
++}
+\ No newline at end of file

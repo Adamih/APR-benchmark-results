@@ -1,0 +1,25 @@
+diff --git a/tmp/50c3477d-228e-4ac4-a5bc-7af7c173af02_buggy.java b/tmp/6d729bf7-7a24-43fe-9c36-19cef38c242d_fixed.java
+index a37dc7a..eab5b0e 100644
+--- a/tmp/50c3477d-228e-4ac4-a5bc-7af7c173af02_buggy.java
++++ b/tmp/6d729bf7-7a24-43fe-9c36-19cef38c242d_fixed.java
+@@ -1,10 +1,16 @@
++/**
++ * Inserts the given nodes at the specified index, shifting existing children to the right.
++ * 
++ * @param index    where to insert (0 = first child, size() = append)
++ * @param children nodes to add
++ */
+ protected void addChildren(int index, Node... children) {
+     Validate.noNullElements(children);
+     ensureChildNodes();
+-        for (int i = children.length - 1; i >= 0; i--) {
+-            Node in = children[i];
++    for (Node in : children) {
+         reparentChild(in);
+-            childNodes.add(index, in);
+     }
++    // Fix: Insert all children at once to maintain the original order
++    childNodes.addAll(index, Arrays.asList(children));
+     reindexChildren(index);
+ }
+\ No newline at end of file

@@ -1,0 +1,47 @@
+diff --git a/tmp/745a3fce-c1a1-41f8-b758-774ad599e224_buggy.java b/tmp/b5e4db5b-f606-4567-b4bf-02587a84f8cd_fixed.java
+index 46817a7..48a0189 100644
+--- a/tmp/745a3fce-c1a1-41f8-b758-774ad599e224_buggy.java
++++ b/tmp/b5e4db5b-f606-4567-b4bf-02587a84f8cd_fixed.java
+@@ -1,16 +1,35 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++    RecordType thisRecord = this;
++    RecordType thatRecord = that.toMaybeRecordType();
++
++    // Add all properties from this record
++    for (String property : thisRecord.getProperties().keySet()) {
++        JSType thisType = thisRecord.getPropertyType(property);
++        if (thatRecord.hasProperty(property)) {
++            JSType thatType = thatRecord.getPropertyType(property);
++            if (thisType.isEquivalentTo(thatType)) {
++                builder.addProperty(property, thisType, thisRecord.getPropertyNode(property));
++            } else {
++                JSType lub = thisType.getLeastSupertype(thatType);
++                builder.addProperty(property, lub, thisRecord.getPropertyNode(property));
+             }
++        } else {
++            builder.addProperty(property, thisType, thisRecord.getPropertyNode(property));
+         }
++    }
++
++    // Add properties from that record that are not already included
++    for (String property : thatRecord.getProperties().keySet()) {
++        if (!thisRecord.hasProperty(property)) {
++            JSType thatType = thatRecord.getPropertyType(property);
++            builder.addProperty(property, thatType, thatRecord.getPropertyNode(property));
++        }
++    }
++
+     return builder.build();
+ }
+\ No newline at end of file

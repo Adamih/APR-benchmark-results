@@ -1,0 +1,25 @@
+diff --git a/tmp/69036e84-156f-45b2-a83d-3ee5643770d2_buggy.java b/tmp/6e0b038e-7876-4cb0-b958-085d382acccd_fixed.java
+index b86b44d..5d9f97f 100644
+--- a/tmp/69036e84-156f-45b2-a83d-3ee5643770d2_buggy.java
++++ b/tmp/6e0b038e-7876-4cb0-b958-085d382acccd_fixed.java
+@@ -1,4 +1,17 @@
++/**
++ * Fixed function to handle empty node sets correctly.
++ */
+ public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    Object arg0Value = args[0].computeValue(context);
++    Object arg1Value = args[1].computeValue(context);
++
++    // Check for empty node sets
++    if (arg0Value instanceof Collection && ((Collection<?>) arg0Value).isEmpty()) {
++        return Boolean.FALSE; // or handle as per specific requirement for empty set comparison
++    }
++    if (arg1Value instanceof Collection && ((Collection<?>) arg1Value).isEmpty()) {
++        return Boolean.FALSE; // or handle as per specific requirement for empty set comparison
++    }
++
++    return compute(arg0Value, arg1Value)? Boolean.TRUE : Boolean.FALSE;
+ }
+\ No newline at end of file

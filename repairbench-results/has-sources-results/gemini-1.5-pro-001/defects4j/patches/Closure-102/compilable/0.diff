@@ -1,0 +1,21 @@
+diff --git a/tmp/b177fa71-ad2a-4cab-a79e-1764882f5859_buggy.java b/tmp/6bd4f3fa-dbcc-4342-8cc9-8a87e5d9181a_fixed.java
+index f47d784..356a9b3 100644
+--- a/tmp/b177fa71-ad2a-4cab-a79e-1764882f5859_buggy.java
++++ b/tmp/6bd4f3fa-dbcc-4342-8cc9-8a87e5d9181a_fixed.java
+@@ -1,12 +1,14 @@
+   @Override
+   public void process(Node externs, Node root) {
+-    NodeTraversal.traverse(compiler, root, this);
++    // TODO(nicksan): renameVars assumes that `arguments` never needs to be
++    // renamed.  This is wrong.
++    removeDuplicateDeclarations(root);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+-    removeDuplicateDeclarations(root);
++    NodeTraversal.traverse(compiler, root, this);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
+   }

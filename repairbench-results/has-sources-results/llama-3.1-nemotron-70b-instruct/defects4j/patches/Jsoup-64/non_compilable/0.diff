@@ -1,0 +1,30 @@
+diff --git a/tmp/73e5ea6b-2e3f-437a-ad2f-9179c10653aa_buggy.java b/tmp/00128fd6-ca96-4ef7-84c6-3d0fed8ed530_fixed.java
+index 5eedc11..33ed7c8 100644
+--- a/tmp/73e5ea6b-2e3f-437a-ad2f-9179c10653aa_buggy.java
++++ b/tmp/00128fd6-ca96-4ef7-84c6-3d0fed8ed530_fixed.java
+@@ -1,6 +1,24 @@
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
++    if (isKnownEmptyElement(startTag.name)) {
++        tb.insertEmpty(startTag);
++    } else {
+         tb.insert(startTag);
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
+         tb.transition(Text);
+     }
++}
++
++// Assuming the method `isKnownEmptyElement` is already defined elsewhere in the codebase,
++// if not, you would need to define it to check for known empty elements like "style", "noframes", etc.
++
++// Example implementation for `isKnownEmptyElement` (if needed):
++// private static boolean isKnownEmptyElement(String elementName) {
++//     String[] knownEmptyElements = {"style", "noframes", /* add more as needed */};
++//     for (String emptyElement : knownEmptyElements) {
++//         if (elementName.equalsIgnoreCase(emptyElement)) {
++//             return true;
++//         }
++//     }
++//     return false;
++// }
+\ No newline at end of file

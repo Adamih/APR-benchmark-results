@@ -1,0 +1,17 @@
+diff --git a/tmp/522c3056-415e-4e5a-aac7-65990d2e39ce_buggy.java b/tmp/4cc85913-41d0-498b-a125-e140271aee7f_fixed.java
+index 6fecc90..bee4b64 100644
+--- a/tmp/522c3056-415e-4e5a-aac7-65990d2e39ce_buggy.java
++++ b/tmp/4cc85913-41d0-498b-a125-e140271aee7f_fixed.java
+@@ -1,7 +1,10 @@
+ static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+-      return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
++        // Assuming allResultsMatch checks all child nodes and MAY_BE_STRING_PREDICATE is a predicate function to check for string possibility.
++        boolean result = allResultsMatch(n, MAY_BE_STRING_PREDICATE);
++        // If the node itself could be a string, return true regardless of child nodes' results
++        return result || MAY_BE_STRING_PREDICATE.test(n);
+     } else {
+         return mayBeStringHelper(n);
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,39 @@
+diff --git a/tmp/7121a804-32f2-476d-aa28-08bef0e14a7d_buggy.java b/tmp/61198f4a-203e-44d7-ad6c-4f59bb7ed696_fixed.java
+index a7f0d46..19de36c 100644
+--- a/tmp/7121a804-32f2-476d-aa28-08bef0e14a7d_buggy.java
++++ b/tmp/61198f4a-203e-44d7-ad6c-4f59bb7ed696_fixed.java
+@@ -1,22 +1,23 @@
+ void add(String newcode) {
+   maybeEndStatement();
+-
+   if (newcode.length() == 0) {
+     return;
+   }
+ 
+   char c = newcode.charAt(0);
+-    if ((isWordChar(c) || c == '\\') &&
+-        isWordChar(getLastChar())) {
+-      // need space to separate. This is not pretty printing.
+-      // For example: "return foo;"
++  char last = getLastChar();
++
++  // When appending new tokens, we sometimes must insert a space.
++  // Originally we inserted a space if the token begins with a word
++  // character (or a backslash) and the last printed character is also a word.
++  // However, to avoid issues with a regex literal (which begins with '/')
++  // following a division (or another regex) – making something like "//"
++  // that might be misinterpreted as a comment – we now also add a space
++  // when both the last printed character and the new token’s first character are '/'.
++  if (((isWordChar(c) || c == '\\') && isWordChar(last)) ||
++      (c == '/' && last == '/')) {
+     append(" ");
+-      // Do not allow a forward slash to appear after a DIV.
+-      // For example,
+-      // REGEXP DIV REGEXP
+-      // is valid and should print like
+-      // / // / /
+   }
+ 
+   append(newcode);
+ }
+\ No newline at end of file

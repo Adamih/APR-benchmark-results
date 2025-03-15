@@ -1,0 +1,46 @@
+diff --git a/tmp/7daee9dc-f10b-4f8c-8f68-253ec729dfaf_buggy.java b/tmp/435d4d02-5dff-46d7-91ea-501a9433ed06_fixed.java
+index bcd80aa..90e6d23 100644
+--- a/tmp/7daee9dc-f10b-4f8c-8f68-253ec729dfaf_buggy.java
++++ b/tmp/435d4d02-5dff-46d7-91ea-501a9433ed06_fixed.java
+@@ -1,25 +1,37 @@
+ void processResponseHeaders(Map<String, List<String>> resHeaders) {
+     for (Map.Entry<String, List<String>> entry : resHeaders.entrySet()) {
+         String name = entry.getKey();
+         if (name == null)
+             continue; // http/1.1 line
+ 
+         List<String> values = entry.getValue();
+         if (name.equalsIgnoreCase("Set-Cookie")) {
+             for (String value : values) {
+                 if (value == null)
+                     continue;
+                 TokenQueue cd = new TokenQueue(value);
+                 String cookieName = cd.chompTo("=").trim();
+                 String cookieVal = cd.consumeTo(";").trim();
+                 // ignores path, date, domain, validateTLSCertificates et al. req'd?
+                 // name not blank, value not null
+                 if (cookieName.length() > 0)
+                     cookie(cookieName, cookieVal);
+             }
+-                } else { // combine same header names with comma: http://www.w3.org/Protocols/rfc2616/rfc2616-sec4.html#sec4.2
+-                    if (!values.isEmpty())
+-                        header(name, values.get(0));
++        } else { // combine same header names with comma
++            if (!values.isEmpty()) {
++                List<String> nonNullTrimmed = new ArrayList<>();
++                for (String value : values) {
++                    if (value != null) {
++                        String trimmed = value.trim();
++                        if (!trimmed.isEmpty()) {
++                            nonNullTrimmed.add(trimmed);
++                        }
++                    }
++                }
++                if (!nonNullTrimmed.isEmpty()) {
++                    header(name, String.join(", ", nonNullTrimmed));
++                }
++            }
+         }
+     }
+ }
+\ No newline at end of file

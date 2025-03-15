@@ -1,0 +1,18 @@
+diff --git a/tmp/f5326ad3-3bc2-4a04-bb2b-e0f65298fb86_buggy.java b/tmp/a1459a00-3c85-4ffe-a754-75155c1bb453_fixed.java
+index 42d4174..a4248c7 100644
+--- a/tmp/f5326ad3-3bc2-4a04-bb2b-e0f65298fb86_buggy.java
++++ b/tmp/a1459a00-3c85-4ffe-a754-75155c1bb453_fixed.java
+@@ -1,7 +1,11 @@
+   /**
+-   * Returns the remainder of the line.
++   * Returns the remainder of the line with leading "*" and whitespace removed.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    if (result != null) {
++      // Trim leading "*" and whitespace
++      result = result.replaceFirst("^\\s*\\*\\s?", "");
++    }
+     return result;
+   }
+\ No newline at end of file

@@ -1,0 +1,28 @@
+diff --git a/tmp/42f72a47-d6a5-40ea-9190-cab9d3a946a5_buggy.java b/tmp/a5ca97bb-567d-420e-8c58-16bd9c7a55b9_fixed.java
+index dcc36a4..f79fa1d 100644
+--- a/tmp/42f72a47-d6a5-40ea-9190-cab9d3a946a5_buggy.java
++++ b/tmp/a5ca97bb-567d-420e-8c58-16bd9c7a55b9_fixed.java
+@@ -1,12 +1,22 @@
+     protected void replaceChild(Node out, Node in) {
+         Validate.isTrue(out.parentNode == this);
+         Validate.notNull(in);
+         if (in.parentNode != null)
+             in.parentNode.removeChild(in);
+ 
+         final int index = out.siblingIndex;
+         ensureChildNodes().set(index, in);
+         in.parentNode = this;
+         in.setSiblingIndex(index);
++
++        // Update adjacent sibling relationships
++        List<Node> siblingNodes = ensureChildNodes();
++        if (index > 0) {
++            siblingNodes.get(index - 1).nextSibling = in;
++        }
++        if (index < siblingNodes.size() - 1) {
++            siblingNodes.get(index + 1).previousSibling = in;
++        }
++
+         out.parentNode = null;
+     }
+\ No newline at end of file

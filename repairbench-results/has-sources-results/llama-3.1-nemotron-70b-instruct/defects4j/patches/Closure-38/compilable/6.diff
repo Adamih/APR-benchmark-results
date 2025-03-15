@@ -1,0 +1,39 @@
+diff --git a/tmp/a4fd7c55-8a8d-4842-ac69-d465c3a15531_buggy.java b/tmp/f637b5a5-5919-40ce-9e3a-595dba9808dc_fixed.java
+index a7d4ff8..537408f 100644
+--- a/tmp/a4fd7c55-8a8d-4842-ac69-d465c3a15531_buggy.java
++++ b/tmp/f637b5a5-5919-40ce-9e3a-595dba9808dc_fixed.java
+@@ -1,28 +1,32 @@
+ void addNumber(double x) {
+   // This is not pretty printing. This is to prevent misparsing of x- -4 as
+   // x--4 (which is a syntax error).
+   char prev = getLastChar();
+   boolean negativeZero = isNegativeZero(x);
+-    if (x < 0 && prev == '-') {
++  if (x < 0 && prev == '-' &&!negativeZero) { // added!negativeZero check
+     add(" ");
+   }
+ 
+   if ((long) x == x &&!negativeZero) {
+     long value = (long) x;
+     long mantissa = value;
+     int exp = 0;
+     if (Math.abs(x) >= 100) {
+       while (mantissa / 10 * Math.pow(10, exp + 1) == value) {
+         mantissa /= 10;
+         exp++;
+       }
+     }
+     if (exp > 2) {
+       add(Long.toString(mantissa) + "E" + Integer.toString(exp));
+     } else {
+       add(Long.toString(value));
+     }
++  } else {
++    if (negativeZero) { // explicitly handle negative zero
++      add("-0.0");
+     } else {
+       add(String.valueOf(x));
+     }
+   }
++}
+\ No newline at end of file

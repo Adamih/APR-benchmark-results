@@ -1,0 +1,38 @@
+diff --git a/tmp/7ed79396-9ebe-467f-85e5-e0b831452cff_buggy.java b/tmp/2a3f8561-a9da-439b-bfcb-41f6ff124d64_fixed.java
+index ef76662..b1a8e66 100644
+--- a/tmp/7ed79396-9ebe-467f-85e5-e0b831452cff_buggy.java
++++ b/tmp/2a3f8561-a9da-439b-bfcb-41f6ff124d64_fixed.java
+@@ -1,17 +1,28 @@
+ void read(Tokeniser t, CharacterReader r) {
+     char c = r.consume();
+     switch (c) {
+         case '>':
+             t.tagPending.selfClosing = true;
+             t.emitTagPending();
+-                    t.transition(Data);
++            t.transition(TokeniserState.Data);
+             break;
+-                case eof:
++        caseEOF:
+             t.eofError(this);
+-                    t.transition(Data);
++            t.transition(TokeniserState.Data);
++            break;
++        case '/': // Missing case for '/'
++            if (t.stateBeforeAttributeName == TokeniserState.AfterAttributeValueQuoted || t.isInAttributeNameState()) {
++                // Handle '/' as part of the attribute value or attribute name
++                t.error(this);
++            } else {
++                // Assume '/' is the closing tag indicator
++                t.tagPending.selfClosing = true;
++                t.emitTagPending();
++                t.transition(TokeniserState.BeforeTagName);
++            }
+             break;
+         default:
+             t.error(this);
+-                    t.transition(BeforeAttributeName);
++            t.transition(TokeniserState.BeforeAttributeName);
+     }
+ }
+\ No newline at end of file

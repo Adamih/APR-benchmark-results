@@ -1,0 +1,18 @@
+diff --git a/tmp/b502c1ac-fbfa-42b4-a23d-05ffed2802af_buggy.java b/tmp/a5ebc059-a69c-40bf-a617-3f253c1c1f04_fixed.java
+index 0878b6b..df26f9c 100644
+--- a/tmp/b502c1ac-fbfa-42b4-a23d-05ffed2802af_buggy.java
++++ b/tmp/a5ebc059-a69c-40bf-a617-3f253c1c1f04_fixed.java
+@@ -1,3 +1,11 @@
+ public final boolean isEmptyType() {
+-    return isNoType() || isNoObjectType() || isNoResolvedType();
++  if (isNoType() || isNoObjectType() || isNoResolvedType()) {
++    return true;
++  }
++  if (isFunctionType()) {
++    FunctionType functionType = asFunctionType();
++    JSType returnType = functionType.getReturnType();
++    return returnType != null && returnType.isEmptyType();
++  }
++  return false;
+ }
+\ No newline at end of file

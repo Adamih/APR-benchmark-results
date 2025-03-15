@@ -1,0 +1,17 @@
+diff --git a/tmp/de4ccb44-51a6-443a-93c4-aef955303782_buggy.java b/tmp/f03b70c4-7752-4d8e-a7ab-356272acb045_fixed.java
+index 7cd18df..cce0807 100644
+--- a/tmp/de4ccb44-51a6-443a-93c4-aef955303782_buggy.java
++++ b/tmp/f03b70c4-7752-4d8e-a7ab-356272acb045_fixed.java
+@@ -1,9 +1,12 @@
+         @Override
+         protected Object _deserializeFromEmptyString() throws IOException {
+             // As per [databind#398], URI requires special handling
+             if (_kind == STD_URI) {
+                 return URI.create("");
+             }
+             // As per [databind#1123], Locale too
++            if (_kind == STD_LOCALE) {
++                return Locale.ROOT;
++            }
+             return super._deserializeFromEmptyString();
+         }

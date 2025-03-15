@@ -1,0 +1,33 @@
+diff --git a/tmp/e6091055-d905-4d6a-bfa2-cbb3b3f3581e_buggy.java b/tmp/1774d9ac-1a70-4d6e-b52e-b8df7573b9a4_fixed.java
+index 19fe1b4..69ca7b3 100644
+--- a/tmp/e6091055-d905-4d6a-bfa2-cbb3b3f3581e_buggy.java
++++ b/tmp/1774d9ac-1a70-4d6e-b52e-b8df7573b9a4_fixed.java
+@@ -1,17 +1,21 @@
+ public static boolean isJSIdentifier(String s) {
+-      int length = s.length();
++    if (s.length() == 0) {
++        return false;
++    }
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++    // First character must be a letter, underscore, or dollar sign
++    char first = s.charAt(0);
++    if (!(Character.isLetter(first) || first == '_' || first == '$')) {
+         return false;
+     }
+ 
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++    // Rest of the characters must be letters, numbers, underscores, or dollar signs
++    for (int i = 1; i < s.length(); i++) {
++        char c = s.charAt(i);
++        if (!(Character.isLetterOrDigit(c) || c == '_' || c == '$')) {
+             return false;
+         }
+     }
+ 
+     return true;
+ }
+\ No newline at end of file

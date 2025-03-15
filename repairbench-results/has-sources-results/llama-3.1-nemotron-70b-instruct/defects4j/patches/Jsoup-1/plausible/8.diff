@@ -1,0 +1,29 @@
+diff --git a/tmp/5b90b4b3-3b14-44ab-b8b5-e6527b04fd16_buggy.java b/tmp/6c3194fd-fc3a-4024-9301-2bee677f80a3_fixed.java
+index 00914da..3b99279 100644
+--- a/tmp/5b90b4b3-3b14-44ab-b8b5-e6527b04fd16_buggy.java
++++ b/tmp/6c3194fd-fc3a-4024-9301-2bee677f80a3_fixed.java
+@@ -1,17 +1,20 @@
+-    // does not recurse.
++/**
++ * Normalises an element by moving non-blank text nodes to the start of the body.
++ */
+ private void normalise(Element element) {
+     List<Node> toMove = new ArrayList<Node>();
+     for (Node node: element.childNodes) {
+         if (node instanceof TextNode) {
+             TextNode tn = (TextNode) node;
+             if (!tn.isBlank())
+                 toMove.add(tn);
+         }
+     }
+ 
++    // Move text nodes to the *start* of the body, not the end
+     for (Node node: toMove) {
+         element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++        body().prependChild(new TextNode(" ", "")); // Add a space before prepending
++        body().prependChild(node);
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,39 @@
+diff --git a/tmp/4c70a880-97d7-48d0-8539-6ed5550806e1_buggy.java b/tmp/de600e1d-7bfb-4197-862c-999dc4ff1823_fixed.java
+index 4b7f469..760908b 100644
+--- a/tmp/4c70a880-97d7-48d0-8539-6ed5550806e1_buggy.java
++++ b/tmp/de600e1d-7bfb-4197-862c-999dc4ff1823_fixed.java
+@@ -1,10 +1,30 @@
+ static boolean isSimpleNumber(String s) {
+   int len = s.length();
+-    for (int index = 0; index < len; index++) {
+-      char c = s.charAt(index);
++  if (len == 0) {
++    return false;
++  }
++
++  // Allow hexadecimal numbers (e.g. "0x10") as simple numbers.
++  if (len > 2 && s.charAt(0) == '0' &&
++      (s.charAt(1) == 'x' || s.charAt(1) == 'X')) {
++    for (int i = 2; i < len; i++) {
++      char c = s.charAt(i);
++      boolean isHexDigit = (c >= '0' && c <= '9') ||
++                           (c >= 'a' && c <= 'f') ||
++                           (c >= 'A' && c <= 'F');
++      if (!isHexDigit) {
++        return false;
++      }
++    }
++    return true;
++  }
++
++  // Otherwise, it must be a decimal literal: all characters must be digits.
++  for (int i = 0; i < len; i++) {
++    char c = s.charAt(i);
+     if (c < '0' || c > '9') {
+       return false;
+     }
+   }
+-    return len > 0;
++  return true;
+ }
+\ No newline at end of file

@@ -1,0 +1,18 @@
+diff --git a/tmp/9e4caef8-2ae7-4d03-af5a-a12c1e9716ee_buggy.java b/tmp/e84c7b63-3be1-4dd8-93f8-f2f409519e4e_fixed.java
+index 22640dd..aa96388 100644
+--- a/tmp/9e4caef8-2ae7-4d03-af5a-a12c1e9716ee_buggy.java
++++ b/tmp/e84c7b63-3be1-4dd8-93f8-f2f409519e4e_fixed.java
+@@ -1,3 +1,11 @@
++/**
++ * Checks if the provided Control Flow Graph (CFG) node has an associated exception handler.
++ * 
++ * @param cfgNode The node in the Control Flow Graph to inspect.
++ * @return True if the node has an exception handler, false otherwise.
++ */
+ private boolean hasExceptionHandler(Node cfgNode) {
+-    return false;
++    // A node typically has an exception handler if it's a TRY node and has a following CATCH or FINALLY block
++    return cfgNode instanceof TryNode && 
++           (cfgNode.getNext() instanceof CatchNode || cfgNode.getNext() instanceof FinallyNode);
+ }
+\ No newline at end of file

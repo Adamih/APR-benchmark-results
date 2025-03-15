@@ -1,0 +1,48 @@
+diff --git a/tmp/0e2afa36-3c4c-4e22-9cb5-27f8e4347f8a_buggy.java b/tmp/c93e6a66-e235-4a5a-96ac-59a8f3b4b68d_fixed.java
+index 546f262..e6c982f 100644
+--- a/tmp/0e2afa36-3c4c-4e22-9cb5-27f8e4347f8a_buggy.java
++++ b/tmp/c93e6a66-e235-4a5a-96ac-59a8f3b4b68d_fixed.java
+@@ -1,29 +1,28 @@
+-    /**
+-     * <p>Throws a {@link MissingOptionException} if all of the
+-     * required options are no present.</p>
+-     *
+-     * @throws MissingOptionException if any of the required Options
+-     * are not present.
+-     */
+ protected void checkRequiredOptions()
+     throws MissingOptionException
+ {
+-        // if there are required options that have not been
+-        // processsed
+     if (getRequiredOptions().size() > 0)
+     {
+         Iterator iter = getRequiredOptions().iterator();
+-            StringBuffer buff = new StringBuffer("Missing required option");
+-            buff.append(getRequiredOptions().size() == 1 ? "" : "s");
++        StringBuffer buff = new StringBuffer("Missing required ");
++       buff.append(getRequiredOptions().size() == 1 ? "option" : "options");
+         buff.append(": ");
++        boolean isFirst = true;
+ 
+-
+-            // loop through the required options
+         while (iter.hasNext())
+         {
+-                buff.append(iter.next());
++            Object option = iter.next();
++            if (!isFirst)
++            {
++                buff.append(", ");
++            }
++            else
++            {
++                isFirst = false;
++            }
++            buff.append(option.toString());
+         }
+ 
+         throw new MissingOptionException(buff.toString());
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,23 @@
+diff --git a/tmp/3772d71f-2f57-4100-abc3-1b727f8acd1e_buggy.java b/tmp/3db9fbfd-572d-4c73-897b-97f2d64b39b9_fixed.java
+index 4d0be80..b6cf43c 100644
+--- a/tmp/3772d71f-2f57-4100-abc3-1b727f8acd1e_buggy.java
++++ b/tmp/3db9fbfd-572d-4c73-897b-97f2d64b39b9_fixed.java
+@@ -1,10 +1,15 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
+-
+-        // Return the bare minimum to put the AST in a valid state.
++    if(loopNode.isForIn()) {
+         return newNode(
+             Token.FOR,
++            Token.IN,
+             transform(loopNode.getIterator()),
+             transform(loopNode.getIteratedObject()),
+             transformBlock(loopNode.getBody()));
++    } else if(loopNode.isForOf()) {
++        // Current implementation does not handle for-of loops, handle as needed
++    } else {
++        throw new UnsupportedOperationException("Unsupported loop type: " + loopNode.getLoopType());
++    }
+ }
+\ No newline at end of file

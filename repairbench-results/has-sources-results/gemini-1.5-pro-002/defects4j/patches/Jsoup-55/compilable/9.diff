@@ -1,0 +1,35 @@
+diff --git a/tmp/afec3470-04be-4a37-88cb-3d055f2a956d_buggy.java b/tmp/910fc29c-98a8-44e8-9604-d42465a9bb96_fixed.java
+index ef76662..f96b0c0 100644
+--- a/tmp/afec3470-04be-4a37-88cb-3d055f2a956d_buggy.java
++++ b/tmp/910fc29c-98a8-44e8-9604-d42465a9bb96_fixed.java
+@@ -1,17 +1,29 @@
+         void read(Tokeniser t, CharacterReader r) {
+             char c = r.consume();
+             switch (c) {
+                 case '>':
++                    t.tagPending.selfClosing = false; // fix: set self-closing to false for html
++                    t.emitTagPending();
++                    t.transition(Data);
++                    break;
++                case '/':
+                     t.tagPending.selfClosing = true;
++                    r.advance();
++                    if (r.current() != '>') {
++                         t.error(this);
++                         t.transition(BeforeAttributeName);
++                     } else {
+                          t.emitTagPending();
+-                    t.transition(Data);
++                         t.advanceTransition(Data);
++                     }
+                     break;
+                 case eof:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+                 default:
+                     t.error(this);
++                    r.unconsume();
+                     t.transition(BeforeAttributeName);
+             }
+         }

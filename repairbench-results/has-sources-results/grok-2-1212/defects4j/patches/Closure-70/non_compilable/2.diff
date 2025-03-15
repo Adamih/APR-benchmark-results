@@ -1,0 +1,50 @@
+diff --git a/tmp/92048457-5fb6-4f30-85dc-fc90b1c31162_buggy.java b/tmp/8f840374-73e3-4d2b-9fbe-d8c6b52de398_fixed.java
+index 1530b34..222c8a9 100644
+--- a/tmp/92048457-5fb6-4f30-85dc-fc90b1c31162_buggy.java
++++ b/tmp/8f840374-73e3-4d2b-9fbe-d8c6b52de398_fixed.java
+@@ -1,23 +1,43 @@
+ /**
+  * Declares all of a function's arguments.
+  */
+ private void declareArguments(Node functionNode) {
+   Node astParameters = functionNode.getFirstChild().getNext();
+   Node body = astParameters.getNext();
+   FunctionType functionType = (FunctionType) functionNode.getJSType();
+   if (functionType != null) {
+     Node jsDocParameters = functionType.getParametersNode();
+     if (jsDocParameters != null) {
+       Node jsDocParameter = jsDocParameters.getFirstChild();
+       for (Node astParameter : astParameters.children()) {
+         if (jsDocParameter != null) {
++          // Check if the parameter is already defined in the current scope
++          String paramName = astParameter.getString();
++          if (scope.isDeclared(paramName, true)) {
++            report(JSError.make(AST_PARAM_REDECLARED, paramName));
++          } else {
+             defineSlot(astParameter, functionNode,
+                 jsDocParameter.getJSType(), true);
++          }
+           jsDocParameter = jsDocParameter.getNext();
+         } else {
+-              defineSlot(astParameter, functionNode, null, true);
++          // If no JSDoc type is available, use the inferred type
++          JSType inferredType = typeInference.inferParameterType(astParameter);
++          defineSlot(astParameter, functionNode, inferredType, true);
+         }
+       }
++    } else {
++      // If no JSDoc parameters are provided, use inferred types for all parameters
++      for (Node astParameter : astParameters.children()) {
++        JSType inferredType = typeInference.inferParameterType(astParameter);
++        defineSlot(astParameter, functionNode, inferredType, true);
++      }
++    }
++  } else {
++    // If functionType is null, use inferred types for all parameters
++    for (Node astParameter : astParameters.children()) {
++      JSType inferredType = typeInference.inferParameterType(astParameter);
++      defineSlot(astParameter, functionNode, inferredType, true);
+     }
+   }
+ } // end declareArguments
+\ No newline at end of file

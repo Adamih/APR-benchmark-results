@@ -1,0 +1,36 @@
+diff --git a/tmp/9d596f0e-ab7c-49ae-a385-2039a5e97515_buggy.java b/tmp/cb649086-6329-4070-aee8-51068de4ab7a_fixed.java
+index 4d0be80..9cdf098 100644
+--- a/tmp/9d596f0e-ab7c-49ae-a385-2039a5e97515_buggy.java
++++ b/tmp/cb649086-6329-4070-aee8-51068de4ab7a_fixed.java
+@@ -1,10 +1,24 @@
+ @Override
+-    Node processForInLoop(ForInLoop loopNode) {
+-
+-        // Return the bare minimum to put the AST in a valid state.
++Node processForInLoop(BaseNode loopNode) {
++    if (loopNode.isForInLoop()) {
++        // Process "for-in" loop nodes.
+         return newNode(
+             Token.FOR,
+-          transform(loopNode.getIterator()),
+-          transform(loopNode.getIteratedObject()),
+-          transformBlock(loopNode.getBody()));
++            Token.VAR,
++            transform(loopNode.asForInLoop().getIterator()),
++            Token.IN,
++            transform(loopNode.asForInLoop().getIteratedObject()),
++            transformBlock(loopNode.asForInLoop().getBody()));
++    } else if (loopNode.isForEachLoop()) {
++        // Process "for-each" loop nodes.
++        return newNode(
++            Token.FOR,
++            Token.VAR,
++            transform(loopNode.asForEachLoop().getIterator()),
++            Token.IN,
++            transform(new Node(Token.THIS), new Node(loopNode.asForEachLoop().getIteratedObject())),
++            transformBlock(loopNode.asForEachLoop().getBody()));
++    }
++    // Throw exception for unsupported loop types.
++    throw new UnsupportedOperationException("Unsupported loop type: " + loopNode.getClass().getName());
+ }
+\ No newline at end of file

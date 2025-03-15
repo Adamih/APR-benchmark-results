@@ -1,0 +1,17 @@
+diff --git a/tmp/c0f9219f-4734-482c-8da1-ffeac00380fc_buggy.java b/tmp/220df875-3a95-48cd-b4ec-5c291ce73e4a_fixed.java
+index a68ccd7..34c7bb1 100644
+--- a/tmp/c0f9219f-4734-482c-8da1-ffeac00380fc_buggy.java
++++ b/tmp/220df875-3a95-48cd-b4ec-5c291ce73e4a_fixed.java
+@@ -1,7 +1,11 @@
+ /**
+  Get the attribute value.
+  @return the attribute value
+  */
+ public String getValue() {
++    if (val == null && isBooleanAttribute && node().hasAttr(getKey())) {
++        // If value is null and it's a boolean attribute, return an empty string
++        return "";
++    }
+     return val;
+ }
+\ No newline at end of file

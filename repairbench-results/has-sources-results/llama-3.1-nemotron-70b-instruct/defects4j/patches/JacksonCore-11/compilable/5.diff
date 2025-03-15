@@ -1,0 +1,25 @@
+diff --git a/tmp/d67a7add-8131-44b6-a494-e9a936bea600_buggy.java b/tmp/73cda21a-62c9-4832-86f2-0a8ead817e4f_fixed.java
+index 29d025a..951776f 100644
+--- a/tmp/d67a7add-8131-44b6-a494-e9a936bea600_buggy.java
++++ b/tmp/73cda21a-62c9-4832-86f2-0a8ead817e4f_fixed.java
+@@ -1,13 +1,15 @@
++/**
++ * Fixed version of the _verifySharing function to prevent ArrayIndexOutOfBoundsException
++ * when rehashing is needed after sharing verification.
++ */
+ private void _verifySharing()
+ {
+     if (_hashShared) {
+-            _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+-            _names = Arrays.copyOf(_names, _names.length);
++        _hashArea = Arrays.copyOf(_hashArea, _hashArea.length * 2); // Increase capacity to accommodate growth
++        _names = Arrays.copyOf(_names, _names.length * 2); // Increase capacity to accommodate growth
+         _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
+     }
+     if (_needRehash) {
+         rehash();
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,26 @@
+diff --git a/tmp/7e0796d2-73db-4f3e-92d0-0df80d2440cf_buggy.java b/tmp/9c137451-a317-4af5-b453-27f11d85929d_fixed.java
+index d5b3da9..e5f8cf9 100644
+--- a/tmp/7e0796d2-73db-4f3e-92d0-0df80d2440cf_buggy.java
++++ b/tmp/9c137451-a317-4af5-b453-27f11d85929d_fixed.java
+@@ -1,7 +1,18 @@
++/**
++ * Copies attributes from a Jsoup Node to a W3C Element, sanitizing attribute names to conform to XML standards.
++ * 
++ * @param source The Jsoup Node from which to copy attributes.
++ * @param el     The W3C Element to which attributes will be copied.
++ */
+ private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
+     for (Attribute attribute : source.attributes()) {
+-                // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+-                String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
++        // Sanitize attribute name to match XML standards: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
++        // - Replace any invalid characters with an underscore to preserve attribute uniqueness
++        String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "_");
++        
++        // Check if the sanitized key is not empty or only underscores (to avoid setting invalid attribute names)
++        if (!key.matches("_*")) {
+             el.setAttribute(key, attribute.getValue());
+         }
+     }
++}
+\ No newline at end of file

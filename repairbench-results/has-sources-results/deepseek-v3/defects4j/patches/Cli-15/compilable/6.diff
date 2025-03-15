@@ -1,0 +1,44 @@
+diff --git a/tmp/6e61e142-d19f-4289-b6aa-e43bf38453c1_buggy.java b/tmp/6aa2e31c-5682-47bb-8260-3efd48bdd76d_fixed.java
+index 4e8b037..85be372 100644
+--- a/tmp/6e61e142-d19f-4289-b6aa-e43bf38453c1_buggy.java
++++ b/tmp/6aa2e31c-5682-47bb-8260-3efd48bdd76d_fixed.java
+@@ -1,20 +1,28 @@
+-    public List getValues(final Option option,
+-                          List defaultValues) {
++public List getValues(final Option option, List defaultValues) {
+     // initialize the return list
+     List valueList = (List) values.get(option);
+ 
+-        // grab the correct default values
++    // if no values were provided, use the default values
+     if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = defaultValues;
++        valueList = new ArrayList(defaultValues);
+     }
+ 
+-        // augment the list with the default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = (List) this.defaultValues.get(option);
++    // get the additional default values from this.defaultValues
++    List additionalDefaults = (List) this.defaultValues.get(option);
++    
++    // if there are additional default values, add them to the list
++    if (additionalDefaults != null && !additionalDefaults.isEmpty()) {
++        // create a new list to avoid modifying the original
++        List mergedList = new ArrayList(valueList);
++        
++        // add only the additional defaults that aren't already in the list
++        for (Object defaultValue : additionalDefaults) {
++            if (!mergedList.contains(defaultValue)) {
++                mergedList.add(defaultValue);
++            }
++        }
++        valueList = mergedList;
+     }
+-                // if there are more default values as specified, add them to
+-                // the list.
+-                    // copy the list first
+ 
+     return valueList == null ? Collections.EMPTY_LIST : valueList;
+ }
+\ No newline at end of file

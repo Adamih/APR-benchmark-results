@@ -1,0 +1,14 @@
+diff --git a/tmp/d6f2a8c9-ad10-4095-906a-9ec1a121f559_buggy.java b/tmp/887313ec-e720-4ebe-84ce-5cd58fa23af1_fixed.java
+index f1d02c1..19c499e 100644
+--- a/tmp/d6f2a8c9-ad10-4095-906a-9ec1a121f559_buggy.java
++++ b/tmp/887313ec-e720-4ebe-84ce-5cd58fa23af1_fixed.java
+@@ -1,4 +1,8 @@
+ @Override
+ protected JSType caseTopType(JSType topType) {
++  // If the input type is unknown (ALL_TYPE), infer the output type based on the context of goog.isArray
++  if (topType.equals(ALL_TYPE)) {
++    return ARRAY_TYPE; // or a more specific type if possible, e.g., based on additional context
++  }
+   return topType;
+ }
+\ No newline at end of file

@@ -1,0 +1,23 @@
+diff --git a/tmp/13b0c034-7416-46f4-bd58-15a387332f38_buggy.java b/tmp/8a43831a-c2ec-4a51-85d1-f76a3d9e2539_fixed.java
+index 5eedc11..24d6ecb 100644
+--- a/tmp/13b0c034-7416-46f4-bd58-15a387332f38_buggy.java
++++ b/tmp/8a43831a-c2ec-4a51-85d1-f76a3d9e2539_fixed.java
+@@ -1,6 +1,17 @@
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
++    if (isKnownEmptyTag(startTag.name)) {
++        tb.insertEmpty(startTag);
++    } else {
+         tb.insert(startTag);
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
+         tb.transition(Text);
+     }
++}
++
++// Assuming the isKnownEmptyTag method is already defined elsewhere,
++// if not, add this method to your class
++private static boolean isKnownEmptyTag(String tagName) {
++    return tagName.equalsIgnoreCase("style") 
++           || tagName.equalsIgnoreCase("noframes");
++}
+\ No newline at end of file

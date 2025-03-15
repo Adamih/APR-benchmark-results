@@ -1,0 +1,34 @@
+diff --git a/tmp/72ffc85e-fb4b-4ec1-9268-dd8231cedd84_buggy.java b/tmp/cfd22699-b4cd-433f-8b4e-a3a016dd2c30_fixed.java
+index 862c60c..49fef03 100644
+--- a/tmp/72ffc85e-fb4b-4ec1-9268-dd8231cedd84_buggy.java
++++ b/tmp/cfd22699-b4cd-433f-8b4e-a3a016dd2c30_fixed.java
+@@ -1,25 +1,27 @@
+ void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+     final boolean prettyPrint = out.prettyPrint();
+     final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+     final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+ 
+     boolean trimLeading = false;
+     boolean trimTrailing = false;
+     if (normaliseWhite) {
++        Node prev = previousSibling();
+         trimLeading = (siblingIndex == 0 && parent != null && parent.tag().isBlock()) ||
+-                parentNode instanceof Document;
++            parentNode instanceof Document ||
++            (prev != null && prev.nodeName().equals("br"));
+         trimTrailing = nextSibling() == null && parent != null && parent.tag().isBlock();
+ 
+         // if this text is just whitespace, and the next node will cause an indent, skip this text:
+         Node next = this.nextSibling();
+         boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+             || (next instanceof TextNode && (((TextNode) next).isBlank())); // next is blank text, from re-parenting
+         if (couldSkip && isBlank()) return;
+ 
+         if ((siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank()) ||
+             (out.outline() && siblingNodes().size() > 0 && !isBlank()))
+             indent(accum, depth, out);
+     }
+ 
+     Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
+ }
+\ No newline at end of file

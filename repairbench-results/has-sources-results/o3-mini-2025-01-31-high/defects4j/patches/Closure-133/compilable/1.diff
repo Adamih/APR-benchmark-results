@@ -1,0 +1,16 @@
+diff --git a/tmp/07bd2420-486c-4854-baa1-8b20b5f594b1_buggy.java b/tmp/47cd22db-c901-4ab9-84ac-ee04cd6cdc2a_fixed.java
+index 42d4174..1810b75 100644
+--- a/tmp/07bd2420-486c-4854-baa1-8b20b5f594b1_buggy.java
++++ b/tmp/47cd22db-c901-4ab9-84ac-ee04cd6cdc2a_fixed.java
+@@ -1,7 +1,9 @@
+ /**
+  * Returns the remainder of the line.
+  */
+ private String getRemainingJSDocLine() {
+   String result = stream.getRemainingJSDocLine();
+-    return result;
++  // Strip any leading whitespace, an asterisk, and an optional space.
++  // This ensures that text extents are computed relative to the actual content.
++  return result.replaceFirst("^[ \\t]*\\* ?", "");
+ }
+\ No newline at end of file

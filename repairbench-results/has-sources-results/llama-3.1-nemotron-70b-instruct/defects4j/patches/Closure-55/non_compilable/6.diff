@@ -1,0 +1,28 @@
+diff --git a/tmp/87f44f31-cc19-4a04-9be3-d1f48e369ba3_buggy.java b/tmp/6b5d284e-f8fc-4b2d-a263-ee85506891b8_fixed.java
+index 43937f5..9479650 100644
+--- a/tmp/87f44f31-cc19-4a04-9be3-d1f48e369ba3_buggy.java
++++ b/tmp/6b5d284e-f8fc-4b2d-a263-ee85506891b8_fixed.java
+@@ -1,3 +1,21 @@
++/**
++ * Checks if a given Node represents a reducable function expression.
++ * A function expression is considered reducable if it is not a constructor 
++ * or an immediately invoked function expression (IIFE).
++ *
++ * @param n the Node to check
++ * @return true if the Node is a reducable function expression, false otherwise
++ */
+ private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++    return NodeUtil.isFunctionExpression(n) 
++           &&!NodeUtil.isConstructor(n) 
++           &&!isImmediatelyInvokedFunctionExpression(n);
++}
++
++// Helper method to check for IIFE (added if not already present)
++private static boolean isImmediatelyInvokedFunctionExpression(Node n) {
++    if (n.getParent() instanceof CallNode) {
++        return ((CallNode) n.getParent()).getCallee() == n;
++    }
++    return false;
+ }
+\ No newline at end of file

@@ -1,0 +1,31 @@
+diff --git a/tmp/8dc23ebb-e198-4e7e-aa48-278339ed5d45_buggy.java b/tmp/58e2ff28-46be-49e9-a644-56a401c1f521_fixed.java
+index 072c672..1e4459a 100644
+--- a/tmp/8dc23ebb-e198-4e7e-aa48-278339ed5d45_buggy.java
++++ b/tmp/58e2ff28-46be-49e9-a644-56a401c1f521_fixed.java
+@@ -1,20 +1,22 @@
+ @Override
+ public int parseArguments(Parameters params) throws CmdLineException {
+   String param = params.getParameter(0);
+-
+   if (param == null) {
+     setter.addValue(true);
+-          return 0;
++    // Even if no extra parameter was provided, the presence of the flag
++    // should count as consuming one argument.
++    return 1;
+   } else {
+     String lowerParam = param.toLowerCase();
+     if (TRUES.contains(lowerParam)) {
+       setter.addValue(true);
+     } else if (FALSES.contains(lowerParam)) {
+       setter.addValue(false);
+     } else {
++      // If the provided parameter isn’t recognized, still treat the flag as present.
+       setter.addValue(true);
+-            return 0;
+     }
++    // In all cases when a parameter is provided we consume it.
+     return 1;
+   }
+ }
+\ No newline at end of file

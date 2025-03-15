@@ -1,0 +1,22 @@
+diff --git a/tmp/5c65d7a0-daf8-4c01-9f17-b99b2f7f7a82_buggy.java b/tmp/f5309445-5815-4dc2-b3d9-6475db22eb3d_fixed.java
+index 29d025a..1fa2157 100644
+--- a/tmp/5c65d7a0-daf8-4c01-9f17-b99b2f7f7a82_buggy.java
++++ b/tmp/f5309445-5815-4dc2-b3d9-6475db22eb3d_fixed.java
+@@ -1,13 +1,14 @@
+-    private void _verifySharing()
+-    {
++private void _verifySharing() {
+     if (_hashShared) {
+         _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+         _names = Arrays.copyOf(_names, _names.length);
+         _hashShared = false;
+         // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+         //    we rehash as needed, as need-rehash flag is not copied from parent
+     }
+     if (_needRehash) {
+         rehash();
+     }
++    // Ensure the symbol table is not shared after rehashing
++    _hashShared = false;
+ }
+\ No newline at end of file

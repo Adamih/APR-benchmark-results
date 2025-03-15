@@ -1,0 +1,57 @@
+diff --git a/tmp/fb67b264-945a-4833-bb35-a8aea7f8d079_buggy.java b/tmp/050a8496-e37d-49b5-9cb9-d5c985956edd_fixed.java
+index 904dba7..8a55c9b 100644
+--- a/tmp/fb67b264-945a-4833-bb35-a8aea7f8d079_buggy.java
++++ b/tmp/050a8496-e37d-49b5-9cb9-d5c985956edd_fixed.java
+@@ -1,46 +1,50 @@
+ private String format(JSError error, boolean warning) {
+     // extract source excerpt
+     SourceExcerptProvider source = getSource();
+     String sourceExcerpt = source == null? null :
+         excerpt.get(
+             source, error.sourceName, error.lineNumber, excerptFormatter);
+ 
+     // formatting the message
+     StringBuilder b = new StringBuilder();
+     if (error.sourceName!= null) {
+       b.append(error.sourceName);
+       if (error.lineNumber > 0) {
+         b.append(':');
+         b.append(error.lineNumber);
+       }
+       b.append(": ");
+     }
+ 
+     b.append(getLevelName(warning? CheckLevel.WARNING : CheckLevel.ERROR));
+     b.append(" - ");
+ 
+     b.append(error.description);
+     b.append('\n');
+     if (sourceExcerpt!= null) {
+       b.append(sourceExcerpt);
+       b.append('\n');
+       int charno = error.getCharno();
+ 
+       // padding equal to the excerpt and arrow at the end
+       // charno == sourceExpert.length() means something is missing
+       // at the end of the line
+       if (excerpt.equals(LINE)
+-          && 0 <= charno && charno < sourceExcerpt.length()) {
++          && 0 <= charno && charno <= sourceExcerpt.length()) { // Modified here
+         for (int i = 0; i < charno; i++) {
+           char c = sourceExcerpt.charAt(i);
+           if (Character.isWhitespace(c)) {
+             b.append(c);
+           } else {
+             b.append(' ');
+           }
+         }
++        if(charno == sourceExcerpt.length()) { // Added condition to print '^' when error is at the end of the line
++            b.append("^");
++        } else {
+             b.append("^\n");
+         }
+       }
++    }
+     return b.toString();
+ }
+\ No newline at end of file

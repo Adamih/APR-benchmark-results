@@ -1,0 +1,35 @@
+diff --git a/tmp/feb93621-9b73-44c6-b288-e79f24e83b32_buggy.java b/tmp/ece9f2fe-0a8d-4af0-8254-f0019cbe5681_fixed.java
+index 9c25814..0d42ae3 100644
+--- a/tmp/feb93621-9b73-44c6-b288-e79f24e83b32_buggy.java
++++ b/tmp/ece9f2fe-0a8d-4af0-8254-f0019cbe5681_fixed.java
+@@ -1,27 +1,29 @@
+     /**
+      * <p>Throws a {@link MissingOptionException} if all of the
+      * required options are no present.</p>
+      *
+      * @throws MissingOptionException if any of the required Options
+      * are not present.
+      */
+     private void checkRequiredOptions()
+         throws MissingOptionException
+     {
+         // if there are required options that have not been
+         // processsed
+         if (requiredOptions.size() > 0)
+         {
+             Iterator iter = requiredOptions.iterator();
+-            StringBuffer buff = new StringBuffer();
++            StringBuffer buff = new StringBuffer("Missing required option");
++            buff.append(requiredOptions.size() == 1 ? "" : "s");
++            buff.append(": ");
+ 
+ 
+             // loop through the required options
+             while (iter.hasNext())
+             {
+                 buff.append(iter.next());
+             }
+ 
+             throw new MissingOptionException(buff.toString());
+         }
+     }

@@ -1,0 +1,19 @@
+diff --git a/tmp/bd481ba6-acfb-42c1-be2a-0f2b91b8063f_buggy.java b/tmp/24229171-3a49-48c9-8da0-7ef2008007ed_fixed.java
+index 1186509..b3cb869 100644
+--- a/tmp/bd481ba6-acfb-42c1-be2a-0f2b91b8063f_buggy.java
++++ b/tmp/24229171-3a49-48c9-8da0-7ef2008007ed_fixed.java
+@@ -1,7 +1,11 @@
+ private void printRow(final Help.TextTable table, final SearchResponse.Response.Doc doc) {
++    // Assuming that the lastUpdated column is not supposed to be included if the timestamp is null
++    if (doc.timestamp() != null) {
+         var lastUpdated = DATE_TIME_FORMATTER.format(
+                 Instant.ofEpochMilli(doc.timestamp()).atZone(ZoneId.systemDefault())
+         );
+-
+-        table.addRowValues(doc.id(), lastUpdated);
++        table.addRowValues(doc.id(), doc.version(), lastUpdated);
++    } else {
++        table.addRowValues(doc.id(), doc.version());
++    }
+ }
+\ No newline at end of file

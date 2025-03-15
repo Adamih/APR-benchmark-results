@@ -1,0 +1,47 @@
+diff --git a/tmp/ce54aac6-9d9e-4139-9779-61b019095d64_buggy.java b/tmp/db881ba1-f22e-4595-9852-69ad6f11da20_fixed.java
+index c84c989..e8f7407 100644
+--- a/tmp/ce54aac6-9d9e-4139-9779-61b019095d64_buggy.java
++++ b/tmp/db881ba1-f22e-4595-9852-69ad6f11da20_fixed.java
+@@ -1,27 +1,40 @@
+ private Position decodeIridiumPosition(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
+ 
+     buf.readUnsignedShortLE(); // length
+ 
+     buf.skipBytes(3); // identification header
+     buf.readUnsignedIntLE(); // index
+ 
+     DeviceSession deviceSession = getDeviceSession(
+             channel, remoteAddress, buf.readSlice(15).toString(StandardCharsets.US_ASCII));
+     if (deviceSession == null) {
+         return null;
+     }
+ 
+     Position position = new Position(getProtocolName());
+     position.setDeviceId(deviceSession.getDeviceId());
+ 
+     buf.readUnsignedByte(); // session status
+     buf.skipBytes(4); // reserved
+-        buf.readUnsignedIntLE(); // date and time
++
++    // Read and parse date and time
++    int dateTime = buf.readUnsignedIntLE();
++    int year = (dateTime >> 26) & 0x3F; // 6 bits
++    int month = (dateTime >> 22) & 0xF; // 4 bits
++    int day = (dateTime >> 17) & 0x1F; // 5 bits
++    int hour = (dateTime >> 12) & 0x1F; // 5 bits
++    int minute = (dateTime >> 6) & 0x3F; // 6 bits
++    int second = dateTime & 0x3F; // 6 bits
++
++    // Convert to Calendar
++    Calendar calendar = Calendar.getInstance();
++    calendar.set(2000 + year, month - 1, day, hour, minute, second);
++    position.setTime(calendar.getTime());
+ 
+     buf.skipBytes(23); // coordinates block
+ 
+     buf.skipBytes(3); // data tag header
+     decodeMinimalDataSet(position, buf);
+ 
+     return position;
+ }
+\ No newline at end of file

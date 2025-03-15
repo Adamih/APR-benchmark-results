@@ -1,0 +1,38 @@
+diff --git a/tmp/71643d98-39b5-4fe0-915c-40c97d5d05c7_buggy.java b/tmp/357831f0-64d2-49a7-9185-e8cca36b8e41_fixed.java
+index 07b0792..38eeaeb 100644
+--- a/tmp/71643d98-39b5-4fe0-915c-40c97d5d05c7_buggy.java
++++ b/tmp/357831f0-64d2-49a7-9185-e8cca36b8e41_fixed.java
+@@ -1,22 +1,30 @@
+ /**
+  * @return Whether the variable is only assigned a value once for its
+  *     lifetime.
+  */
+ boolean isAssignedOnceInLifetime() {
+   Reference ref = getOneAndOnlyAssignment();
+   if (ref == null) {
+     return false;
+   }
+ 
+   // Make sure this assignment is not in a loop.
+   for (BasicBlock block = ref.getBasicBlock();
+        block!= null; block = block.getParent()) {
+     if (block.isFunction) {
+       break;
+-        } else if (block.isLoop) {
++    } else if (block.isLoop || hasMultipleExecutions(ref)) {
+       return false;
+     }
+   }
+ 
+-      return true;
++  // Check if there's only one assignment in the entire code.
++  return getAssignments().size() == 1;
++}
++
++// Helper function to check if a reference has multiple executions.
++private boolean hasMultipleExecutions(Reference ref) {
++  // This is a simplified version and may need to be adapted to the actual codebase.
++  // It's also possible that this function already exists in the codebase.
++  return ref.getBasicBlock().getPredecessors().size() > 1;
+ }
+\ No newline at end of file

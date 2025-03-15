@@ -1,0 +1,42 @@
+diff --git a/tmp/0c6a6036-c5e7-4d8e-9a30-d2aded88d93e_buggy.java b/tmp/4251be99-5e20-42ce-970a-9c180b28a4e4_fixed.java
+index 07b0792..cce2560 100644
+--- a/tmp/0c6a6036-c5e7-4d8e-9a30-d2aded88d93e_buggy.java
++++ b/tmp/4251be99-5e20-42ce-970a-9c180b28a4e4_fixed.java
+@@ -1,22 +1,28 @@
+-    /**
+-     * @return Whether the variable is only assigned a value once for its
+-     *     lifetime.
+-     */
+ boolean isAssignedOnceInLifetime() {
+   Reference ref = getOneAndOnlyAssignment();
+   if (ref == null) {
+     return false;
+   }
+ 
+-      // Make sure this assignment is not in a loop.
+-      for (BasicBlock block = ref.getBasicBlock();
+-           block != null; block = block.getParent()) {
++  // If the assignment is within a function call, check all blocks belonging to that function
++  if(ref.isFunctionCall()) {
++    Script script = ref.getFunction().getSourceFile().getScript();
++    for (Function function : script.getFunctions()) {
++      if (function.getScript() == ref.getFunction().getScript() && function.isLoop()) {
++        return false;
++      }
++    }
++  }
++  // If the assignment is not within a function call, check blocks belonging to the assignment
++  else {
++    for (BasicBlock block = ref.getBasicBlock(); block != null; block = block.getParent()) {
+       if (block.isFunction) {
+         break;
+-        } else if (block.isLoop) {
++      } else if (block.isLoop && !ref.isFunctionCall()) {
+         return false;
+       }
+     }
++  }
+ 
+   return true;
+ }
+\ No newline at end of file

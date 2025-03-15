@@ -1,0 +1,26 @@
+diff --git a/tmp/be8d22f2-ea9a-4b24-9dbe-b31387b0a784_buggy.java b/tmp/15512b8b-ce04-4d5f-9b32-b326458f7417_fixed.java
+index 29d025a..024447a 100644
+--- a/tmp/be8d22f2-ea9a-4b24-9dbe-b31387b0a784_buggy.java
++++ b/tmp/15512b8b-ce04-4d5f-9b32-b326458f7417_fixed.java
+@@ -1,13 +1,18 @@
+     private void _verifySharing()
+     {
+         if (_hashShared) {
++            // Need to copy the primary hash area and name array
+             _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+             _names = Arrays.copyOf(_names, _names.length);
++            // Also need to copy the collision area since it's part of the shared state
++            if (_spilloverEnd > 0) {
++                _spilloverArea = Arrays.copyOf(_spilloverArea, _spilloverArea.length);
++            }
+             _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
++            // When sharing is split, we need to force rehash to ensure proper operation
++            _needRehash = true;
+         }
+         if (_needRehash) {
+             rehash();
+         }
+     }
+\ No newline at end of file

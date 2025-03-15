@@ -1,0 +1,34 @@
+diff --git a/tmp/9225e8d6-c6f5-43be-afbc-a3594edb9ff0_buggy.java b/tmp/edd90518-d75f-4ed9-a2f3-e5adef2f4f77_fixed.java
+index ae12a4d..67ab9e0 100644
+--- a/tmp/9225e8d6-c6f5-43be-afbc-a3594edb9ff0_buggy.java
++++ b/tmp/edd90518-d75f-4ed9-a2f3-e5adef2f4f77_fixed.java
+@@ -1,3 +1,27 @@
+ private boolean isFormatAsBlock(Document.OutputSettings out) {
+-        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
++    // Check if the current tag formats as a block
++    if (tag.formatAsBlock()) {
++        return true;
++    }
++    
++    // Check if the parent tag formats as a block
++    if (parent() != null && parent().tag().formatAsBlock()) {
++        return true;
++    }
++    
++    // Check if the output settings specify outlining (pretty print)
++    if (out.outline()) {
++        return true;
++    }
++    
++    // Check if the element has a display style of 'inline' but is still a block-level element
++    if (hasAttr("style")) {
++        String style = attr("style");
++        if (style.contains("display:inline;")) {
++            // Check if the tag is inherently a block-level element
++            return Tag.isBlock(tag.getName());
++        }
++    }
++    
++    return false;
+ }
+\ No newline at end of file

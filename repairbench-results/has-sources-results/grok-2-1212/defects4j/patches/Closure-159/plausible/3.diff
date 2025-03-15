@@ -1,0 +1,35 @@
+diff --git a/tmp/e7fb4313-2dff-404c-af96-a9744f919d4e_buggy.java b/tmp/da94edc9-1570-4fbf-8b25-4d63cfb620d1_fixed.java
+index de9af32..2315959 100644
+--- a/tmp/e7fb4313-2dff-404c-af96-a9744f919d4e_buggy.java
++++ b/tmp/da94edc9-1570-4fbf-8b25-4d63cfb620d1_fixed.java
+@@ -1,18 +1,26 @@
+ /**
+  * @see #findCalledFunctions(Node)
+  */
+ private void findCalledFunctions(
+     Node node, Set<String> changed) {
+   Preconditions.checkArgument(changed != null);
+   // For each referenced function, add a new reference
+   if (node.getType() == Token.CALL) {
+-      Node child = node.getFirstChild();
+-      if (child.getType() == Token.NAME) {
+-        changed.add(child.getString());
++    Node callee = node.getFirstChild();
++    if (callee.getType() == Token.NAME) {
++      changed.add(callee.getString());
++    } else if (callee.getType() == Token.GETPROP) {
++      Node property = callee.getLastChild();
++      if (property.getType() == Token.STRING && property.getString().equals("call")) {
++        Node functionName = callee.getFirstChild();
++        if (functionName.getType() == Token.NAME) {
++          changed.add(functionName.getString());
++        }
++      }
+     }
+   }
+ 
+   for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+     findCalledFunctions(c, changed);
+   }
+ }
+\ No newline at end of file

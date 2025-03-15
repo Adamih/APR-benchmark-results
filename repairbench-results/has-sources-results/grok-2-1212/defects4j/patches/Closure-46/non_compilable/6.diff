@@ -1,0 +1,38 @@
+diff --git a/tmp/b0353de3-1a94-4d92-ba37-d0e8638ffa20_buggy.java b/tmp/153d326c-4484-4fc9-ba18-6f62947dc5de_fixed.java
+index 46817a7..db47605 100644
+--- a/tmp/b0353de3-1a94-4d92-ba37-d0e8638ffa20_buggy.java
++++ b/tmp/153d326c-4484-4fc9-ba18-6f62947dc5de_fixed.java
+@@ -1,16 +1,26 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++    Set<String> allProperties = new HashSet<>(properties.keySet());
++    allProperties.addAll(that.toMaybeRecordType().getOwnPropertyNames());
++
++    for (String property : allProperties) {
++        if (properties.containsKey(property) && that.toMaybeRecordType().hasProperty(property)) {
++            // If both types have the property, we take the union of the property types
++            JSType thisType = getPropertyType(property);
++            JSType thatType = that.toMaybeRecordType().getPropertyType(property);
++            JSType unionType = registry.createUnionType(thisType, thatType);
++            builder.addProperty(property, unionType, getPropertyNode(property));
++        } else if (properties.containsKey(property)) {
++            // If only this type has the property, we add it as is
++            builder.addProperty(property, getPropertyType(property), getPropertyNode(property));
++        } else {
++            // If only that type has the property, we add it as is
++            builder.addProperty(property, that.toMaybeRecordType().getPropertyType(property), null);
+         }
+     }
+     return builder.build();
+ }
+\ No newline at end of file

@@ -1,0 +1,31 @@
+diff --git a/tmp/a4102e30-f76e-42f3-8b7a-7bc9eef895b2_buggy.java b/tmp/36c452ef-7aee-4db9-99da-c7b4bafb62ee_fixed.java
+index 8afddc6..2952f83 100644
+--- a/tmp/a4102e30-f76e-42f3-8b7a-7bc9eef895b2_buggy.java
++++ b/tmp/36c452ef-7aee-4db9-99da-c7b4bafb62ee_fixed.java
+@@ -1,22 +1,26 @@
+   @Override
+   protected CompilerOptions createOptions() {
+     CompilerOptions options = new CompilerOptions();
+     options.setCodingConvention(new ClosureCodingConvention());
+     CompilationLevel level = flags.compilation_level;
+     level.setOptionsForCompilationLevel(options);
+     if (flags.debug) {
+       level.setDebugOptionsForCompilationLevel(options);
+     }
+ 
+     WarningLevel wLevel = flags.warning_level;
+     wLevel.setOptionsForWarningLevel(options);
+     for (FormattingOption formattingOption : flags.formatting) {
+       formattingOption.applyToOptions(options);
+     }
+     if (flags.process_closure_primitives) {
+       options.closurePass = true;
++    } else {
++      // This was missing in the original code. We must disable the closure pass if
++      // the flag is explicitly set to false.
++      options.setProcessClosurePrimitives(false);
+     }
+ 
+     initOptionsFromFlags(options);
+     return options;
+   }

@@ -1,0 +1,60 @@
+diff --git a/tmp/3ec4b8f5-4f13-4ed7-a354-27583e8694f7_buggy.java b/tmp/02421ccd-5cf9-44e1-affa-3e45cce6e140_fixed.java
+index d87dd79..5569ff6 100644
+--- a/tmp/3ec4b8f5-4f13-4ed7-a354-27583e8694f7_buggy.java
++++ b/tmp/02421ccd-5cf9-44e1-affa-3e45cce6e140_fixed.java
+@@ -1,47 +1,53 @@
+ @Override
+ protected Object decode(
+         ChannelHandlerContext ctx, Channel channel, ByteBuf buf) throws Exception {
+ 
++    while (buf.isReadable()) {
+         int endIndex = -1;
+         for (int i = buf.writerIndex() - 1; i >= buf.readerIndex(); i--) {
+             if (buf.getByte(i) == ']') {
+-                endIndex = i + 1;
++                endIndex = i;
+                 break;
+             }
+         }
+ 
+         if (endIndex > 0) {
+             ByteBuf frame = Unpooled.buffer();
++            int startReaderIndex = buf.readerIndex();
+             while (buf.readerIndex() < endIndex) {
+                 byte b1 = buf.readByte();
+                 if (b1 == '}') {
+                     byte b2 = buf.readByte();
+                     switch (b2) {
+                         case 0x01:
+                             frame.writeByte('}');
+                             break;
+                         case 0x02:
+                             frame.writeByte('[');
+                             break;
+                         case 0x03:
+                             frame.writeByte(']');
+                             break;
+                         case 0x04:
+                             frame.writeByte(',');
+                             break;
+                         case 0x05:
+                             frame.writeByte('*');
+                             break;
+                         default:
+                             throw new IllegalArgumentException(String.format(
+                                     "unexpected byte at %d: 0x%02x", buf.readerIndex() - 1, b2));
+                     }
+                 } else {
+                     frame.writeByte(b1);
+                 }
+             }
++            buf.readerIndex(startReaderIndex + endIndex + 1); // Move reader index past the ']'
+             return frame;
++        } else {
++            return null;
++        }
+     }
+ 
+     return null;
+ }
+\ No newline at end of file

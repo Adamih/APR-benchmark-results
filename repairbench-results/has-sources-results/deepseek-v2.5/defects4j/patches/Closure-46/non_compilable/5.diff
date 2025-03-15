@@ -1,0 +1,46 @@
+diff --git a/tmp/a7008745-5610-4cf5-b0e5-c3b1a27145b8_buggy.java b/tmp/d007c428-89f4-447a-a581-85566e1c4e64_fixed.java
+index 46817a7..3fc4030 100644
+--- a/tmp/a7008745-5610-4cf5-b0e5-c3b1a27145b8_buggy.java
++++ b/tmp/d007c428-89f4-447a-a581-85566e1c4e64_fixed.java
+@@ -1,16 +1,35 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+   if (!that.isRecordType()) {
+     return super.getLeastSupertype(that);
+   }
++
+   RecordTypeBuilder builder = new RecordTypeBuilder(registry);
++
++  // Add properties from the current record type
+   for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++    JSType thisPropertyType = getPropertyType(property);
++    JSType thatPropertyType = that.toMaybeRecordType().getPropertyType(property);
++
++    if (that.toMaybeRecordType().hasProperty(property)) {
++      // If the property exists in both record types, create a union of their types
++      JSType unionType = thatPropertyType.isEquivalentTo(thisPropertyType)
++          ? thisPropertyType
++          : registry.createUnionType(thisPropertyType, thatPropertyType);
++      builder.addProperty(property, unionType, getPropertyNode(property));
++    } else {
++      // If the property exists only in the current record type, add it as is
++      builder.addProperty(property, thisPropertyType, getPropertyNode(property));
+     }
+   }
++
++  // Add properties from the `that` record type that are not in the current record type
++  for (String property : that.toMaybeRecordType().getProperties()) {
++    if (!properties.containsKey(property)) {
++      JSType thatPropertyType = that.toMaybeRecordType().getPropertyType(property);
++      builder.addProperty(property, thatPropertyType, that.toMaybeRecordType().getPropertyNode(property));
++    }
++  }
++
+   return builder.build();
+ }
+\ No newline at end of file

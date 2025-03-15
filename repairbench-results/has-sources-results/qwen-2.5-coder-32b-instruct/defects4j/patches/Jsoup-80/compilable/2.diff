@@ -1,0 +1,25 @@
+diff --git a/tmp/3245f132-d216-4c2d-8f83-3403b08600ff_buggy.java b/tmp/4c1f06d6-04dd-4eb9-8f8d-98a16471f164_fixed.java
+index cbfa753..ece2ed7 100644
+--- a/tmp/3245f132-d216-4c2d-8f83-3403b08600ff_buggy.java
++++ b/tmp/4c1f06d6-04dd-4eb9-8f8d-98a16471f164_fixed.java
+@@ -1,15 +1,19 @@
+ void insert(Token.Comment commentToken) {
+     Comment comment = new Comment(commentToken.getData());
+     Node insert = comment;
+     if (commentToken.bogus) { // xml declarations are emitted as bogus comments (which is right for html, but not xml)
+         // so we do a bit of a hack and parse the data as an element to pull the attributes out
+         String data = comment.getData();
+         if (data.length() > 1 && (data.startsWith("!") || data.startsWith("?"))) {
+             Document doc = Jsoup.parse("<" + data.substring(1, data.length() - 1) + ">", baseUri, Parser.xmlParser());
++            if (!doc.children().isEmpty()) { // Check if there is at least one child
+                 Element el = doc.child(0);
+                 insert = new XmlDeclaration(settings.normalizeTag(el.tagName()), data.startsWith("!"));
+                 insert.attributes().addAll(el.attributes());
++            } else {
++                // Handle the case where there are no children as needed, or log a warning/error
++            }
+         }
+     }
+     insertNode(insert);
+ }
+\ No newline at end of file

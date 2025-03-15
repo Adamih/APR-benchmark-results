@@ -1,0 +1,31 @@
+diff --git a/tmp/c8b32b70-37eb-4004-a810-691f6aa04d95_buggy.java b/tmp/5763afb9-77b0-41d6-b3ba-64a3e7a282c1_fixed.java
+index 5eedc11..e17afce 100644
+--- a/tmp/c8b32b70-37eb-4004-a810-691f6aa04d95_buggy.java
++++ b/tmp/5763afb9-77b0-41d6-b3ba-64a3e7a282c1_fixed.java
+@@ -1,6 +1,24 @@
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
++    // Insert the start tag into the current tree.
+     tb.insert(startTag);
+-        tb.tokeniser.transition(TokeniserState.Rawtext);
++    
++    // Transition the tokeniser to the RAWTEXT state.
++    tb.tokeniser.transition(TokeniserState.RAWTEXT);
++    
++    // Mark the current insertion mode.
+     tb.markInsertionMode();
++    
++    // Transition to the TEXT insertion mode.
+     tb.transition(Text);
++    
++    // Additionally, handle the end tag for elements like <style> and <noframes>
++    // by inserting the end tag and adjusting the parser state.
++    if (startTag.tagName.equals("style") || startTag.tagName.equals("noframes")) {
++        // Insert the end tag for the element.
++        tb.insert(new Token.EndTag(startTag.tagName));
++        
++        // Reset the tokeniser and insertion modes.
++        tb.tokeniser.reset();
++        tb.resetInsertionMode();
++    }
+ }
+\ No newline at end of file

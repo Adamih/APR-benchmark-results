@@ -1,0 +1,37 @@
+diff --git a/tmp/0a908d2c-98a2-4dcd-98c4-3189cdde8e91_buggy.java b/tmp/595ca8a4-5474-4437-8d63-5a911a5e6064_fixed.java
+index 5bf31b1..f965eb4 100644
+--- a/tmp/0a908d2c-98a2-4dcd-98c4-3189cdde8e91_buggy.java
++++ b/tmp/595ca8a4-5474-4437-8d63-5a911a5e6064_fixed.java
+@@ -1,17 +1,24 @@
+ private String consumeSubQuery() {
+     StringBuilder sq = StringUtil.borrowBuilder();
++    int depth = 0;
+     while (!tq.isEmpty()) {
+-            if (tq.matches("("))
++        if (tq.matches("(")) {
+             sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+-            else if (tq.matches("["))
++        } else if (tq.matches("[")) {
+             sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++        } else if (tq.matchesAny(Combinators)) {
++            if (sq.length() > 0 && depth == 0) {
+                 break;
+-                else
+-                    tq.consume();
+-            else
++            } else {
++                if (tq.consume().equals(">")) {
++                    depth++;
++                } else if (tq.consume().equals(",")) {
++                    depth = 0;
++                }
++            }
++        } else {
+             sq.append(tq.consume());
+         }
++    }
+     return StringUtil.releaseBuilder(sq);
+ }
+\ No newline at end of file

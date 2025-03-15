@@ -1,0 +1,17 @@
+diff --git a/tmp/4bbf8dbf-6001-4d1a-92fe-370132f85cc0_buggy.java b/tmp/0779d5d3-1eca-4c36-a00c-2440ce841f95_fixed.java
+index ae6c2b1..2b9577b 100644
+--- a/tmp/4bbf8dbf-6001-4d1a-92fe-370132f85cc0_buggy.java
++++ b/tmp/0779d5d3-1eca-4c36-a00c-2440ce841f95_fixed.java
+@@ -1,10 +1,11 @@
+ public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+     String str = text.substring(position);
+     for (String id : ALL_IDS) {
+         if (str.startsWith(id)) {
+             bucket.setZone(DateTimeZone.forID(id));
+             return position + id.length();
+         }
+     }
++    // If no match is found, return the original position to indicate failure
+     return ~position;
+ }
+\ No newline at end of file

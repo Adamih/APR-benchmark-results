@@ -1,0 +1,18 @@
+diff --git a/tmp/5689398a-8f43-4aa3-be5b-df38befb2137_buggy.java b/tmp/8bad68e0-2f69-4769-b5de-b7bbfc62b54f_fixed.java
+index 42d4174..3a8003f 100644
+--- a/tmp/5689398a-8f43-4aa3-be5b-df38befb2137_buggy.java
++++ b/tmp/8bad68e0-2f69-4769-b5de-b7bbfc62b54f_fixed.java
+@@ -1,7 +1,11 @@
+ /**
+  * Returns the remainder of the line.
+  */
+ private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
+-    return result;
++    int endIndex = result.indexOf("*/");
++    if (endIndex != -1) {
++        result = result.substring(0, endIndex);
++    }
++    return result.trim();
+ }
+\ No newline at end of file

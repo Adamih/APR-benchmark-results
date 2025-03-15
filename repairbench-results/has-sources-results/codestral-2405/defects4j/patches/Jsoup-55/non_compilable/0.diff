@@ -1,0 +1,40 @@
+diff --git a/tmp/f307326e-653e-4c65-a05a-be7e09dcd090_buggy.java b/tmp/2214d641-360b-4ac4-aa3a-f50600e81bab_fixed.java
+index ef76662..d932dca 100644
+--- a/tmp/f307326e-653e-4c65-a05a-be7e09dcd090_buggy.java
++++ b/tmp/2214d641-360b-4ac4-aa3a-f50600e81bab_fixed.java
+@@ -1,17 +1,28 @@
+ void read(Tokeniser t, CharacterReader r) {
+     char c = r.consume();
+-            switch (c) {
+-                case '>':
++    if (c == '/') {
++        char next = r.consume();
++        if (next > 0 && !isWhitespace(next) && next != '>' && next != eof) {
++            // if '/' is not followed by '>', or eof, or whitespace and not the last character of the tag,
++            // it should be treated as part of the attribute value, so the state does not change.
++            t.tagPending.appendTagName('/');
++            return;
++        } else {
++            // if '/' is followed by '>', or eof, or whitespace, it's end of tag, so the tag is self-closing.
++            r.unconsume();
+             t.tagPending.selfClosing = true;
+             t.emitTagPending();
+             t.transition(Data);
+-                    break;
+-                case eof:
++            return;
++        }
++    } else if (c == '>') {
++        t.emitTagPending();
++        t.transition(Data);
++    } else if (c == eof) {
+         t.eofError(this);
+         t.transition(Data);
+-                    break;
+-                default:
++    } else {
+         t.error(this);
+         t.transition(BeforeAttributeName);
+     }
+ }
+\ No newline at end of file

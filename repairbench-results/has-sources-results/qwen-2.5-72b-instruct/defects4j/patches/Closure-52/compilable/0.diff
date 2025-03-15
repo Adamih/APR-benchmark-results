@@ -1,0 +1,52 @@
+diff --git a/tmp/691cc430-3ba7-4c9a-b3b4-63da4bf8034f_buggy.java b/tmp/5c541227-23fd-41d3-8bf3-6d9052b0c991_fixed.java
+index 4b7f469..4bbb924 100644
+--- a/tmp/691cc430-3ba7-4c9a-b3b4-63da4bf8034f_buggy.java
++++ b/tmp/5c541227-23fd-41d3-8bf3-6d9052b0c991_fixed.java
+@@ -1,10 +1,44 @@
+ static boolean isSimpleNumber(String s) {
+     int len = s.length();
++    if (len == 0) {
++        return false;
++    }
++
++    // Check for hexadecimal
++    if (len > 2 && s.charAt(0) == '0' && (s.charAt(1) == 'x' || s.charAt(1) == 'X')) {
++        for (int index = 2; index < len; index++) {
++            char c = s.charAt(index);
++            if (!(c >= '0' && c <= '9' || c >= 'a' && c <= 'f' || c >= 'A' && c <= 'F')) {
++                return false;
++            }
++        }
++        return true;
++    }
++
++    // Check for octal
++    if (len > 1 && s.charAt(0) == '0') {
++        for (int index = 1; index < len; index++) {
++            char c = s.charAt(index);
++            if (c < '0' || c > '7') {
++                return false;
++            }
++        }
++        return true;
++    }
++
++    // Check for floating-point and decimal numbers
++    boolean dotFound = false;
+     for (int index = 0; index < len; index++) {
+         char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++        if (c == '.') {
++            if (dotFound) {
++                return false; // More than one dot
++            }
++            dotFound = true;
++        } else if (c < '0' || c > '9') {
+             return false;
+         }
+     }
+-    return len > 0;
++
++    return true;
+ }
+\ No newline at end of file

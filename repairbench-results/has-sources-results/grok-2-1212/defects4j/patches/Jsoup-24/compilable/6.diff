@@ -1,0 +1,43 @@
+diff --git a/tmp/8b524317-5c00-4363-a757-5aa17f8ab0b4_buggy.java b/tmp/132a6be1-35a4-4701-84cc-604d7dcb4172_fixed.java
+index b2d53db..409b081 100644
+--- a/tmp/8b524317-5c00-4363-a757-5aa17f8ab0b4_buggy.java
++++ b/tmp/132a6be1-35a4-4701-84cc-604d7dcb4172_fixed.java
+@@ -1,34 +1,36 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+         t.dataBuffer.append(name);
+         r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
+             default:
+-                        t.dataBuffer.append(c);
++                // If the character is not a space, '/', or '>', we should not append it
++                // to the data buffer and should handle it differently
++                r.unconsume(); // Put the character back
+                 anythingElse(t, r);
+                 break;
+         }
+     } else {
+         anythingElse(t, r);
+     }
+ }
+\ No newline at end of file

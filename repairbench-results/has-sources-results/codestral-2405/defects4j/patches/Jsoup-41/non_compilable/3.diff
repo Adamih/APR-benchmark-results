@@ -1,0 +1,33 @@
+diff --git a/tmp/2151f4ff-9e5a-48ee-911b-9216a150f5de_buggy.java b/tmp/aba9e058-57f0-4091-bd45-76feff5c93e9_fixed.java
+index d457dbe..1217a75 100644
+--- a/tmp/2151f4ff-9e5a-48ee-911b-9216a150f5de_buggy.java
++++ b/tmp/aba9e058-57f0-4091-bd45-76feff5c93e9_fixed.java
+@@ -1,10 +1,23 @@
+ @Override
+ public boolean equals(Object o) {
+-        if (this == o) return true;
+-        if (o == null || getClass() != o.getClass()) return false;
+-        if (!super.equals(o)) return false;
++    if (this == o)
++        return true;
++    if (o == null || getClass() != o.getClass())
++        return false;
+ 
+     Element element = (Element) o;
+ 
+-        return this == o;
++    boolean idEquals = (this.id == null ? element.id == null : this.id.equals(element.id));
++    boolean classEquals = (this.className == null ? element.className == null : this.className.equals(element.className));
++    boolean contentEquals = this.ownText().equals(element.ownText());
++
++    return idEquals && classEquals && contentEquals;
++}
++
++@Override
++public int hashCode() {
++    int result = id != null ? id.hashCode() : 0;
++    result = 31 * result + (className != null ? className.hashCode() : 0);
++    result = 31 * result + ownText().hashCode();
++    return result;
+ }
+\ No newline at end of file

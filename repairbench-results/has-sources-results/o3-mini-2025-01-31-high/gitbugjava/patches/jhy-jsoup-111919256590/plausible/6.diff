@@ -1,0 +1,17 @@
+diff --git a/tmp/a44cd585-d4a9-4d52-b17f-9f63561d26ff_buggy.java b/tmp/c2b44d56-77d8-4575-a575-7f14e66b031e_fixed.java
+index e807cbf..646d0db 100644
+--- a/tmp/a44cd585-d4a9-4d52-b17f-9f63561d26ff_buggy.java
++++ b/tmp/c2b44d56-77d8-4575-a575-7f14e66b031e_fixed.java
+@@ -1,7 +1,11 @@
+ private boolean isInlineable(Document.OutputSettings out) {
+     if (!tag.isInline())
+         return false;
++    // Special-case <br>: if inside a <p>, we want it printed inline (so that the <p>’s opening tag and the <br> are not split by a newline),
++    // but if not, then <br> should force a break.
++    if (tag.getName().equals("br"))
++        return parent() != null && parent().tagName().equals("p") && !out.outline();
+     return (parent() == null || parent().isBlock())
+         && !isEffectivelyFirst()
+         && !out.outline();
+ }
+\ No newline at end of file

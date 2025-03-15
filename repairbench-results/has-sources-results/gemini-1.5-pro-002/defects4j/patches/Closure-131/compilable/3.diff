@@ -1,0 +1,30 @@
+diff --git a/tmp/b4a2bc04-4159-41fd-a04b-1826363d07af_buggy.java b/tmp/b4781359-3f65-4839-b6ff-8ae6bba60f4c_fixed.java
+index 19fe1b4..47f91fb 100644
+--- a/tmp/b4a2bc04-4159-41fd-a04b-1826363d07af_buggy.java
++++ b/tmp/b4781359-3f65-4839-b6ff-8ae6bba60f4c_fixed.java
+@@ -1,17 +1,20 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++      if (length == 0) {
+         return false;
+       }
+ 
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++      for (int i = 0; i < length; i++) {
++        char c = s.charAt(i);
++        if (!(Character.isLetterOrDigit(c) || c == '_' || c == '$' ||
++            Character.isUnicodeIdentifierPart(c) &&
++            // check if it's a non-ascii character that is allowed
++            // as part of a JS identifier but not a Java identifier.
++            (c == '$' || c > 127))) {
+            return false;
+          }
+       }
+ 
+       return true;
+     }

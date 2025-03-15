@@ -1,0 +1,35 @@
+diff --git a/tmp/d8a06c3c-ca01-49a7-87cf-053ab61177ac_buggy.java b/tmp/4439ad16-ba0c-4b31-86e8-36b2a68e6bd6_fixed.java
+index 98d89dc..7573bbf 100644
+--- a/tmp/d8a06c3c-ca01-49a7-87cf-053ab61177ac_buggy.java
++++ b/tmp/4439ad16-ba0c-4b31-86e8-36b2a68e6bd6_fixed.java
+@@ -1,23 +1,29 @@
+     private boolean compute(Object left, Object right) {
+         left = reduce(left);
+         right = reduce(right);
+ 
+         if (left instanceof InitialContext) {
+             ((InitialContext) left).reset();
+         }
+         if (right instanceof InitialContext) {
+             ((InitialContext) right).reset();
+         }
+         if (left instanceof Iterator && right instanceof Iterator) {
+             return findMatch((Iterator) left, (Iterator) right);
+         }
+         if (left instanceof Iterator) {
+             return containsMatch((Iterator) left, right);
+         }
+         if (right instanceof Iterator) {
+             return containsMatch((Iterator) right, left);
+         }
+         double ld = InfoSetUtil.doubleValue(left);
+         double rd = InfoSetUtil.doubleValue(right);
++        
++        // Handle NaN comparisons
++        if (Double.isNaN(ld) || Double.isNaN(rd)) {
++            return evaluateCompare(0);
++        }
++        
+         return evaluateCompare(ld == rd ? 0 : ld < rd ? -1 : 1);
+     }
+\ No newline at end of file

@@ -1,0 +1,36 @@
+diff --git a/tmp/4d4d4636-87c0-4ebe-9841-8cbfcafd3ef2_buggy.java b/tmp/944316e5-ab98-4849-b48d-31cce1b08879_fixed.java
+index 1ea204a..cf69c5b 100644
+--- a/tmp/4d4d4636-87c0-4ebe-9841-8cbfcafd3ef2_buggy.java
++++ b/tmp/944316e5-ab98-4849-b48d-31cce1b08879_fixed.java
+@@ -1,17 +1,24 @@
+-  private static String extractClassNameIfGoog(Node node, Node parent,
+-      String functionName){
++/**
++ * Extracts the class name if the given node is a goog.require() call.
++ * 
++ * @param node Node to analyze
++ * @param parent Parent node of the given node
++ * @param functionName Expected function name (e.g., "goog.require")
++ * @return Class name if extracted, null otherwise
++ */
++private static String extractClassNameIfGoog(Node node, Node parent, String functionName){
+     String className = null;
+-    if (NodeUtil.isExprCall(parent)) {
++    if (NodeUtil.isExprCall(parent) && parent.getChildCount() > 1) { // Ensure at least one argument
+       Node callee = node.getFirstChild();
+       if (callee!= null && callee.getType() == Token.GETPROP) {
+         String qualifiedName = callee.getQualifiedName();
+         if (functionName.equals(qualifiedName)) {
+-          Node target = callee.getNext();
+-          if (target != null) {
+-            className = target.getString();
++          Node target = parent.getChildCount() > 1? parent.getChild(1) : null; // Get the first argument
++          if (target!= null && target.getFirstChild()!= null) { // Ensure argument has a child (e.g., string literal)
++            className = target.getFirstChild().getString();
+           }
+         }
+       }
+     }
+     return className;
+ }
+\ No newline at end of file

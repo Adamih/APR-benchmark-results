@@ -1,0 +1,26 @@
+diff --git a/tmp/333611d4-03e3-4f6c-a932-6bc2fa2647ec_buggy.java b/tmp/613ba7b2-483a-4ad0-8cfb-9a7fdc259e90_fixed.java
+index ae12a4d..605fef2 100644
+--- a/tmp/333611d4-03e3-4f6c-a932-6bc2fa2647ec_buggy.java
++++ b/tmp/613ba7b2-483a-4ad0-8cfb-9a7fdc259e90_fixed.java
+@@ -1,3 +1,19 @@
+ private boolean isFormatAsBlock(Document.OutputSettings out) {
+-        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
++    if (tag.formatAsBlock() && !hasInlineDisplayStyle()) {
++        return true;
++    }
++    if (parent() != null && parent().tag().formatAsBlock() && !hasInlineDisplayStyle()) {
++        return true;
++    }
++    return out.outline();
++}
++
++private boolean hasInlineDisplayStyle() {
++    String style = attributes.get("style");
++    if (style != null) {
++        Styles styles = new Styles(style);
++        String display = styles.get("display");
++        return display != null && (display.equals("inline") || display.equals("inline-block"));
++    }
++    return false;
+ }
+\ No newline at end of file

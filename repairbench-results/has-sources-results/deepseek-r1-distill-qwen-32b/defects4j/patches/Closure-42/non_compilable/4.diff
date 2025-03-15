@@ -1,0 +1,23 @@
+diff --git a/tmp/8cf0dcac-11a7-45f2-82fc-94675faec9dc_buggy.java b/tmp/7a32019e-2088-4c44-a6e6-ea7c89097583_fixed.java
+index 4d0be80..035fe2e 100644
+--- a/tmp/8cf0dcac-11a7-45f2-82fc-94675faec9dc_buggy.java
++++ b/tmp/7a32019e-2088-4c44-a6e6-ea7c89097583_fixed.java
+@@ -1,10 +1,16 @@
+     @Override
+     Node processForInLoop(ForInLoop loopNode) {
+ 
+-        // Return the bare minimum to put the AST in a valid state.
++        // Get the initializer (like 'var curTiming')
++        Node initializer = loopNode.getLeftHandSide() != null
++            ? transformVariableDeclarationStatement(loopNode.getLeftHandSide())
++            : null;
++
++        // Return a new For node with the initializer, iterator, iterated object, and body
+         return newNode(
+             Token.FOR,
++            initializer,
+             transform(loopNode.getIterator()),
+             transform(loopNode.getIteratedObject()),
+             transformBlock(loopNode.getBody()));
+     }
+\ No newline at end of file

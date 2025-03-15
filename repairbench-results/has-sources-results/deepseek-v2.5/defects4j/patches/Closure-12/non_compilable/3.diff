@@ -1,0 +1,15 @@
+diff --git a/tmp/a045aec1-4112-497a-8239-ae9293572569_buggy.java b/tmp/466c7a23-96a3-4e63-b9d9-47e71b74f9e4_fixed.java
+index 22640dd..7c138b1 100644
+--- a/tmp/a045aec1-4112-497a-8239-ae9293572569_buggy.java
++++ b/tmp/466c7a23-96a3-4e63-b9d9-47e71b74f9e4_fixed.java
+@@ -1,3 +1,7 @@
+-  private boolean hasExceptionHandler(Node cfgNode) {
+-    return false;
++@Override
++protected JSType caseTopType(JSType topType) {
++    if (topType.isUnknownType()) {
++        return topType;
++    }
++    return getNativeType(JSTypeNative.ARRAY_TYPE);
+ }
+\ No newline at end of file

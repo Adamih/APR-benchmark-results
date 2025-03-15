@@ -1,0 +1,49 @@
+diff --git a/tmp/4ef9af81-ebb7-4fe7-a81f-a69f82e61e0e_buggy.java b/tmp/080b5ebe-1611-416f-9f70-deae18fe4464_fixed.java
+index 46817a7..09eeeeb 100644
+--- a/tmp/4ef9af81-ebb7-4fe7-a81f-a69f82e61e0e_buggy.java
++++ b/tmp/080b5ebe-1611-416f-9f70-deae18fe4464_fixed.java
+@@ -1,16 +1,38 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
++
++    RecordType otherRecord = that.toMaybeRecordType();
++    boolean isCompatible = true;
++
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+     for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++        if (otherRecord.hasProperty(property)) {
++            JSType thisPropertyType = getPropertyType(property);
++            JSType thatPropertyType = otherRecord.getPropertyType(property);
++            if (!thisPropertyType.isEquivalentTo(thatPropertyType)) {
++                isCompatible = false;
++                break;
+             }
++            builder.addProperty(property, thisPropertyType, getPropertyNode(property));
++        } else {
++            isCompatible = false;
++            break;
+         }
++    }
++
++    for (String property : otherRecord.getOwnPropertyNames()) {
++        if (!properties.containsKey(property)) {
++            isCompatible = false;
++            break;
++        }
++    }
++
++    if (isCompatible) {
+         return builder.build();
++    } else {
++        return registry.createUnionType(this, that);
++    }
+ }
+\ No newline at end of file

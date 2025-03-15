@@ -1,0 +1,25 @@
+diff --git a/tmp/dc0ec0a5-d7b3-4796-9da8-e44c85554f43_buggy.java b/tmp/b6d236ec-bb6e-4e1c-b3c7-31b63da02709_fixed.java
+index 084a224..12382f7 100644
+--- a/tmp/dc0ec0a5-d7b3-4796-9da8-e44c85554f43_buggy.java
++++ b/tmp/b6d236ec-bb6e-4e1c-b3c7-31b63da02709_fixed.java
+@@ -1,7 +1,14 @@
+-    private static ZipLong unixTimeToZipLong(long l) {
+-        final long TWO_TO_32 = 0x100000000L;
+-        if (l >= TWO_TO_32) {
+-            throw new IllegalArgumentException("X5455 timestamps must fit in a signed 32 bit integer: " + l);
+-        }
+-        return new ZipLong(l);
++
++try {
++
++    // Java time is 1000 x larger (milliseconds).
++
++    xf.setModifyJavaTime(new Date(1000L * (MAX_TIME_SECONDS.getValue() + 1L)));
++
++    fail("Time too big for 32 bits!");
++
++} catch (final IllegalArgumentException iae) {
++
++    // All is good.
++
+ }

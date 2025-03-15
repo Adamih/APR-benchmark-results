@@ -1,0 +1,22 @@
+diff --git a/tmp/1c6ebec5-fe27-4245-9f7d-1b16c47f95f6_buggy.java b/tmp/f2997077-9934-471e-83c7-ba429186c9d0_fixed.java
+index c9c2b44..e1c07b0 100644
+--- a/tmp/1c6ebec5-fe27-4245-9f7d-1b16c47f95f6_buggy.java
++++ b/tmp/f2997077-9934-471e-83c7-ba429186c9d0_fixed.java
+@@ -1,13 +1,16 @@
+         @Override
+         public boolean matches(Element root, Element element) {
+             // evaluate from last to first
+             for (int i = evaluators.size() - 1; i >= 0; --i) {
+                 if (element == null)
+                     return false;
+                 Evaluator eval = evaluators.get(i);
+                 if (!eval.matches(root, element))
+                     return false;
++                // Only move to the parent if the current evaluator is not a direct child constraint
++                if (!(eval instanceof Evaluator.Parent)) {
+                     element = element.parent();
+                 }
++            }
+             return true;
+         }
+\ No newline at end of file

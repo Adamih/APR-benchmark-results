@@ -1,0 +1,41 @@
+diff --git a/tmp/44ae1c57-c0a9-4989-ba2f-1763baa7e0d0_buggy.java b/tmp/ee7ca95f-4b6c-4b4d-97b3-2d3ddf073a01_fixed.java
+index c51c8b1..9b6ebad 100644
+--- a/tmp/44ae1c57-c0a9-4989-ba2f-1763baa7e0d0_buggy.java
++++ b/tmp/ee7ca95f-4b6c-4b4d-97b3-2d3ddf073a01_fixed.java
+@@ -1,31 +1,35 @@
+ private void recordAssignment(NodeTraversal t, Node n, Node recordNode) {
+   Node nameNode = n.getFirstChild();
+   Node parent = n.getParent();
+   NameInformation ns = createNameInformation(t, nameNode);
+   if (ns != null) {
+     if (parent.isFor() && !NodeUtil.isForIn(parent)) {
+       // Patch for assignments that appear in the init,
+       // condition or iteration part of a FOR loop.  Without
+       // this change, all 3 of those parts try to claim the for
+       // loop as their dependency scope.  The last assignment in
+       // those three fields wins, which can result in incorrect
+       // reference edges between referenced and assigned variables.
+       //
+       // TODO(user) revisit the dependency scope calculation
+       // logic.
+       if (parent.getFirstChild().getNext() != n) {
+         recordDepScope(recordNode, ns);
+       } else {
+         recordDepScope(nameNode, ns);
+       }
+     } else {
+       // The rhs of the assignment is the caller, so it's used by the
+       // context. Don't associate it w/ the lhs.
+       // FYI: this fixes only the specific case where the assignment is the
+       // caller expression, but it could be nested deeper in the caller and
+       // we would still get a bug.
+       // See testAssignWithCall2 for an example of this.
++      if (NodeUtil.isCall(n.getParent()) && n.getParent().getFirstChild() == n) {
++        recordDepScope(nameNode, ns);
++      } else {
+         recordDepScope(recordNode, ns);
+       }
+     }
+   }
++}
+\ No newline at end of file

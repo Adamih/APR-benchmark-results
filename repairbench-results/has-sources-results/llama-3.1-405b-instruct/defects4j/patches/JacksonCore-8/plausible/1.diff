@@ -1,0 +1,20 @@
+diff --git a/tmp/6423755c-67c9-4dd7-aeec-8991bf78e6a3_buggy.java b/tmp/3618bdfa-56d5-4d24-bb16-6ef25f3de9ae_fixed.java
+index 9c4508f..70c8c52 100644
+--- a/tmp/6423755c-67c9-4dd7-aeec-8991bf78e6a3_buggy.java
++++ b/tmp/3618bdfa-56d5-4d24-bb16-6ef25f3de9ae_fixed.java
+@@ -1,13 +1,13 @@
+ public char[] getTextBuffer()
+ {
+     // Are we just using shared input buffer?
+     if (_inputStart >= 0) return _inputBuffer;
+     if (_resultArray!= null)  return _resultArray;
+     if (_resultString!= null) {
+         return (_resultArray = _resultString.toCharArray());
+     }
+     // Nope; but does it fit in just one segment?
+-        if (!_hasSegments)  return _currentSegment;
++    if (!_hasSegments)  return _currentSegment!= null? _currentSegment : new char[0];
+     // Nope, need to have/create a non-segmented array and return it
+     return contentsAsArray();
+ }
+\ No newline at end of file

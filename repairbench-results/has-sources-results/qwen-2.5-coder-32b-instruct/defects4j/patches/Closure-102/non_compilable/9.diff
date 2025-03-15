@@ -1,0 +1,21 @@
+diff --git a/tmp/1df719ef-3d03-4b8f-a909-c24030e4f811_buggy.java b/tmp/e560183c-4a19-4b67-b017-707641e2b8bb_fixed.java
+index f47d784..dc4dee8 100644
+--- a/tmp/1df719ef-3d03-4b8f-a909-c24030e4f811_buggy.java
++++ b/tmp/e560183c-4a19-4b67-b017-707641e2b8bb_fixed.java
+@@ -1,12 +1,14 @@
+ @Override
+ public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+-      MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
++        MakeDeclaredNamesUnique.Context ctx = new MakeDeclaredNamesUnique.Context();
++        ctx.addExcludedName("arguments"); // Exclude the 'arguments' parameter from being renamed
++        MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique(ctx);
+         NodeTraversal t = new NodeTraversal(compiler, renamer);
+         t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
+ }
+\ No newline at end of file

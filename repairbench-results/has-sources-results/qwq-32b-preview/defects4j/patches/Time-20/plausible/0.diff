@@ -1,0 +1,29 @@
+diff --git a/tmp/e42164fa-c131-4e25-ac63-f55883f03318_buggy.java b/tmp/469df1e8-9ef9-48d0-8b85-cbc1c941981d_fixed.java
+index ae6c2b1..97a5784 100644
+--- a/tmp/e42164fa-c131-4e25-ac63-f55883f03318_buggy.java
++++ b/tmp/469df1e8-9ef9-48d0-8b85-cbc1c941981d_fixed.java
+@@ -1,10 +1,22 @@
++
+ public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+     String str = text.substring(position);
++    String bestMatch = null;
++    int bestMatchLength = 0;
++
+     for (String id : ALL_IDS) {
+         if (str.startsWith(id)) {
+-                    bucket.setZone(DateTimeZone.forID(id));
+-                    return position + id.length();
++            if (id.length() > bestMatchLength) {
++                bestMatch = id;
++                bestMatchLength = id.length();
+             }
+         }
++    }
++
++    if (bestMatch != null) {
++        bucket.setZone(DateTimeZone.forID(bestMatch));
++        return position + bestMatch.length();
++    } else {
+         return ~position;
+     }
++}

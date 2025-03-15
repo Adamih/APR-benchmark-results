@@ -1,0 +1,31 @@
+diff --git a/tmp/78b8d698-6d9e-4e7b-95bb-73050bede746_buggy.java b/tmp/48b94adb-52c8-4b4c-9226-efbeef3dd013_fixed.java
+index 7498011..f4a8427 100644
+--- a/tmp/78b8d698-6d9e-4e7b-95bb-73050bede746_buggy.java
++++ b/tmp/48b94adb-52c8-4b4c-9226-efbeef3dd013_fixed.java
+@@ -1,12 +1,24 @@
+ /**
+-     * Retrieves the element's inner HTML. E.g. on a {@code <div>} with one empty {@code <p>}, would return
++ * Retrieves the element's inner HTML. E.g., on a {@code <div>} with one empty {@code <p>}, would return
+  * {@code <p></p>}. (Whereas {@link #outerHtml()} would return {@code <div><p></p></div>}.)
+  * 
+  * @return String of HTML.
+  * @see #outerHtml()
+  */
+ public String html() {
++    OutputSettings outputSettings = this.document.outputSettings();
++    boolean prettyPrint = outputSettings.prettyPrint();
++
++    if (!prettyPrint) {
++        // If pretty printing is disabled, return the inner HTML as is.
++        // Assuming that there is a way to retrieve the raw inner HTML.
++        // This might involve accessing the underlying data structure directly.
++        // For the sake of this example, let's assume there is a method rawInnerHTML().
++        return rawInnerHTML();
++    } else {
++        // If pretty printing is enabled, build the inner HTML with proper formatting.
+         StringBuilder accum = new StringBuilder();
+         html(accum);
+         return accum.toString().trim();
+     }
++}
+\ No newline at end of file

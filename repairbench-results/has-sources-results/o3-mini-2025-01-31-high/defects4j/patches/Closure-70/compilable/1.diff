@@ -1,0 +1,38 @@
+diff --git a/tmp/3e9e5573-d08d-4d90-a747-bca7fc9dd26d_buggy.java b/tmp/71f53fa8-7528-4026-885f-f3ca8483ec70_fixed.java
+index 1530b34..afee45d 100644
+--- a/tmp/3e9e5573-d08d-4d90-a747-bca7fc9dd26d_buggy.java
++++ b/tmp/71f53fa8-7528-4026-885f-f3ca8483ec70_fixed.java
+@@ -1,23 +1,18 @@
+-    /**
+-     * Declares all of a function's arguments.
+-     */
+ private void declareArguments(Node functionNode) {
+   Node astParameters = functionNode.getFirstChild().getNext();
+-      Node body = astParameters.getNext();
+   FunctionType functionType = (FunctionType) functionNode.getJSType();
+-      if (functionType != null) {
+-        Node jsDocParameters = functionType.getParametersNode();
+-        if (jsDocParameters != null) {
+-          Node jsDocParameter = jsDocParameters.getFirstChild();
++  // If functionType is available, get the jsdoc node containing the parameter types;
++  // otherwise, treat all parameter types as unknown (null).
++  Node jsDocParameters = functionType != null ? functionType.getParametersNode() : null;
++  Node jsDocParameter = jsDocParameters != null ? jsDocParameters.getFirstChild() : null;
++  
++  // Always iterate over the AST parameters.
+   for (Node astParameter : astParameters.children()) {
++    // If we have a corresponding jsdoc parameter, extract its type; otherwise, use null.
++    JSType type = jsDocParameter != null ? jsDocParameter.getJSType() : null;
++    defineSlot(astParameter, functionNode, type, true);
+     if (jsDocParameter != null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
+       jsDocParameter = jsDocParameter.getNext();
+-            } else {
+-              defineSlot(astParameter, functionNode, null, true);
+     }
+   }
+ }
+\ No newline at end of file
+-      }
+-    } // end declareArguments

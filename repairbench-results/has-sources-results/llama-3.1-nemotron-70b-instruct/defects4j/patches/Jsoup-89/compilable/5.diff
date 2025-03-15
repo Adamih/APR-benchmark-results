@@ -1,0 +1,26 @@
+diff --git a/tmp/0ec17d1c-494b-4be7-8296-385301b2f641_buggy.java b/tmp/e1e25f6c-fd56-4f1a-b833-418b1b59f983_fixed.java
+index 25217b6..bc854b2 100644
+--- a/tmp/0ec17d1c-494b-4be7-8296-385301b2f641_buggy.java
++++ b/tmp/e1e25f6c-fd56-4f1a-b833-418b1b59f983_fixed.java
+@@ -1,14 +1,16 @@
+ /**
+-     Set the attribute value.
+-     @param val the new attribute value; must not be null
++ * Set the attribute value.
++ * @param val the new attribute value; must not be null
+  */
+ public String setValue(String val) {
+-        String oldVal = parent.get(this.key);
++    String oldVal = (parent!= null)? parent.get(this.key) : this.val;
+     if (parent!= null) {
+         int i = parent.indexOfKey(this.key);
+         if (i!= Attributes.NotFound)
+             parent.vals[i] = val;
+-        }
++    } else {
++        // update value directly when attribute is orphaned
+         this.val = val;
++    }
+     return Attributes.checkNotNull(oldVal);
+ }
+\ No newline at end of file

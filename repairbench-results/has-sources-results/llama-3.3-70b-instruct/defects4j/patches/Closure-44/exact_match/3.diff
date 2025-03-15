@@ -1,0 +1,31 @@
+diff --git a/tmp/cab74567-fe06-4dd9-a7a1-e9ff9d8fd9b1_buggy.java b/tmp/8e6c9f39-42b3-43c6-b166-286a96d1b657_fixed.java
+index a7f0d46..919d53b 100644
+--- a/tmp/cab74567-fe06-4dd9-a7a1-e9ff9d8fd9b1_buggy.java
++++ b/tmp/8e6c9f39-42b3-43c6-b166-286a96d1b657_fixed.java
+@@ -1,22 +1,20 @@
+ void add(String newcode) {
+     maybeEndStatement();
+ 
+     if (newcode.length() == 0) {
+       return;
+     }
+ 
+     char c = newcode.charAt(0);
+     if ((isWordChar(c) || c == '\\') &&
+         isWordChar(getLastChar())) {
+       // need space to separate. This is not pretty printing.
+       // For example: "return foo;"
+       append(" ");
+-      // Do not allow a forward slash to appear after a DIV.
+-      // For example,
+-      // REGEXP DIV REGEXP
+-      // is valid and should print like
+-      // / // / /
++    } else if (c == '/' && getLastChar() == '/') {
++      // Special case for consecutive slashes, add a space in between
++      append(" ");
+     }
+ 
+     append(newcode);
+ }
+\ No newline at end of file

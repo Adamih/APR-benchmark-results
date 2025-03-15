@@ -1,0 +1,22 @@
+diff --git a/tmp/365bacc1-01c9-45be-9e76-c228b479e0db_buggy.java b/tmp/fef7f821-b7b7-46b0-a431-af5f13a6721e_fixed.java
+index 593602f..3fa9cc6 100644
+--- a/tmp/365bacc1-01c9-45be-9e76-c228b479e0db_buggy.java
++++ b/tmp/fef7f821-b7b7-46b0-a431-af5f13a6721e_fixed.java
+@@ -1,6 +1,14 @@
+ @Override
+ public String toString() {
++    if (rangesList.size() == 1) {
++        return rangesList.get(0).stream()
++            .map(Object::toString)
++            .collect(Collectors.joining(AND_JOINER));
++    } else {
+         return rangesList.stream()
+-            .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++            .map(rangeSet -> "(" + rangeSet.stream()
++                .map(Object::toString)
++                .collect(Collectors.joining(AND_JOINER)) + ")")
++            .collect(Collectors.joining(OR_JOINER));
++    }
+ }
+\ No newline at end of file

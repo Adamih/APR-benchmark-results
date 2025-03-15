@@ -1,0 +1,34 @@
+diff --git a/tmp/48444121-dfd1-4636-a711-31891eaf333d_buggy.java b/tmp/01e8c14a-7fef-4ad8-865a-e6ca6e8c5b46_fixed.java
+index 19fe1b4..3db25eb 100644
+--- a/tmp/48444121-dfd1-4636-a711-31891eaf333d_buggy.java
++++ b/tmp/01e8c14a-7fef-4ad8-865a-e6ca6e8c5b46_fixed.java
+@@ -1,17 +1,27 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+           !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+       for (int i = 1; i < length; i++) {
+         if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++            !Character.isJavaIdentifierPart(s.charAt(i)) ||
++            Character.isISOControl(s.charAt(i)) ||
++            Character.isWhitespace(s.charAt(i)) ||
++            s.charAt(i) == '.' ||
++            s.charAt(i) == ',' ||
++            s.charAt(i) == ';' ||
++            s.charAt(i) == ':' ||
++            s.charAt(i) == ' ' ||
++            s.charAt(i) == '\u0004' || // Control character
++            s.charAt(i) == '\u1d17'    // Phonetic extension character
++        ) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }
+\ No newline at end of file

@@ -1,0 +1,16 @@
+diff --git a/tmp/1651ce97-7260-4c4e-823b-c42e1278469f_buggy.java b/tmp/de4d5229-7cbe-4ac5-9bab-a1803784cac0_fixed.java
+index 1c92640..4f1956f 100644
+--- a/tmp/1651ce97-7260-4c4e-823b-c42e1278469f_buggy.java
++++ b/tmp/de4d5229-7cbe-4ac5-9bab-a1803784cac0_fixed.java
+@@ -1,7 +1,9 @@
+ /**
+  * Set the name of the entry.
+  * @param name the name to use
+  */
+ protected void setName(String name) {
+-        this.name = name;
++    // Some zip tools (like WinZip) don't follow the zip spec for
++    // unicode names and use '\' instead of '/' in the name.
++    this.name = name.replace('\\', '/');
+ }
+\ No newline at end of file

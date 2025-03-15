@@ -1,0 +1,38 @@
+diff --git a/tmp/99702a8b-251f-4681-9741-65007cb1ab70_buggy.java b/tmp/20de0060-c39b-43f3-a76e-0733b5696a55_fixed.java
+index b56897c..00237a0 100644
+--- a/tmp/99702a8b-251f-4681-9741-65007cb1ab70_buggy.java
++++ b/tmp/20de0060-c39b-43f3-a76e-0733b5696a55_fixed.java
+@@ -1,27 +1,31 @@
+       @Override
+       public boolean apply(Node n) {
+         // When the node is null it means, we reached the implicit return
+         // where the function returns (possibly without an return statement)
+         if (n == null) {
+           return false;
+         }
+ 
++        // Handle 'in' operator as having side effects
++        if (n.isIn()) {
++          return true;
++        }
++
+         // TODO(user): We only care about calls to functions that
+         // passes one of the dependent variable to a non-side-effect free
+         // function.
+         if (n.isCall() && NodeUtil.functionCallHasSideEffects(n)) {
+           return true;
+         }
+ 
+         if (n.isNew() && NodeUtil.constructorCallHasSideEffects(n)) {
+           return true;
+         }
+ 
+-
+         for (Node c = n.getFirstChild(); c != null; c = c.getNext()) {
+           if (!ControlFlowGraph.isEnteringNewCfgNode(c) && apply(c)) {
+             return true;
+           }
+         }
+         return false;
+       }
+\ No newline at end of file

@@ -1,0 +1,21 @@
+diff --git a/tmp/a51898dd-ded5-4360-bda4-1d9aca188e69_buggy.java b/tmp/c4c74dd7-cf68-411c-a3e9-4ab317809042_fixed.java
+index 6c3142f..c8e9e85 100644
+--- a/tmp/a51898dd-ded5-4360-bda4-1d9aca188e69_buggy.java
++++ b/tmp/c4c74dd7-cf68-411c-a3e9-4ab317809042_fixed.java
+@@ -1,10 +1,14 @@
+   static boolean isSimpleNumber(String s) {
+     int len = s.length();
++    if (len == 0) {
++      return false;
++    }
+     for (int index = 0; index < len; index++) {
+       char c = s.charAt(index);
+       if (c < '0' || c > '9') {
+         return false;
+       }
+     }
+-    return len > 0 && s.charAt(0) != '0';
++    // Allow '0' specifically without checking for leading zero in this use case
++    return !(len > 1 && s.charAt(0) == '0');
+   }
+\ No newline at end of file

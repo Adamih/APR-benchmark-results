@@ -1,0 +1,19 @@
+diff --git a/tmp/73eb198e-501b-4af9-8be6-a99d53be41f8_buggy.java b/tmp/6515af25-e800-4a14-943c-7c32a6144818_fixed.java
+index 22640dd..0b34b74 100644
+--- a/tmp/73eb198e-501b-4af9-8be6-a99d53be41f8_buggy.java
++++ b/tmp/6515af25-e800-4a14-943c-7c32a6144818_fixed.java
+@@ -1,3 +1,13 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
++    Node node = cfgNode;
++    while (node != null) {
++        if (node.getType() == Token.TRY) {
++            // Check if this try node has a catch.
++            if (node.getChildCount() >= 2 && node.getChildAt(1).getType() == Token.CATCH) {
++                return true;
++            }
++        }
++        node = node.getParent();
++    }
+     return false;
+   }
+\ No newline at end of file

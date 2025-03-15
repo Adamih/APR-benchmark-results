@@ -1,0 +1,26 @@
+diff --git a/tmp/b713349e-5e51-4176-a24d-a01a67a5c430_buggy.java b/tmp/d03fd708-9e38-4587-961b-4a8e937adfab_fixed.java
+index 19fe1b4..24f0eb6 100644
+--- a/tmp/b713349e-5e51-4176-a24d-a01a67a5c430_buggy.java
++++ b/tmp/d03fd708-9e38-4587-961b-4a8e937adfab_fixed.java
+@@ -1,17 +1,20 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+           !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+       for (int i = 1; i < length; i++) {
+         if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++            !Character.isJavaIdentifierPart(s.charAt(i)) ||
++            // Java considers some unicode characters to be valid identifier
++            // parts, even though they are not valid in javascript.
++            s.charAt(i) > 127) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }

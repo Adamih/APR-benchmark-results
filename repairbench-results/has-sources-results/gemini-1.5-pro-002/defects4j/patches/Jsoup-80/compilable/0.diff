@@ -1,0 +1,22 @@
+diff --git a/tmp/147b902a-4ca4-4283-99e9-300c5b84ed79_buggy.java b/tmp/fa56806a-782c-4a88-a6b7-693c11ab1258_fixed.java
+index cbfa753..4f469f9 100644
+--- a/tmp/147b902a-4ca4-4283-99e9-300c5b84ed79_buggy.java
++++ b/tmp/fa56806a-782c-4a88-a6b7-693c11ab1258_fixed.java
+@@ -1,15 +1,17 @@
+     void insert(Token.Comment commentToken) {
+         Comment comment = new Comment(commentToken.getData());
+         Node insert = comment;
+         if (commentToken.bogus) { // xml declarations are emitted as bogus comments (which is right for html, but not xml)
+             // so we do a bit of a hack and parse the data as an element to pull the attributes out
+             String data = comment.getData();
+             if (data.length() > 1 && (data.startsWith("!") || data.startsWith("?"))) {
+                 Document doc = Jsoup.parse("<" + data.substring(1, data.length() -1) + ">", baseUri, Parser.xmlParser());
++                if (doc.children().size() > 0) { // added size check
+                     Element el = doc.child(0);
+                     insert = new XmlDeclaration(settings.normalizeTag(el.tagName()), data.startsWith("!"));
+                     insert.attributes().addAll(el.attributes());
+                 }
+             }
++        }
+         insertNode(insert);
+     }

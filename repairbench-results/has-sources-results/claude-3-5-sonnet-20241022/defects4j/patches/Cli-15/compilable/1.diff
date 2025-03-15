@@ -1,0 +1,49 @@
+diff --git a/tmp/1289247e-5444-4e97-845c-4e088d00fe8e_buggy.java b/tmp/cc2dbf3d-29a1-4591-a892-8d01e468af13_fixed.java
+index 4e8b037..7d49747 100644
+--- a/tmp/1289247e-5444-4e97-845c-4e088d00fe8e_buggy.java
++++ b/tmp/cc2dbf3d-29a1-4591-a892-8d01e468af13_fixed.java
+@@ -1,20 +1,31 @@
+-    public List getValues(final Option option,
+-                          List defaultValues) {
++public List getValues(final Option option, List defaultValues) {
+     // initialize the return list
+     List valueList = (List) values.get(option);
+ 
+-        // grab the correct default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = defaultValues;
++    if (valueList == null) {
++        valueList = new ArrayList();
+     }
+ 
+-        // augment the list with the default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = (List) this.defaultValues.get(option);
++    // if we have values, use them
++    if (!valueList.isEmpty()) {
++        // if there are default values, add any that aren't already present
++        if (defaultValues != null) {
++            for (int i = valueList.size(); i < defaultValues.size(); i++) {
++                valueList.add(defaultValues.get(i));
++            }
++        }
++    } else {
++        // no values, use the defaults
++        if (defaultValues != null) {
++            valueList.addAll(defaultValues);
++        } else {
++            // try secondary defaults
++            List secondaryDefaults = (List) this.defaultValues.get(option);
++            if (secondaryDefaults != null) {
++                valueList.addAll(secondaryDefaults);
++            }
++        }
+     }
+-                // if there are more default values as specified, add them to
+-                // the list.
+-                    // copy the list first
+ 
+-        return valueList == null ? Collections.EMPTY_LIST : valueList;
++    return valueList.isEmpty() ? Collections.EMPTY_LIST : valueList;
+ }
+\ No newline at end of file

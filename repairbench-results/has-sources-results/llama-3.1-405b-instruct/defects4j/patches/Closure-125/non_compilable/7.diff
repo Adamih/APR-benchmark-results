@@ -1,0 +1,30 @@
+diff --git a/tmp/38103633-09c2-42ae-a906-d04392ed5b51_buggy.java b/tmp/a40c7471-a6c0-41a2-b976-38ffcea427c7_fixed.java
+index 7e43c1c..ee99309 100644
+--- a/tmp/38103633-09c2-42ae-a906-d04392ed5b51_buggy.java
++++ b/tmp/a40c7471-a6c0-41a2-b976-38ffcea427c7_fixed.java
+@@ -1,19 +1,20 @@
+   /**
+    * Visits a NEW node.
+    */
+   private void visitNew(NodeTraversal t, Node n) {
+     Node constructor = n.getFirstChild();
+     JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
+-    if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
++    if (type.isEmptyType()) {
++      report(t, n, NULL_UNDEFINED_NOT776);
++    } else if (type.isConstructor()) {
+       FunctionType fnType = type.toMaybeFunctionType();
+-      if (fnType != null) {
+       visitParameterList(t, n, fnType);
+       ensureTyped(t, n, fnType.getInstanceType());
+-      } else {
++    } else if (type.isUnknownType() ||!type.hasInternalRepresentation() || (constructor!= null && constructor.hasDecal())) {
++      // OK, can't resolve fn type (yet) / or could be valid new call depending on local vars
+       ensureTyped(t, n);
+-      }
+     } else {
+       report(t, n, NOT_A_CONSTRUCTOR);
+       ensureTyped(t, n);
+     }
+   }
+\ No newline at end of file

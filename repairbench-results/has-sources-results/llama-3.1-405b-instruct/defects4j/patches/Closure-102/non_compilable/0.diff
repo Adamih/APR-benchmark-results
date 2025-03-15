@@ -1,0 +1,19 @@
+diff --git a/tmp/683b79e6-0abc-495f-bbeb-7ee30c8c5d89_buggy.java b/tmp/7a714a20-6a09-46c5-befc-232863287838_fixed.java
+index f47d784..6eba461 100644
+--- a/tmp/683b79e6-0abc-495f-bbeb-7ee30c8c5d89_buggy.java
++++ b/tmp/7a714a20-6a09-46c5-befc-232863287838_fixed.java
+@@ -1,12 +1,13 @@
+   @Override
+   public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
++      renamer.setReserveJsNames(true); // Add this line to fix the bug
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+        .process(externs, root);
+   }
+\ No newline at end of file

@@ -1,0 +1,14 @@
+diff --git a/tmp/cfde11cb-dc6b-4c27-aad6-cdcd8f19e6f1_buggy.java b/tmp/a78e15e9-c002-4b41-b8d9-06e862ba244e_fixed.java
+index 5eedc11..4632714 100644
+--- a/tmp/cfde11cb-dc6b-4c27-aad6-cdcd8f19e6f1_buggy.java
++++ b/tmp/a78e15e9-c002-4b41-b8d9-06e862ba244e_fixed.java
+@@ -1,6 +1,7 @@
+     private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+         tb.insert(startTag);
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
+-        tb.transition(Text);
++        tb.transition(HtmlTreeBuilderState.Text);
++        tb.insertEmptyEndTag(startTag);  // Fix: Ensure empty tags like <style /> or <noframes /> are handled correctly
+     }
+\ No newline at end of file

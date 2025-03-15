@@ -1,0 +1,16 @@
+diff --git a/tmp/44caa2ab-e4c3-461d-a3a4-ce69aae75c67_buggy.java b/tmp/3a1e710c-e1cc-488c-a6b2-f9c07a5a75c5_fixed.java
+index 22640dd..48f1b69 100644
+--- a/tmp/44caa2ab-e4c3-461d-a3a4-ce69aae75c67_buggy.java
++++ b/tmp/3a1e710c-e1cc-488c-a6b2-f9c07a5a75c5_fixed.java
+@@ -1,3 +1,10 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++  // Traverse up the CFG to check for an exception handler
++  for (Node current : cfgNode.getPredecessors()) {
++    if (current.isExceptionHandler()) {
++      return true;
++    }
++  }
++  // If no exception handler found, return false
+   return false;
+ }
+\ No newline at end of file

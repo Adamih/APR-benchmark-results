@@ -1,0 +1,37 @@
+diff --git a/tmp/30d5acf5-f689-4d4e-90e5-a1c667ae5afb_buggy.java b/tmp/ca7ca325-ab53-49bd-af74-fddead8623d3_fixed.java
+index 19fe1b4..ab6b56e 100644
+--- a/tmp/30d5acf5-f689-4d4e-90e5-a1c667ae5afb_buggy.java
++++ b/tmp/ca7ca325-ab53-49bd-af74-fddead8623d3_fixed.java
+@@ -1,17 +1,28 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++          !isJSIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+       for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++        if (!isJSIdentifierPart(s.charAt(i))) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }
++
++    private static boolean isJSIdentifierStart(char c) {
++      return Character.isUnicodeIdentifierStart(c) && !isIgnorableControlCharacter(c);
++    }
++
++    private static boolean isJSIdentifierPart(char c) {
++      return Character.isUnicodeIdentifierPart(c) && !isIgnorableControlCharacter(c);
++    }
++
++    private static boolean isIgnorableControlCharacter(char c) {
++      return c >= '\u0000' && c <= '\u001F' || c >= '\u007F' && c <= '\u009F';
++    }
+\ No newline at end of file

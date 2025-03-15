@@ -1,0 +1,26 @@
+diff --git a/tmp/a6932c0d-ab60-47a8-9d95-1dd66dab2cba_buggy.java b/tmp/311345c4-71d8-41e7-a6f9-524133b62aff_fixed.java
+index 29d025a..f023b43 100644
+--- a/tmp/a6932c0d-ab60-47a8-9d95-1dd66dab2cba_buggy.java
++++ b/tmp/311345c4-71d8-41e7-a6f9-524133b62aff_fixed.java
+@@ -1,13 +1,16 @@
++/**
++ * Fix for [jackson-core#216]: Ensure proper rehashing when sharing is verified.
++ */
+ private void _verifySharing()
+ {
+     if (_hashShared) {
+-            _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+-            _names = Arrays.copyOf(_names, _names.length);
++        _hashArea = Arrays.copyOf(_hashArea, _hashArea.length * 2); // Expand capacity to avoid AIOOBE
++        _names = Arrays.copyOf(_names, _names.length * 2); // Maintain parallel array structure
+         _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
++        // Rehashing is now implicitly handled due to increased capacity, but explicit call ensured for consistency
++        _needRehash = true; 
+     }
+     if (_needRehash) {
+         rehash();
+     }
+ }
+\ No newline at end of file

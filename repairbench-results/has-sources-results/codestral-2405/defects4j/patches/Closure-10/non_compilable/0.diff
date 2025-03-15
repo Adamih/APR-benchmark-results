@@ -1,0 +1,22 @@
+diff --git a/tmp/10219336-a9be-4366-b135-62e9f4271be3_buggy.java b/tmp/2b32420e-a38d-4906-b4da-f82695b17e53_fixed.java
+index 6fecc90..4faef88 100644
+--- a/tmp/10219336-a9be-4366-b135-62e9f4271be3_buggy.java
++++ b/tmp/2b32420e-a38d-4906-b4da-f82695b17e53_fixed.java
+@@ -1,7 +1,14 @@
+ static boolean mayBeString(Node n, boolean recurse) {
+-    if (recurse) {
+-      return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
++    if (recurse && n.isOp()) {
++        switch (n.getOp()) {
++            // If the operation is addition and any of the operands may be a string, then the result may also be a string.
++            case ADD:
++            case SUB:
++                return mayBeString(n.getFirstChild(), true) || mayBeString(n.getSecondChild(), true);
++            default:
++                return mayBeStringHelper(n);
++        }
+     } else {
+         return mayBeStringHelper(n);
+     }
+ }
+\ No newline at end of file

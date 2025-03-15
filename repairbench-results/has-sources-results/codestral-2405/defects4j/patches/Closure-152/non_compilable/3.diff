@@ -1,0 +1,50 @@
+diff --git a/tmp/ba279681-9dae-413e-875e-b828f1b74179_buggy.java b/tmp/32666cd3-9fd6-4a04-a306-3f6e5e310eb7_fixed.java
+index 58a1651..368f6c6 100644
+--- a/tmp/ba279681-9dae-413e-875e-b828f1b74179_buggy.java
++++ b/tmp/32666cd3-9fd6-4a04-a306-3f6e5e310eb7_fixed.java
+@@ -1,32 +1,41 @@
+ @Override
+ JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+   setResolvedTypeInternal(this);
+ 
+   call = (ArrowType) safeResolve(call, t, scope);
+   prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+-    // Warning about typeOfThis if it doesn't resolve to an ObjectType
+-    // is handled further upstream.
+-    // TODO(nicksantos): Handle this correctly if we have a UnionType.
++  // Check if the resolved typeOfThis is an instance of ObjectType
++  if (typeOfThis.isInstanceType()) {
+     typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
++  } else {
++    if (typeOfThis.isUnionType() && typeOfThis.toMaybeUnionType().isObjectUnion()) {
++      typeOfThis = typeOfThis.toMaybeUnionType().getObjectMembers().get(0);
++    } else {
++      // This treated like a warning instead of an error.
++      t.warning(JSError.TYPE_OF_THIS_NOT_OBJECT,
++                node.getSourceFileName(), node.getLineno(),
++                "This type expected to be an object, found: " + typeOfThis);
++    }
++  }
+ 
+   boolean changed = false;
+   ImmutableList.Builder<ObjectType> resolvedInterfaces =
+       ImmutableList.builder();
+   for (ObjectType iface : implementedInterfaces) {
+     ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+     resolvedInterfaces.add(resolvedIface);
+     changed |= (resolvedIface != iface);
+   }
+   if (changed) {
+     implementedInterfaces = resolvedInterfaces.build();
+   }
+ 
+   if (subTypes != null) {
+     for (int i = 0; i < subTypes.size(); i++) {
+       subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+     }
+   }
+ 
+   return super.resolveInternal(t, scope);
+ }
+\ No newline at end of file

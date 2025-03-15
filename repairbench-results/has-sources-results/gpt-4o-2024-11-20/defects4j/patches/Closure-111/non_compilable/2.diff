@@ -1,0 +1,14 @@
+diff --git a/tmp/bd63d790-7eb3-45c8-b143-fc5ae4ce87ae_buggy.java b/tmp/c8cb36e9-2586-497e-9fbe-ef5fa6d829c1_fixed.java
+index f1d02c1..6e401ba 100644
+--- a/tmp/bd63d790-7eb3-45c8-b143-fc5ae4ce87ae_buggy.java
++++ b/tmp/c8cb36e9-2586-497e-9fbe-ef5fa6d829c1_fixed.java
+@@ -1,4 +1,8 @@
+         @Override
+         protected JSType caseTopType(JSType topType) {
++          if (topType.isAllType()) {
++            // Narrow the ALL_TYPE to ARRAY_TYPE if possible
++            return getNativeType(JSTypeNative.ARRAY_TYPE);
++          }
+           return topType;
+         }
+\ No newline at end of file

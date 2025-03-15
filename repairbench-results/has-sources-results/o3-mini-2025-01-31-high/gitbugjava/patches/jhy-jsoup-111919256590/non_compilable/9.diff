@@ -1,0 +1,19 @@
+diff --git a/tmp/971b897e-a36d-43cc-8682-c51f9d1a8b6a_buggy.java b/tmp/a95c5f01-1c45-421d-8bcd-812c6432e57d_fixed.java
+index e807cbf..4272e17 100644
+--- a/tmp/971b897e-a36d-43cc-8682-c51f9d1a8b6a_buggy.java
++++ b/tmp/a95c5f01-1c45-421d-8bcd-812c6432e57d_fixed.java
+@@ -1,7 +1,10 @@
+ private boolean isInlineable(Document.OutputSettings out) {
+     if (!tag.isInline())
+         return false;
+-        return (parent() == null || parent().isBlock())
+-            && !isEffectivelyFirst()
+-            && !out.outline();
++    if (out.outline())
++        return false;
++    // When the parent is a block element, only the first child should remain inlined.
++    if (parent() != null && parent().isBlock())
++        return isEffectivelyFirst();
++    return true;
+ }
+\ No newline at end of file

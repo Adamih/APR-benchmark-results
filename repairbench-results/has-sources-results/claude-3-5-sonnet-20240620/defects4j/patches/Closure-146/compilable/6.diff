@@ -1,0 +1,44 @@
+diff --git a/tmp/94f9fca3-8a13-41c0-9192-78f64b02084c_buggy.java b/tmp/ed2ee1b8-347a-4b8e-802a-69db4fbc026b_fixed.java
+index 210695a..d372b92 100644
+--- a/tmp/94f9fca3-8a13-41c0-9192-78f64b02084c_buggy.java
++++ b/tmp/ed2ee1b8-347a-4b8e-802a-69db4fbc026b_fixed.java
+@@ -1,32 +1,26 @@
+-  /**
+-   * Computes the subset of {@code this} and {@code that} types if inequality
+-   * is observed. If a value {@code v1} of type {@code number} is not equal to a
+-   * value {@code v2} of type {@code (undefined,number)}, we can infer that the
+-   * type of {@code v1} is {@code number} and the type of {@code v2} is
+-   * {@code number} as well.
+-   *
+-   * @return a pair containing the restricted type of {@code this} as the first
+-   *         component and the restricted type of {@code that} as the second
+-   *         element. The returned pair is never {@code null} even though its
+-   *         components may be {@code null}
+-   */
+ public TypePair getTypesUnderInequality(JSType that) {
+     // unions types
+     if (that instanceof UnionType) {
+         TypePair p = that.getTypesUnderInequality(this);
+         return new TypePair(p.typeB, p.typeA);
+     }
+ 
+     // other types
+     switch (this.testForEquality(that)) {
+         case TRUE:
+             return new TypePair(null, null);
+ 
+         case FALSE:
++            if (this.isVoidType() && that.isVoidType()) {
++                return new TypePair(getNativeType(JSTypeNative.NO_TYPE),
++                                    getNativeType(JSTypeNative.NO_TYPE));
++            }
++            // Fall through to UNKNOWN case
++
+         case UNKNOWN:
+             return new TypePair(this, that);
+     }
+ 
+     // switch case is exhaustive
+     throw new IllegalStateException();
+ }
+\ No newline at end of file

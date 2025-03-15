@@ -1,0 +1,46 @@
+diff --git a/tmp/009e85f9-2ed9-4543-aa09-fb47ab35c6c1_buggy.java b/tmp/58c12025-92c3-478d-9a48-fb015e813305_fixed.java
+index 4e8b037..80d9f60 100644
+--- a/tmp/009e85f9-2ed9-4543-aa09-fb47ab35c6c1_buggy.java
++++ b/tmp/58c12025-92c3-478d-9a48-fb015e813305_fixed.java
+@@ -1,20 +1,31 @@
+     public List getValues(final Option option,
+                           List defaultValues) {
+         // initialize the return list
+         List valueList = (List) values.get(option);
+ 
+         // grab the correct default values
+-        if ((valueList == null) || valueList.isEmpty()) {
++        if (valueList == null) {
+             valueList = defaultValues;
+-        }
+-
+-        // augment the list with the default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = (List) this.defaultValues.get(option);
+-        }
+-                // if there are more default values as specified, add them to
+-                // the list.
++        } else if (valueList.size() < option.getArgument().getMaximum()) {
++            List defaultList = (List) this.defaultValues.get(option);
++            if (defaultList != null) {
+                 // copy the list first
++                List tempList = new ArrayList(defaultList);
++                tempList.removeAll(valueList); // remove already present values
++                valueList.addAll(tempList);
++            }
++        }
++
++        // if there are more default values as specified, add them to
++        // the list, but not beyond the maximum allowed
++        if (valueList == null) {
++            valueList = (List) this.defaultValues.get(option);
++        }
++
++        // ensure the list size does not exceed the maximum allowed
++        if (valueList != null && valueList.size() > option.getArgument().getMaximum()) {
++            valueList = valueList.subList(0, option.getArgument().getMaximum());
++        }
+ 
+         return valueList == null ? Collections.EMPTY_LIST : valueList;
+     }
+\ No newline at end of file

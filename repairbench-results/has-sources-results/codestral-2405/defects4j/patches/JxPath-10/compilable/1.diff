@@ -1,0 +1,21 @@
+diff --git a/tmp/fe278d5d-d43c-40aa-8ebb-ca9b3475a524_buggy.java b/tmp/0ed587b5-5edc-4018-85d5-e10ddfe27305_fixed.java
+index b86b44d..bc5b54d 100644
+--- a/tmp/fe278d5d-d43c-40aa-8ebb-ca9b3475a524_buggy.java
++++ b/tmp/0ed587b5-5edc-4018-85d5-e10ddfe27305_fixed.java
+@@ -1,4 +1,14 @@
+ public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
++    Object left = args[0].computeValue(context);
++    Object right = args[1].computeValue(context);
++
++    if (left == null || right == null)
++        return Boolean.FALSE;
++
++    // Check that left and right are instances of Number
++    if (!(left instanceof Number) || !(right instanceof Number))
++        throw new IllegalArgumentException("Operands are not numbers");
++
++    return compute((Number)left, (Number)right)
+             ? Boolean.TRUE : Boolean.FALSE;
+ }
+\ No newline at end of file

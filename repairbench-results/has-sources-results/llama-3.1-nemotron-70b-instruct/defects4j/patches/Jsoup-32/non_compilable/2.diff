@@ -1,0 +1,14 @@
+diff --git a/tmp/6c9e4a59-d429-4309-a013-df1848e502b4_buggy.java b/tmp/e88989ff-103c-41d9-b6c2-2e1d4ea53e4a_fixed.java
+index 91469b4..e231909 100644
+--- a/tmp/6c9e4a59-d429-4309-a013-df1848e502b4_buggy.java
++++ b/tmp/e88989ff-103c-41d9-b6c2-2e1d4ea53e4a_fixed.java
+@@ -1,6 +1,7 @@
+ @Override
+ public Element clone() {
+     Element clone = (Element) super.clone();
+-        clone.classNames();
++    // Create a defensive copy of the classNames set to ensure cloning works correctly
++    clone.attrs = new Attributes(clone.attrs); // assuming classNames is based on attrs
+     return clone;
+ }
+\ No newline at end of file

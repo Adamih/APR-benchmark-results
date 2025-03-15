@@ -1,0 +1,32 @@
+diff --git a/tmp/4998ab97-7fb5-4199-bdef-43d87d0c6873_buggy.java b/tmp/844459b8-1800-4566-bdc8-6308b6a6bce1_fixed.java
+index 19fe1b4..cf452ad 100644
+--- a/tmp/4998ab97-7fb5-4199-bdef-43d87d0c6873_buggy.java
++++ b/tmp/844459b8-1800-4566-bdc8-6308b6a6bce1_fixed.java
+@@ -1,17 +1,25 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+           !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+       for (int i = 1; i < length; i++) {
+         if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++            !Character.isJavaIdentifierPart(s.charAt(i)) ||
++            // Additional check for spaces and certain control characters
++            Character.isSpaceChar(s.charAt(i)) ||
++            s.charAt(i) == '.' ||
++            s.charAt(i) == ',' ||
++            s.charAt(i) == ';' ||
++            s.charAt(i) == ':' ||
++            s.charAt(i) == '\u0004' // Control character U+0004
++        ) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }
+\ No newline at end of file

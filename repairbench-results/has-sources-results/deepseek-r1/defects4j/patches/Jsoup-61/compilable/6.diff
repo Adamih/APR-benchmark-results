@@ -1,0 +1,54 @@
+diff --git a/tmp/32247e3d-f09c-442e-9b84-a181174bce76_buggy.java b/tmp/9de2deea-30de-4eb1-a4b3-82a200d8a187_fixed.java
+index 139579d..05cec2c 100644
+--- a/tmp/32247e3d-f09c-442e-9b84-a181174bce76_buggy.java
++++ b/tmp/9de2deea-30de-4eb1-a4b3-82a200d8a187_fixed.java
+@@ -1,43 +1,40 @@
+-    // performance sensitive
+     public boolean hasClass(String className) {
+         final String classAttr = attributes.get("class");
++        if (classAttr == null) {
++            return false;
++        }
+         final int len = classAttr.length();
+         final int wantLen = className.length();
+ 
+         if (len == 0 || len < wantLen) {
+             return false;
+         }
+ 
+-        // if both lengths are equal, only need compare the className with the attribute
+         if (len == wantLen) {
+-            return className.equalsIgnoreCase(classAttr);
++            return classAttr.regionMatches(true, 0, className, 0, wantLen);
+         }
+ 
+-        // otherwise, scan for whitespace and compare regions (with no string or arraylist allocations)
+         boolean inClass = false;
+         int start = 0;
+         for (int i = 0; i < len; i++) {
+             if (Character.isWhitespace(classAttr.charAt(i))) {
+                 if (inClass) {
+-                    // white space ends a class name, compare it with the requested one, ignore case
+                     if (i - start == wantLen && classAttr.regionMatches(true, start, className, 0, wantLen)) {
+                         return true;
+                     }
+                     inClass = false;
+                 }
+             } else {
+                 if (!inClass) {
+-                    // we're in a class name : keep the start of the substring
+-                    inClass = true;
+                     start = i;
++                    inClass = true;
+                 }
+             }
+         }
+ 
+-        // check the last entry
+         if (inClass && len - start == wantLen) {
+             return classAttr.regionMatches(true, start, className, 0, wantLen);
+         }
+ 
+         return false;
+     }
+\ No newline at end of file

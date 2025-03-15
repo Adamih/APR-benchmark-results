@@ -1,0 +1,27 @@
+diff --git a/tmp/7b601455-bc22-44af-820c-f58a03cd0aa9_buggy.java b/tmp/76ad9b0e-7bc4-43ac-bd38-23e2aeb4ef9b_fixed.java
+index 23f078d..8470eb1 100644
+--- a/tmp/7b601455-bc22-44af-820c-f58a03cd0aa9_buggy.java
++++ b/tmp/76ad9b0e-7bc4-43ac-bd38-23e2aeb4ef9b_fixed.java
+@@ -1,14 +1,17 @@
+ private static void appendToAscii(String s, boolean spaceAsPlus, StringBuilder sb) throws UnsupportedEncodingException {
+-        // minimal normalization of Unicode -> Ascii, and space normal. Existing escapes are left as-is.
++    // minimal normalization of Unicode -> Ascii, and space normalization. Existing escapes are left as-is.
+     for (int i = 0; i < s.length(); i++) {
+         int c = s.codePointAt(i);
+-            if (c == ' ') {
++        if (Character.isSupplementaryCodePoint(c)) {
++            // Handle supplementary characters correctly
++            i++; // Skip the next character as it is part of the surrogate pair
++            sb.append(URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name()));
++        } else if (c == ' ') {
+             sb.append(spaceAsPlus ? '+' : "%20");
+         } else if (c > 127) { // out of ascii range
+-                sb.append(URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name()));
+-                // ^^ is a bit heavy-handed - if perf critical, we could optimize
++            sb.append(URLEncoder.encode(String.valueOf((char) c), UTF_8.name()));
+         } else {
+             sb.append((char) c);
+         }
+     }
+ }
+\ No newline at end of file

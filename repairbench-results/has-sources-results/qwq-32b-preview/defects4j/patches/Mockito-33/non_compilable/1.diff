@@ -1,0 +1,24 @@
+diff --git a/tmp/48837899-0b39-4bbb-9c9e-e20c9db258a3_buggy.java b/tmp/f55c93b4-b51c-4732-bd44-72f9de97cd99_fixed.java
+index e1fc51f..e270e12 100644
+--- a/tmp/48837899-0b39-4bbb-9c9e-e20c9db258a3_buggy.java
++++ b/tmp/f55c93b4-b51c-4732-bd44-72f9de97cd99_fixed.java
+@@ -1,9 +1,11 @@
+-    public boolean hasSameMethod(Invocation candidate) {        
+-        //not using method.equals() for 1 good reason:
+-        //sometimes java generates forwarding methods when generics are in play see JavaGenericsForwardingMethodsTest
+-        Method m1 = invocation.getMethod();
+-        Method m2 = candidate.getMethod();
++class Super<T> {
++    void foo(T t) {}
++}
++
++class Sub extends Super<Integer> {
++    // inherits foo(Integer t)
++}
+ 
+-        	/* Avoid unnecessary cloning */
+-        return m1.equals(m2);
++class AnotherSub extends Super<Object> {
++    // inherits foo(Object t)
+ }
+\ No newline at end of file

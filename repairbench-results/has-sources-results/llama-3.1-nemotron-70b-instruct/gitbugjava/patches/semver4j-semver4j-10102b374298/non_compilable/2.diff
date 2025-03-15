@@ -1,0 +1,21 @@
+diff --git a/tmp/3cb681a2-9e81-4a08-8fe1-ab6a27cd23da_buggy.java b/tmp/1dee11a8-7b3d-464a-b012-dedb9271f2df_fixed.java
+index 593602f..fe3184a 100644
+--- a/tmp/3cb681a2-9e81-4a08-8fe1-ab6a27cd23da_buggy.java
++++ b/tmp/1dee11a8-7b3d-464a-b012-dedb9271f2df_fixed.java
+@@ -1,6 +1,13 @@
+ @Override
+ public String toString() {
+-        return rangesList.stream()
++    String rangesString = rangesList.stream()
+        .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++       .collect(joining(" and "));
++    return isFirstAndLastRangeEnclosedInParentheses()? rangesString : "(" + rangesString + ")";
++}
++
++// assuming the following method exists or needs to be added
++private boolean isFirstAndLastRangeEnclosedInParentheses() {
++    return rangesList.stream()
++       .anyMatch(range -> range.startsWith("(") && range.endsWith(")"));
+ }
+\ No newline at end of file

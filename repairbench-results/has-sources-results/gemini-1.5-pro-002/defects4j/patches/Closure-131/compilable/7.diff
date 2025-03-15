@@ -1,0 +1,32 @@
+diff --git a/tmp/a3e25fb1-a077-4148-a5b5-ec77928ac3d0_buggy.java b/tmp/4abc0bb2-ce29-4a02-be76-cab35284a139_fixed.java
+index 19fe1b4..c54aa17 100644
+--- a/tmp/a3e25fb1-a077-4148-a5b5-ec77928ac3d0_buggy.java
++++ b/tmp/4abc0bb2-ce29-4a02-be76-cab35284a139_fixed.java
+@@ -1,17 +1,22 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++      if (length == 0) {
+         return false;
+       }
+ 
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++      for (int i = 0; i < length; i++) {
++        char c = s.charAt(i);
++        if (i == 0) {
++          if (!Character.isUnicodeIdentifierStart(c)) {
+             return false;
+           }
++        } else {
++          if (!Character.isUnicodeIdentifierPart(c)) {
++            return false;
++          }
++        }
+       }
+ 
+       return true;
+     }

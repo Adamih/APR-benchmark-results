@@ -1,0 +1,42 @@
+diff --git a/tmp/e05fb5d7-c2d9-4ab6-baaf-95fabddf30b2_buggy.java b/tmp/7ee5ac7d-34ad-4605-9d4d-dd5538f6552e_fixed.java
+index 62e8ec8..ee255d6 100644
+--- a/tmp/e05fb5d7-c2d9-4ab6-baaf-95fabddf30b2_buggy.java
++++ b/tmp/7ee5ac7d-34ad-4605-9d4d-dd5538f6552e_fixed.java
+@@ -1,26 +1,34 @@
+     /**
+      * <p>If an {@link Option} exists for <code>token</code> then
+      * set the current option and add the token to the processed 
+      * list.</p>
+      *
+      * <p>If an {@link Option} does not exist and <code>stopAtNonOption</code>
+      * is set then ignore the current token and add the remaining tokens
+      * to the processed tokens list directly.</p>
+      *
++     * <p>If an {@link Option} does not exist and <code>stopAtNonOption</code>
++     * is not set, throw an {@link UnrecognizedOptionException}.</p>
++     *
+      * @param token The current option token
+      * @param stopAtNonOption Specifies whether flattening should halt
+      * at the first non option.
++     * @throws UnrecognizedOptionException if the option is not recognized and stopAtNonOption is false
+      */
+-    private void processOptionToken(String token, boolean stopAtNonOption)
++    private void processOptionToken(String token, boolean stopAtNonOption) throws UnrecognizedOptionException
+     {
+         if (options.hasOption(token))
+         {
+             currentOption = options.getOption(token);
+             tokens.add(token);
+         }
+         else if (stopAtNonOption)
+         {
+             eatTheRest = true;
+-            tokens.add(token);
++            // Do not add the unrecognized token to the list when stopping at non-option
++        }
++        else
++        {
++            throw new UnrecognizedOptionException(token);
+         }
+     }
+\ No newline at end of file

@@ -1,0 +1,20 @@
+diff --git a/tmp/2c94f48f-2048-4b35-acee-652a1ac6b58c_buggy.java b/tmp/c948d6f0-20cc-48b1-bf0e-2854280735b7_fixed.java
+index ee836e4..6a6021a 100644
+--- a/tmp/2c94f48f-2048-4b35-acee-652a1ac6b58c_buggy.java
++++ b/tmp/c948d6f0-20cc-48b1-bf0e-2854280735b7_fixed.java
+@@ -1,9 +1,14 @@
+ @Override
+ protected String buildCanonicalName()
+ {
+     StringBuilder sb = new StringBuilder();
+     sb.append(_class.getName());
+     sb.append('<');
+     sb.append(_referencedType.toCanonical());
++    // Remove trailing '>' if the referenced type is an array
++    if (_referencedType.isArrayType()) {
++        sb.setLength(sb.length() - 1);
++    }
++    sb.append('>');
+     return sb.toString();
+ }
+\ No newline at end of file

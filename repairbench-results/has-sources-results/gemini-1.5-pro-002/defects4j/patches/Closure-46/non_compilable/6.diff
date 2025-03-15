@@ -1,0 +1,43 @@
+diff --git a/tmp/57200284-02bd-4401-bb25-a9445432d0f4_buggy.java b/tmp/1756800a-d7fc-4e3c-8d6a-e229b58cad86_fixed.java
+index 46817a7..2060f90 100644
+--- a/tmp/57200284-02bd-4401-bb25-a9445432d0f4_buggy.java
++++ b/tmp/1756800a-d7fc-4e3c-8d6a-e229b58cad86_fixed.java
+@@ -1,16 +1,33 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+       return super.getLeastSupertype(that);
+     }
++    RecordType thatRecord = that.toMaybeRecordType();
++    if (isEmpty() || thatRecord.isEmpty()) {
++      return getTopMostAncestorOfType(JSTypeNative.OBJECT_TYPE);
++    }
++
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+     for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
++      if (thatRecord.hasProperty(property)) {
++        JSType thisPropertyType = getPropertyType(property);
++        JSType thatPropertyType = thatRecord.getPropertyType(property);
++        builder.addProperty(property, thisPropertyType.getLeastSupertype(thatPropertyType),
+             getPropertyNode(property));
+       }
+     }
+-    return builder.build();
++    for (String property : thatRecord.getProperties()) {
++      if (!hasProperty(property)) {
++        builder.addProperty(property, thatRecord.getPropertyType(property),
++            thatRecord.getPropertyNode(property));
++      }
++    }
++
++    JSType result = builder.build();
++    if (result == null) {
++       return getTopMostAncestorOfType(JSTypeNative.OBJECT_TYPE);
++    }
++    return result;
++
+   }

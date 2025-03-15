@@ -1,0 +1,21 @@
+diff --git a/tmp/4ebf933d-47a7-4f00-af57-bfc3e31d66a7_buggy.java b/tmp/016122e2-bc45-4bf4-a70c-f91f374d084f_fixed.java
+index 3ecd591..d211d99 100644
+--- a/tmp/4ebf933d-47a7-4f00-af57-bfc3e31d66a7_buggy.java
++++ b/tmp/016122e2-bc45-4bf4-a70c-f91f374d084f_fixed.java
+@@ -1,6 +1,13 @@
+ private boolean isInlineable(Document.OutputSettings out) {
+-        return tag().isInline()
++    if (tag().isInline()
+             && (parent() == null || parent().isBlock())
+             && previousSibling() != null
+-            && !out.outline();
++            && !out.outline()) {
++        return true;
++    }
++    // special case to handle nested anchor elements (<a> within a <a>) properly
++    if (tag().isInline() && parent() != null && parent().tag().isInline() && parent().isBlock()) {
++        return false;
++    }
++    return false;
+ }
+\ No newline at end of file

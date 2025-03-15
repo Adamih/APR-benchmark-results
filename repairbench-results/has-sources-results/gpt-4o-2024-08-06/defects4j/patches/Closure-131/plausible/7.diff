@@ -1,0 +1,29 @@
+diff --git a/tmp/01c20ff6-955d-477a-b293-bc5df88ca264_buggy.java b/tmp/d65e94d2-bc41-4935-910c-bb1b81cd1f33_fixed.java
+index 19fe1b4..ee3b3a3 100644
+--- a/tmp/01c20ff6-955d-477a-b293-bc5df88ca264_buggy.java
++++ b/tmp/d65e94d2-bc41-4935-910c-bb1b81cd1f33_fixed.java
+@@ -1,17 +1,21 @@
+ public static boolean isJSIdentifier(String s) {
+     int length = s.length();
+ 
+     if (length == 0 ||
+         !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+     }
+ 
+     for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++        char ch = s.charAt(i);
++        // Check if the character is a valid JavaScript identifier part,
++        // or if it is an ignorable control character in Java, but not in JavaScript
++        if (!Character.isJavaIdentifierPart(ch) || 
++            Character.isISOControl(ch) || 
++            Character.isWhitespace(ch)) {
+             return false;
+         }
+     }
+ 
+     return true;
+ }
+\ No newline at end of file

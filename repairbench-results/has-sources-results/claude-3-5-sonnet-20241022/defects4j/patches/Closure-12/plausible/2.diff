@@ -1,0 +1,16 @@
+diff --git a/tmp/8ac6728b-c2d2-4532-be30-59d600357790_buggy.java b/tmp/db98a01f-4166-43ec-a31f-691708b4f643_fixed.java
+index 22640dd..66c050f 100644
+--- a/tmp/8ac6728b-c2d2-4532-be30-59d600357790_buggy.java
++++ b/tmp/db98a01f-4166-43ec-a31f-691708b4f643_fixed.java
+@@ -1,3 +1,10 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++    Node parent = cfgNode.getParent();
++    while (parent != null) {
++        if (parent.isTry()) {
++            return true;
++        }
++        parent = parent.getParent();
++    }
+     return false;
+ }
+\ No newline at end of file

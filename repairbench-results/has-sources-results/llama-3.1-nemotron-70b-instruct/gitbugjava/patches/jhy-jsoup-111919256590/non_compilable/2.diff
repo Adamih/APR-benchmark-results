@@ -1,0 +1,20 @@
+diff --git a/tmp/c0c2b364-bd45-41b0-ab8e-ccc31ea33a3c_buggy.java b/tmp/07c6695e-9957-4f45-879e-d26805e8d19d_fixed.java
+index e807cbf..7c55d04 100644
+--- a/tmp/c0c2b364-bd45-41b0-ab8e-ccc31ea33a3c_buggy.java
++++ b/tmp/07c6695e-9957-4f45-879e-d26805e8d19d_fixed.java
+@@ -1,7 +1,13 @@
++/**
++ * Checks if an element can be inlined (i.e., not wrapped in a new line) during pretty-printing.
++ * 
++ * @param out the output settings for pretty-printing
++ * @return true if the element can be inlined, false otherwise
++ */
+ private boolean isInlineable(Document.OutputSettings out) {
+     if (!tag.isInline())
+         return false;
+     return (parent() == null || parent().isBlock())
+-            && !isEffectivelyFirst()
++        && (isEffectivelyFirst() ||!(this instanceof TextNode) || ((TextNode) this).isWhitespace())
+         &&!out.outline();
+ }
+\ No newline at end of file

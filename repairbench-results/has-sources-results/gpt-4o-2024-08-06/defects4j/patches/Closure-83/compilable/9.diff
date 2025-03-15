@@ -1,0 +1,31 @@
+diff --git a/tmp/35f287d8-28e5-40ce-81bf-6334b380ad0b_buggy.java b/tmp/11c55500-bd7e-4371-a0ae-13e43832e7e4_fixed.java
+index 072c672..d695c6c 100644
+--- a/tmp/35f287d8-28e5-40ce-81bf-6334b380ad0b_buggy.java
++++ b/tmp/11c55500-bd7e-4371-a0ae-13e43832e7e4_fixed.java
+@@ -1,20 +1,23 @@
+       @Override
+       public int parseArguments(Parameters params) throws CmdLineException {
+         String param = params.getParameter(0);
+ 
+         if (param == null) {
+           setter.addValue(true);
+           return 0;
+         } else {
+           String lowerParam = param.toLowerCase();
+           if (TRUES.contains(lowerParam)) {
+             setter.addValue(true);
+           } else if (FALSES.contains(lowerParam)) {
+             setter.addValue(false);
+           } else {
+-            setter.addValue(true);
+-            return 0;
++            // Assuming parameters like "--version" should be handled as special cases
++            if (param.startsWith("--")) {
++              return -1; // or some other convention indicating the special flag was present
++            }
++            throw new CmdLineException("Unrecognized parameter: " + param);
+           }
+           return 1;
+         }
+       }
+\ No newline at end of file

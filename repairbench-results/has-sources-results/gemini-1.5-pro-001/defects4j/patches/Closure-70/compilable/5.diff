@@ -1,0 +1,36 @@
+diff --git a/tmp/76fa5e29-23d7-41ec-b61a-faa9abc1ff30_buggy.java b/tmp/4ac22d33-8f6f-43e6-a4ce-e9cf3a7cdc5d_fixed.java
+index 1530b34..df08a44 100644
+--- a/tmp/76fa5e29-23d7-41ec-b61a-faa9abc1ff30_buggy.java
++++ b/tmp/4ac22d33-8f6f-43e6-a4ce-e9cf3a7cdc5d_fixed.java
+@@ -1,23 +1,31 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
++              // The JSDoc list is shorter than the actual argument list.
++              // Treat the rest of the arguments as unknown types.
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
++        } else {
++          // This function does not have a JSDoc type.
++          // Treat all the arguments as unknown types.
++          for (Node astParameter : astParameters.children()) {
++            defineSlot(astParameter, functionNode, null, true);
++          }
+         }
+       }
+     } // end declareArguments

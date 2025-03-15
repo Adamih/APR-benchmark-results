@@ -1,0 +1,28 @@
+diff --git a/tmp/0bd47967-bf7d-47f2-912a-f283bbc50617_buggy.java b/tmp/b005470c-9d43-4ab4-bbc1-4a09d154b8b3_fixed.java
+index 7e43c1c..ed11f41 100644
+--- a/tmp/0bd47967-bf7d-47f2-912a-f283bbc50617_buggy.java
++++ b/tmp/b005470c-9d43-4ab4-bbc1-4a09d154b8b3_fixed.java
+@@ -1,19 +1,20 @@
+   /**
+    * Visits a NEW node.
+    */
+   private void visitNew(NodeTraversal t, Node n) {
+     Node constructor = n.getFirstChild();
+     JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
+     if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
+       FunctionType fnType = type.toMaybeFunctionType();
+       if (fnType != null) {
+         visitParameterList(t, n, fnType);
+         ensureTyped(t, n, fnType.getInstanceType());
+       } else {
+-        ensureTyped(t, n);
++        report(t, n, NOT_A_CONSTRUCTOR);
+       }
+     } else {
+       report(t, n, NOT_A_CONSTRUCTOR);
++    }
++    // Move the ensureTyped call out of conditional branch to always ensure the node is typed
+     ensureTyped(t, n);
+   }
+\ No newline at end of file
+-  }

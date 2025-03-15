@@ -1,0 +1,15 @@
+diff --git a/tmp/5cfb1108-fbfb-44d8-a7c3-cc55446dac01_buggy.java b/tmp/f746e066-c01c-41c7-9ac4-6494ff6b9703_fixed.java
+index fc49bcd..601dc31 100644
+--- a/tmp/5cfb1108-fbfb-44d8-a7c3-cc55446dac01_buggy.java
++++ b/tmp/f746e066-c01c-41c7-9ac4-6494ff6b9703_fixed.java
+@@ -1,4 +1,8 @@
+ @Override
+ public DefaultPrettyPrinter createInstance() {
+-        return new DefaultPrettyPrinter(this);
++    try {
++        return this.getClass().getConstructor().newInstance();
++    } catch (Exception e) {
++        throw new IllegalStateException("Subclass does not have a no-arg constructor", e);
++    }
+ }
+\ No newline at end of file

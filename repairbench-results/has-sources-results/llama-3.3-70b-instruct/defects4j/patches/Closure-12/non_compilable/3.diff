@@ -1,0 +1,15 @@
+diff --git a/tmp/56afec7e-2ead-41af-b800-7b271092b85e_buggy.java b/tmp/b679c5f1-a52c-4b9e-afe1-693783169953_fixed.java
+index 22640dd..fa0f2d0 100644
+--- a/tmp/56afec7e-2ead-41af-b800-7b271092b85e_buggy.java
++++ b/tmp/b679c5f1-a52c-4b9e-afe1-693783169953_fixed.java
+@@ -1,3 +1,9 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++    // Check if the node is a TRY node and has a CATCH or FINALLY block
++    if (cfgNode.isTry()) {
++        Node catchBlock = cfgNode.getCatchBlock();
++        Node finallyBlock = cfgNode.getFinallyBlock();
++        return catchBlock!= null || finallyBlock!= null;
++    }
+     return false;
+ }
+\ No newline at end of file

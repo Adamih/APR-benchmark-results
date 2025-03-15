@@ -1,0 +1,33 @@
+diff --git a/tmp/74349fe6-5fb2-4ef5-b4cb-0f5f96ca5034_buggy.java b/tmp/12b57e26-6a42-4b3a-99a4-cb6c632a94b2_fixed.java
+index d5b3da9..f257863 100644
+--- a/tmp/74349fe6-5fb2-4ef5-b4cb-0f5f96ca5034_buggy.java
++++ b/tmp/12b57e26-6a42-4b3a-99a4-cb6c632a94b2_fixed.java
+@@ -1,7 +1,27 @@
+         private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
+             for (Attribute attribute : source.attributes()) {
+                 // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+                 String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
++
++                // Add validation for invalid XML characters
++                if (isValidXmlAttributeName(key)) {
+                     el.setAttribute(key, attribute.getValue());
+                 }
+             }
++        }
++
++        private boolean isValidXmlAttributeName(String name) {
++            if (name == null || name.length() == 0) {
++                return false;
++            }
++            if (!Character.isLetter(name.charAt(0)) && name.charAt(0) != '_' && name.charAt(0) != ':') {
++                return false;
++            }
++            for (int i = 1; i < name.length(); i++) {
++                char ch = name.charAt(i);
++                if (!Character.isLetterOrDigit(ch) && ch != '_' && ch != ':' && ch != '.' && ch != '-') {
++                    return false;
++                }
++            }
++            return true;
++        }
+\ No newline at end of file

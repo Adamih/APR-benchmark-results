@@ -1,0 +1,25 @@
+diff --git a/tmp/ea0ce5a5-d1a6-4ca3-92ae-3ea334d782fe_buggy.java b/tmp/9172fcba-50a5-4366-9473-e580eebf1a04_fixed.java
+index 00914da..155ee55 100644
+--- a/tmp/ea0ce5a5-d1a6-4ca3-92ae-3ea334d782fe_buggy.java
++++ b/tmp/9172fcba-50a5-4366-9473-e580eebf1a04_fixed.java
+@@ -1,17 +1,16 @@
+-    // does not recurse.
++    // Fixed normalise function.
+     private void normalise(Element element) {
+         List<Node> toMove = new ArrayList<Node>();
+         for (Node node : element.childNodes) {
+             if (node instanceof TextNode) {
+                 TextNode tn = (TextNode) node;
+                 if (!tn.isBlank())
+                     toMove.add(tn);
+             }
+         }
+ 
+         for (Node node : toMove) {
+             element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++            element.prependChild(node); // Correctly adds the text node to the start of the element.
+         }
+     }
+\ No newline at end of file

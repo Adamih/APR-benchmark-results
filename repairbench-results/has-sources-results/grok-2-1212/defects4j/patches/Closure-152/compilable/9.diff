@@ -1,0 +1,64 @@
+diff --git a/tmp/6d33a444-2a29-4632-b413-854eb6082fa3_buggy.java b/tmp/ba9657e5-bfce-44a0-bb89-e2dede24b07a_fixed.java
+index 58a1651..2329952 100644
+--- a/tmp/6d33a444-2a29-4632-b413-854eb6082fa3_buggy.java
++++ b/tmp/ba9657e5-bfce-44a0-bb89-e2dede24b07a_fixed.java
+@@ -1,32 +1,57 @@
+   @Override
+   JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+     setResolvedTypeInternal(this);
+ 
+     call = (ArrowType) safeResolve(call, t, scope);
+     prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+     // Warning about typeOfThis if it doesn't resolve to an ObjectType
+     // is handled further upstream.
+     // TODO(nicksantos): Handle this correctly if we have a UnionType.
+-    typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
++    JSType resolvedTypeOfThis = safeResolve(typeOfThis, t, scope);
++    if (resolvedTypeOfThis instanceof ObjectType) {
++      typeOfThis = (ObjectType) resolvedTypeOfThis;
++    } else if (resolvedTypeOfThis instanceof UnionType) {
++      UnionType unionType = (UnionType) resolvedTypeOfThis;
++      ObjectType objectType = null;
++      for (JSType alt : unionType.getAlternates()) {
++        if (alt instanceof ObjectType) {
++          if (objectType != null) {
++            // If there are multiple ObjectTypes in the union, we need to decide which one to use or handle this case differently.
++            // For now, we'll pick the first one encountered.
++            break;
++          }
++          objectType = (ObjectType) alt;
++        }
++      }
++      if (objectType != null) {
++        typeOfThis = objectType;
++      } else {
++        // No ObjectType found in the union, handle this case appropriately (e.g., report an error, set to null, or use a default type)
++        typeOfThis = null; // Or handle this as per your error handling strategy
++      }
++    } else {
++      // Handle other types (e.g., null, void, etc.) as needed
++      typeOfThis = null; // Or handle this as per your error handling strategy
++    }
+ 
+     boolean changed = false;
+     ImmutableList.Builder<ObjectType> resolvedInterfaces =
+         ImmutableList.builder();
+     for (ObjectType iface : implementedInterfaces) {
+       ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+       resolvedInterfaces.add(resolvedIface);
+       changed |= (resolvedIface != iface);
+     }
+     if (changed) {
+       implementedInterfaces = resolvedInterfaces.build();
+     }
+ 
+     if (subTypes != null) {
+       for (int i = 0; i < subTypes.size(); i++) {
+         subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+       }
+     }
+ 
+     return super.resolveInternal(t, scope);
+   }
+\ No newline at end of file

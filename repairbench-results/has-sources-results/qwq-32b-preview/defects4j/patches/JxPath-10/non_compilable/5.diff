@@ -1,0 +1,26 @@
+diff --git a/tmp/c2281e40-0f98-4a99-a490-6ea340ae8ea7_buggy.java b/tmp/2a3bed22-d3af-4c81-a2fb-87206b5ac077_fixed.java
+index b86b44d..56f18a3 100644
+--- a/tmp/c2281e40-0f98-4a99-a490-6ea340ae8ea7_buggy.java
++++ b/tmp/2a3bed22-d3af-4c81-a2fb-87206b5ac077_fixed.java
+@@ -1,4 +1,18 @@
+ public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    Object left = args[0].computeValue(context);
++    Object right = args[1].computeValue(context);
++
++    // Convert empty node sets to numbers
++    left = convertEmptyNodeSetToNumber(left);
++    right = convertEmptyNodeSetToNumber(right);
++
++    boolean result = compute(left, right);
++    return result ? Boolean.TRUE : Boolean.FALSE;
++}
++
++private Object convertEmptyNodeSetToNumber(Object value) {
++    if (value instanceof NodeList && ((NodeList) value).getLength() == 0) {
++        return new Double(0);
++    }
++    return value;
+ }
+\ No newline at end of file

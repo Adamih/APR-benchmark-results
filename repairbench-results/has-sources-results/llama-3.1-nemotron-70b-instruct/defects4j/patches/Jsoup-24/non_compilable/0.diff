@@ -1,0 +1,44 @@
+diff --git a/tmp/e7f4c016-aeed-46f5-9935-c56cebd5724f_buggy.java b/tmp/2763b3df-51be-425f-949f-a459cf2d9a29_fixed.java
+index b2d53db..5a01208 100644
+--- a/tmp/e7f4c016-aeed-46f5-9935-c56cebd5724f_buggy.java
++++ b/tmp/2763b3df-51be-425f-949f-a459cf2d9a29_fixed.java
+@@ -1,34 +1,38 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+         t.dataBuffer.append(name);
+         r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() &&!r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
++                if (t.tagPending.getName().equalsIgnoreCase("script")) {
++                    // Fix: Append the '>' character to dataBuffer when handling script tags
++                    t.dataBuffer.append(c);
++                }
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
+             default:
+                 t.dataBuffer.append(c);
+                 anythingElse(t, r);
+                 break;
+         }
+     } else {
+         anythingElse(t, r);
+     }
+ }
+\ No newline at end of file

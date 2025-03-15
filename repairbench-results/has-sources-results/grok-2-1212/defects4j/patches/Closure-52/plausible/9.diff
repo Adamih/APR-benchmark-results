@@ -1,0 +1,44 @@
+diff --git a/tmp/74cb7b74-0150-43bf-ad8e-6c04e35e00cd_buggy.java b/tmp/a6ea2442-dca1-46c5-bdf9-f908bb6300eb_fixed.java
+index 4b7f469..03b95a3 100644
+--- a/tmp/74cb7b74-0150-43bf-ad8e-6c04e35e00cd_buggy.java
++++ b/tmp/a6ea2442-dca1-46c5-bdf9-f908bb6300eb_fixed.java
+@@ -1,10 +1,36 @@
+ static boolean isSimpleNumber(String s) {
++    if (s.isEmpty()) {
++        return false;
++    }
++    
+     int len = s.length();
++    boolean hasDigit = false;
++    boolean hasLeadingZero = false;
++    boolean hasDecimalPoint = false;
++    
+     for (int index = 0; index < len; index++) {
+         char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++        
++        if (c == '.') {
++            if (hasDecimalPoint || index == 0 || index == len - 1) {
++                return false;
++            }
++            hasDecimalPoint = true;
++        } else if (c == 'x' || c == 'X') {
++            if (index != 1 || s.charAt(0) != '0') {
++                return false;
++            }
++        } else if (c >= '0' && c <= '9') {
++            if (c != '0' || index > 0) {
++                hasDigit = true;
++            }
++            if (c == '0' && index == 0 && len > 1) {
++                hasLeadingZero = true;
++            }
++        } else {
+             return false;
+         }
+     }
+-    return len > 0;
++    
++    return hasDigit && !(hasLeadingZero && !hasDecimalPoint && !s.startsWith("0x") && !s.startsWith("0X"));
+ }
+\ No newline at end of file

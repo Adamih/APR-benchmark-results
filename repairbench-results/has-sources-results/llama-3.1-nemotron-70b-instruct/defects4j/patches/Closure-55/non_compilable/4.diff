@@ -1,0 +1,28 @@
+diff --git a/tmp/4a419b38-b43a-4d05-b9b4-117183d4353e_buggy.java b/tmp/d625511f-538b-4863-9462-2797e9b70304_fixed.java
+index 43937f5..63831be 100644
+--- a/tmp/4a419b38-b43a-4d05-b9b4-117183d4353e_buggy.java
++++ b/tmp/d625511f-538b-4863-9462-2797e9b70304_fixed.java
+@@ -1,3 +1,21 @@
++/**
++ * Checks if a given node represents a reducable function expression.
++ * A function expression is considered reducable if it's not a constructor
++ * or an immediately invoked function expression (IIFE).
++ *
++ * @param n the node to check
++ * @return true if the node is a reducable function expression, false otherwise
++ */
+ private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++    return NodeUtil.isFunctionExpression(n) 
++           &&!n.isConstructor() 
++           &&!isImmediatelyInvokedFunctionExpression(n);
++}
++
++// Assuming the following helper method is already available or needs to be added
++private static boolean isImmediatelyInvokedFunctionExpression(Node n) {
++    // Simple implementation, might need adjustments based on the actual AST structure
++    return n.getParent()!= null 
++           && n.getParent().isCall() 
++           && n.getParent().getFirstChild() == n;
+ }
+\ No newline at end of file

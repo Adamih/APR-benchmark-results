@@ -1,0 +1,55 @@
+diff --git a/tmp/2c0ff255-9111-4d3c-8932-4f6c18cba34b_buggy.java b/tmp/c02cf9e4-5baa-41b4-8f57-98c9164f379c_fixed.java
+index 4ebe4f9..0eab904 100644
+--- a/tmp/2c0ff255-9111-4d3c-8932-4f6c18cba34b_buggy.java
++++ b/tmp/c02cf9e4-5baa-41b4-8f57-98c9164f379c_fixed.java
+@@ -1,41 +1,45 @@
+-    /*
+-    /**********************************************************
+-    /* Validation, post-processing
+-    /**********************************************************
++/**
++ * {@inheritDoc}
+  */
+ @Override
+ public JsonDeserializer<?> createContextual(DeserializationContext ctxt,
+         BeanProperty property) throws JsonMappingException
+ {
+     // May need to resolve types for delegate-based creators:
+     JsonDeserializer<Object> delegate = null;
+     if (_valueInstantiator!= null) {
+         // [databind#2324]: check both array-delegating and delegating
+         AnnotatedWithParams delegateCreator = _valueInstantiator.getDelegateCreator();
+         if (delegateCreator!= null) {
+             JavaType delegateType = _valueInstantiator.getDelegateType(ctxt.getConfig());
+             delegate = findDeserializer(ctxt, delegateType, property);
+         }
+     }
+     JsonDeserializer<?> valueDeser = _valueDeserializer;
+     final JavaType valueType = _containerType.getContentType();
+     if (valueDeser == null) {
+         // [databind#125]: May have a content converter
+         valueDeser = findConvertingContentDeserializer(ctxt, property, valueDeser);
+         if (valueDeser == null) {
+             // And we may also need to get deserializer for String
+             valueDeser = ctxt.findContextualValueDeserializer(valueType, property);
+         }
+     } else { // if directly assigned, probably not yet contextual, so:
+         valueDeser = ctxt.handleSecondaryContextualization(valueDeser, property, valueType);
+     }
+     // 11-Dec-2015, tatu: Should we pass basic `Collection.class`, or more refined? Mostly
+     //   comes down to "List vs Collection" I suppose... for now, pass Collection
+     Boolean unwrapSingle = findFormatFeature(ctxt, property, Collection.class,
+             JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+     NullValueProvider nuller = findContentNullProvider(ctxt, property, valueDeser);
++    // Check for default deserializer and replace with null in that case
+     if (isDefaultDeserializer(valueDeser)) {
++        // Fixed bug: Added check to ensure non-null delegate deserializer
++        if (delegate!= null) {
++            valueDeser = delegate;
++        } else {
+             valueDeser = null;
+         }
++    }
+     return withResolved(delegate, valueDeser, nuller, unwrapSingle);
+ }
+\ No newline at end of file

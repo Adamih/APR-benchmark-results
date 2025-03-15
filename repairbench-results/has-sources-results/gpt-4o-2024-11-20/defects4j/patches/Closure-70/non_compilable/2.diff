@@ -1,0 +1,39 @@
+diff --git a/tmp/6c475745-58aa-408e-be3b-d70b910723cb_buggy.java b/tmp/3cf17463-d596-4ee5-a6af-9b34328def17_fixed.java
+index 1530b34..068f2dc 100644
+--- a/tmp/6c475745-58aa-408e-be3b-d70b910723cb_buggy.java
++++ b/tmp/3cf17463-d596-4ee5-a6af-9b34328def17_fixed.java
+@@ -1,23 +1,33 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
++              if (!astParameter.isName() || astParameter.getString() == null) {
++                continue; // Skip invalid or malformed parameters.
++              }
++              JSType currentType = astParameter.getJSType();
++              if (currentType != null && currentType != jsDocParameter.getJSType()) {
++                reportWarning("Variable redefinition with conflicting types for " + astParameter.getString());
++              }
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
++              if (!astParameter.isName() || astParameter.getString() == null) {
++                continue; // Skip invalid or malformed parameters.
++              }
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+     } // end declareArguments
+\ No newline at end of file

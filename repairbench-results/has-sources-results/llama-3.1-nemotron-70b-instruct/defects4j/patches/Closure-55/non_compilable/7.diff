@@ -1,0 +1,34 @@
+diff --git a/tmp/172af5cf-84bf-404b-9ea8-648899c14978_buggy.java b/tmp/fd680ff3-3485-4863-8af2-1b73faa85736_fixed.java
+index 43937f5..58f9d51 100644
+--- a/tmp/172af5cf-84bf-404b-9ea8-648899c14978_buggy.java
++++ b/tmp/fd680ff3-3485-4863-8af2-1b73faa85736_fixed.java
+@@ -1,3 +1,27 @@
++/**
++ * Checks if a given node represents a reducable function expression.
++ * A function expression is considered reducable if it's not a constructor 
++ * and doesn't have more than one getter/setter in its prototype.
++ *
++ * @param n the node to check
++ * @return true if the node is a reducable function expression, false otherwise
++ */
+ private static boolean isReduceableFunctionExpression(Node n) {
+-    return NodeUtil.isFunctionExpression(n);
++  return NodeUtil.isFunctionExpression(n) 
++      &&!NodeUtil.isConstructor(n) 
++      && countPrototypeAccessors(n) <= 1;
++}
++
++// Helper method to count the number of getters/setters in a function's prototype
++private static int countPrototypeAccessors(Node n) {
++  int count = 0;
++  Node prototype = NodeUtil.getPrototypeProperty(n);
++  if (prototype!= null) {
++    for (Node child : prototype.children) {
++      if (NodeUtil.isGetter(child) || NodeUtil.isSetter(child)) {
++        count++;
++      }
++    }
++  }
++  return count;
+ }
+\ No newline at end of file

@@ -1,0 +1,19 @@
+diff --git a/tmp/1a1fafc5-e76f-4814-ba29-9d190c25109b_buggy.java b/tmp/a3db89e5-d4dd-4d2d-8c65-588c9e53b86e_fixed.java
+index 42d4174..d18528d 100644
+--- a/tmp/1a1fafc5-e76f-4814-ba29-9d190c25109b_buggy.java
++++ b/tmp/a3db89e5-d4dd-4d2d-8c65-588c9e53b86e_fixed.java
+@@ -1,7 +1,12 @@
+   /**
+-   * Returns the remainder of the line.
++   * Returns the remaining JSDoc line.
+    */
+   private String getRemainingJSDocLine() {
++    int jsDocLineStartPos = jsDocParser.getCurrentOffSet();  // get the current offset
+     String result = stream.getRemainingJSDocLine();
++    jsDocParser.updateOffset(result.length() + 1);  // update the offset based on the length of the returned line
++    if (jsDocParser.getLineNumber() > 0) {
++      jsDocParser.updateLineNumber();  // update the line number if necessary
++    }
+     return result;
+   }
+\ No newline at end of file

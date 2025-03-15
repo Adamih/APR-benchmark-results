@@ -1,0 +1,41 @@
+diff --git a/tmp/15490977-7da1-4b97-824d-f7b7881905fe_buggy.java b/tmp/ac296bfc-9a0b-4f1f-833f-90c624551bbc_fixed.java
+index b2d53db..f8aac30 100644
+--- a/tmp/15490977-7da1-4b97-824d-f7b7881905fe_buggy.java
++++ b/tmp/ac296bfc-9a0b-4f1f-833f-90c624551bbc_fixed.java
+@@ -1,34 +1 @@
+-        void read(Tokeniser t, CharacterReader r) {
+-            if (r.matchesLetter()) {
+-                String name = r.consumeLetterSequence();
+-                t.tagPending.appendTagName(name.toLowerCase());
+-                t.dataBuffer.append(name);
+-                r.advance();
+-                return;
+-            }
+-
+-            if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+-                char c = r.consume();
+-                switch (c) {
+-                    case '\t':
+-                    case '\n':
+-                    case '\f':
+-                    case ' ':
+-                        t.transition(BeforeAttributeName);
+-                        break;
+-                    case '/':
+-                        t.transition(SelfClosingStartTag);
+-                        break;
+-                    case '>':
+-                        t.emitTagPending();
+-                        t.transition(Data);
+-                        break;
+-                    default:
+-                        t.dataBuffer.append(c);
+-                        anythingElse(t, r);
+-                        break;
+-                }
+-            } else {
+-                anythingElse(t, r);
+-            }
+-        }
++junit.framework.AssertionFailedError: expected:<...ocument.write('</scr['] + 'ipt>');
+\ No newline at end of file

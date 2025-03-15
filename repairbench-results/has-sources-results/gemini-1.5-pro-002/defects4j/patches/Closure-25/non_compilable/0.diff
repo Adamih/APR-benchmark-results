@@ -1,0 +1,55 @@
+diff --git a/tmp/5e3d19ab-0ed3-4475-9f43-cbc4447a95e9_buggy.java b/tmp/b322c7cc-601e-474a-be4c-17feeb0d9cac_fixed.java
+index b98f0a7..ef85d86 100644
+--- a/tmp/5e3d19ab-0ed3-4475-9f43-cbc4447a95e9_buggy.java
++++ b/tmp/b322c7cc-601e-474a-be4c-17feeb0d9cac_fixed.java
+@@ -1,29 +1,50 @@
+   private FlowScope traverseNew(Node n, FlowScope scope) {
+ 
+     Node constructor = n.getFirstChild();
+     scope = traverse(constructor, scope);
+     JSType constructorType = constructor.getJSType();
+     JSType type = null;
+     if (constructorType != null) {
+       constructorType = constructorType.restrictByNotNullOrUndefined();
+       if (constructorType.isUnknownType()) {
+         type = getNativeType(UNKNOWN_TYPE);
+       } else {
+         FunctionType ct = constructorType.toMaybeFunctionType();
+         if (ct == null && constructorType instanceof FunctionType) {
+           // If constructorType is a NoObjectType, then toMaybeFunctionType will
+           // return null. But NoObjectType implements the FunctionType
+           // interface, precisely because it can validly construct objects.
+           ct = (FunctionType) constructorType;
+         }
+         if (ct != null && ct.isConstructor()) {
+           type = ct.getInstanceType();
++          if (constructor.getNext() != null && constructorType.isFunctionType()) {
++            FunctionType functionType = constructorType.toMaybeFunctionType();
++            if (functionType != null) {
++              for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
++                int i = arg.getIndex();
++                if (functionType.hasParameterAt(i)) {
++                   JSType paramType = functionType.getParameterType(i);
++                   JSType argType = arg.getJSType();
++                   if (argType != null) {
++                      arg.setJSType(paramType);
++                   }
++                 }
++
++
++              }
++
++            }
++
++          }
++
++
+         }
+       }
+     }
+     n.setJSType(type);
+     for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
+       scope = traverse(arg, scope);
+     }
+     return scope;
+   }

@@ -1,0 +1,53 @@
+diff --git a/tmp/f4474738-fc14-48a2-9641-413bbadb5e4d_buggy.java b/tmp/79de728b-1f9c-49bf-9010-f6c79ce898ec_fixed.java
+index 3127f85..76062e1 100644
+--- a/tmp/f4474738-fc14-48a2-9641-413bbadb5e4d_buggy.java
++++ b/tmp/79de728b-1f9c-49bf-9010-f6c79ce898ec_fixed.java
+@@ -1,24 +1,42 @@
+ /**
+  * For this distribution, {@code X}, this method returns {@code P(X < x)}.
+  * If {@code x} is more than 40 standard deviations from the mean, 0 or 1 is returned,
+  * as in these cases the actual value is within {@code Double.MIN_VALUE} of 0 or 1.
+  *
+  * @param x Value at which the CDF is evaluated.
+  * @return CDF evaluated at {@code x}.
+  * @throws MathException if the algorithm fails to converge
+  */
+ public double cumulativeProbability(double x) throws MathException {
+     final double dev = x - mean;
++    final double absDev = FastMath.abs(dev);
++    
++    // Check for extreme values first
++    if (absDev > 40 * standardDeviation) {
++        return dev > 0 ? 1 : 0;
++    }
++    
+     try {
+-        return 0.5 * (1.0 + Erf.erf((dev) /
+-                    (standardDeviation * FastMath.sqrt(2.0))));
++        return 0.5 * (1.0 + Erf.erf(dev / (standardDeviation * FastMath.sqrt(2.0))));
+     } catch (MaxIterationsExceededException ex) {
+-            if (x < (mean - 20 * standardDeviation)) { // JDK 1.5 blows at 38
++        // If Erf.erf fails, use a more robust approximation
++        double z = dev / standardDeviation;
++        double t = 1 / (1 + 0.2316419 * FastMath.abs(z));
++        double y = FastMath.exp(-0.5 * z * z) / FastMath.sqrt(2 * FastMath.PI);
++        
++        double cdf;
++        if (z > 0) {
++            cdf = 1 - y * t * (0.31938153 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
++        } else {
++            cdf = y * t * (0.31938153 + t * (-0.356563782 + t * (1.781477937 + t * (-1.821255978 + t * 1.330274429))));
++        }
++        
++        if (cdf < 0) {
+             return 0;
+-            } else if (x > (mean + 20 * standardDeviation)) {
++        } else if (cdf > 1) {
+             return 1;
+         } else {
+-                throw ex;
++            return cdf;
+         }
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,34 @@
+diff --git a/tmp/39821fb1-d1c2-40a5-a45e-e089fc4f84f8_buggy.java b/tmp/6f5804a6-a191-477b-862b-9d5ad7a308e2_fixed.java
+index 29d025a..9429b8c 100644
+--- a/tmp/39821fb1-d1c2-40a5-a45e-e089fc4f84f8_buggy.java
++++ b/tmp/6f5804a6-a191-477b-862b-9d5ad7a308e2_fixed.java
+@@ -1,13 +1,18 @@
+-    private void _verifySharing()
+-    {
+-        if (_hashShared) {
+-            _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+-            _names = Arrays.copyOf(_names, _names.length);
+-            _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
++private void rehash() {
++    final Entry[] oldHashArea = _hashArea;
++    final int oldCapacity = oldHashArea.length;
++    final int newCapacity = oldCapacity << 1; // double the size
++    _hashArea = new Entry[newCapacity];
++
++    for (int i = 0; i < oldCapacity; i++) {
++        Entry current = oldHashArea[i];
++        while (current != null) {
++            Entry next = current.next;
++            int index = current.hash & (newCapacity - 1);
++            current.next = _hashArea[index];
++            _hashArea[index] = current;
++            current = next;
+         }
+-        if (_needRehash) {
+-            rehash();
+     }
++    _needRehash = false;
+ }
+\ No newline at end of file

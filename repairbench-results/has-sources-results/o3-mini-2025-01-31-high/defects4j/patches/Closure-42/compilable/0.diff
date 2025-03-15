@@ -1,0 +1,19 @@
+diff --git a/tmp/a8897d55-4639-4324-917a-8c1462fbe82a_buggy.java b/tmp/982386e8-899b-4b52-bbee-0fed07512b2c_fixed.java
+index 4d0be80..86f4004 100644
+--- a/tmp/a8897d55-4639-4324-917a-8c1462fbe82a_buggy.java
++++ b/tmp/982386e8-899b-4b52-bbee-0fed07512b2c_fixed.java
+@@ -1,10 +1,11 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
+-
+-        // Return the bare minimum to put the AST in a valid state.
++  if (loopNode.isForEach()) {
++    throw new UnsupportedOperationException("unsupported language extension: for each");
++  }
+   return newNode(
+       Token.FOR,
+       transform(loopNode.getIterator()),
+       transform(loopNode.getIteratedObject()),
+       transformBlock(loopNode.getBody()));
+ }
+\ No newline at end of file

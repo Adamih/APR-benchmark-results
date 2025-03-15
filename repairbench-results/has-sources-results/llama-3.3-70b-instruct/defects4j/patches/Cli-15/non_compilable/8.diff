@@ -1,0 +1,53 @@
+diff --git a/tmp/8fd7b144-0f15-4d01-af4f-971617ed4fb8_buggy.java b/tmp/9ab35f0c-31da-4607-bfc6-e96eb873d2a9_fixed.java
+index 4e8b037..96593b8 100644
+--- a/tmp/8fd7b144-0f15-4d01-af4f-971617ed4fb8_buggy.java
++++ b/tmp/9ab35f0c-31da-4607-bfc6-e96eb873d2a9_fixed.java
+@@ -1,20 +1,38 @@
+-    public List getValues(final Option option,
+-                          List defaultValues) {
++public List getValues(final Option option, List defaultValues) {
+     // initialize the return list
+     List valueList = (List) values.get(option);
+ 
+     // grab the correct default values
+     if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = defaultValues;
+-        }
+-
+-        // augment the list with the default values
+-        if ((valueList == null) || valueList.isEmpty()) {
++        if ((defaultValues == null) || defaultValues.isEmpty()) {
+             valueList = (List) this.defaultValues.get(option);
++        } else {
++            valueList = defaultValues;
+         }
+-                // if there are more default values as specified, add them to
+-                // the list.
++    }
++
++    // if there are more default values as specified, add them to the list.
+     // copy the list first
++    if ((defaultValues!= null) &&!defaultValues.isEmpty()) {
++        List defaultValueList = (List) this.defaultValues.get(option);
++        if (defaultValueList!= null &&!defaultValueList.isEmpty()) {
++            int minLength = Math.max(option.getArgument().getMinimum(), valueList.size());
++            int maxLength = Math.min(option.getArgument().getMaximum(), defaultValueList.size() + valueList.size());
++            if (valueList.size() < minLength) {
++                List LICENSE_HEADER = new ArrayList<>(valueList);
++                for (int i = LICENSE_HEADER.size(); i < minLength; i++) {
++                    LICENSE_HEADER.add(defaultValueList.get(i - valueList.size()));
++                }
++                valueList = LICENSE_HEADER;
++            } else if (valueList.size() < maxLength) {
++                List LICENSE_HEADER = new ArrayList<>(valueList);
++                for (int i = valueList.size(); i < maxLength; i++) {
++                    LICENSE_HEADER.add(defaultValueList.get(i - valueList.size()));
++                }
++                valueList = LICENSE_HEADER;
++            }
++        }
++    }
+ 
+     return valueList == null? Collections.EMPTY_LIST : valueList;
+ }
+\ No newline at end of file

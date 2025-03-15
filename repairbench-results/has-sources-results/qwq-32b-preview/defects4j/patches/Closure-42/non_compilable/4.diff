@@ -1,0 +1,21 @@
+diff --git a/tmp/a6c51f53-99c4-47d5-a0c1-cb9caa0bce84_buggy.java b/tmp/afac660a-9f13-4f99-baf3-ab86d4d10583_fixed.java
+index 4d0be80..c24bd84 100644
+--- a/tmp/a6c51f53-99c4-47d5-a0c1-cb9caa0bce84_buggy.java
++++ b/tmp/afac660a-9f13-4f99-baf3-ab86d4d10583_fixed.java
+@@ -1,10 +1,15 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
+ 
++  // Ensure that we are only processing standard for...in loops
++  if (!loopNode.isForInLoop()) {
++    throw new IllegalArgumentException("Expected a for...in loop node");
++  }
++
+   // Return the bare minimum to put the AST in a valid state.
+   return newNode(
+       Token.FOR,
+       transform(loopNode.getIterator()),
+       transform(loopNode.getIteratedObject()),
+       transformBlock(loopNode.getBody()));
+ }
+\ No newline at end of file

@@ -1,0 +1,25 @@
+diff --git a/tmp/3acb05a4-bd2b-41bd-a81b-a0622725d63d_buggy.java b/tmp/dc87e191-3b68-40f1-b356-db970d7d05ac_fixed.java
+index 5bf31b1..d68aa3d 100644
+--- a/tmp/3acb05a4-bd2b-41bd-a81b-a0622725d63d_buggy.java
++++ b/tmp/dc87e191-3b68-40f1-b356-db970d7d05ac_fixed.java
+@@ -1,17 +1,19 @@
+ private String consumeSubQuery() {
+     StringBuilder sq = StringUtil.borrowBuilder();
+     while (!tq.isEmpty()) {
++        // If a comma is encountered, it's a query group separator; stop consuming.
++        if (tq.matches(",")) break;
+         if (tq.matches("("))
+             sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+         else if (tq.matches("["))
+             sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+         else if (tq.matchesAny(Combinators))
+             if (sq.length() > 0)
+                 break;
+             else
+                 tq.consume();
+         else
+             sq.append(tq.consume());
+     }
+     return StringUtil.releaseBuilder(sq);
+ }
+\ No newline at end of file

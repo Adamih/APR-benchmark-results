@@ -1,0 +1,25 @@
+diff --git a/tmp/c83eae6b-e42f-4b73-a025-258f5a22b0c1_buggy.java b/tmp/7718d42b-06bc-49c0-995d-91f7b4329acb_fixed.java
+index 00914da..ee646b6 100644
+--- a/tmp/c83eae6b-e42f-4b73-a025-258f5a22b0c1_buggy.java
++++ b/tmp/7718d42b-06bc-49c0-995d-91f7b4329acb_fixed.java
+@@ -1,17 +1,17 @@
+ // does not recurse.
+ private void normalise(Element element) {
+     List<Node> toMove = new ArrayList<Node>();
+     for (Node node: element.childNodes) {
+         if (node instanceof TextNode) {
+             TextNode tn = (TextNode) node;
+             if (!tn.isBlank())
+                 toMove.add(tn);
+         }
+     }
+ 
++    // Move the text nodes to the start of the body, maintaining their original order
+     for (Node node: toMove) {
+         element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++        body().prependChild(node);
+     }
+ }
+\ No newline at end of file

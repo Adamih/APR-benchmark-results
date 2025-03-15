@@ -1,0 +1,51 @@
+diff --git a/tmp/e3d071b7-86c3-4201-aa7d-349706c18f2d_buggy.java b/tmp/95e953bb-3102-40fc-a109-a6eead192f50_fixed.java
+index 139579d..8b1cfd5 100644
+--- a/tmp/e3d071b7-86c3-4201-aa7d-349706c18f2d_buggy.java
++++ b/tmp/95e953bb-3102-40fc-a109-a6eead192f50_fixed.java
+@@ -1,43 +1,43 @@
+     // performance sensitive
+     public boolean hasClass(String className) {
+         final String classAttr = attributes.get("class");
+         final int len = classAttr.length();
+         final int wantLen = className.length();
+ 
+         if (len == 0 || len < wantLen) {
+             return false;
+         }
+ 
+-        // if both lengths are equal, only need compare the className with the attribute
++        // if both lengths are equal, compare using regionMatches for consistency
+         if (len == wantLen) {
+-            return className.equalsIgnoreCase(classAttr);
++            return classAttr.regionMatches(true, 0, className, 0, wantLen);
+         }
+ 
+         // otherwise, scan for whitespace and compare regions (with no string or arraylist allocations)
+         boolean inClass = false;
+         int start = 0;
+         for (int i = 0; i < len; i++) {
+             if (Character.isWhitespace(classAttr.charAt(i))) {
+                 if (inClass) {
+                     // white space ends a class name, compare it with the requested one, ignore case
+                     if (i - start == wantLen && classAttr.regionMatches(true, start, className, 0, wantLen)) {
+                         return true;
+                     }
+                     inClass = false;
+                 }
+             } else {
+                 if (!inClass) {
+                     // we're in a class name : keep the start of the substring
+                     inClass = true;
+                     start = i;
+                 }
+             }
+         }
+ 
+         // check the last entry
+         if (inClass && len - start == wantLen) {
+             return classAttr.regionMatches(true, start, className, 0, wantLen);
+         }
+ 
+         return false;
+     }
+\ No newline at end of file

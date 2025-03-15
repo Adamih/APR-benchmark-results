@@ -1,0 +1,16 @@
+diff --git a/tmp/4d0546e4-1c4d-40d4-b2d9-912e1564a1e7_buggy.java b/tmp/b402be42-5967-4149-9c18-db7bdeaba0aa_fixed.java
+index 1c92640..2f7550c 100644
+--- a/tmp/4d0546e4-1c4d-40d4-b2d9-912e1564a1e7_buggy.java
++++ b/tmp/b402be42-5967-4149-9c18-db7bdeaba0aa_fixed.java
+@@ -1,7 +1,11 @@
+     /**
+      * Set the name of the entry.
+      * @param name the name to use
+      */
+     protected void setName(String name) {
++        if (name != null && getPlatform() == PLATFORM_FAT
++            && name.indexOf("/") == -1) {
++            name = name.replace('\\', '/');
++        }
+         this.name = name;
+     }

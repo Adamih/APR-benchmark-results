@@ -1,0 +1,24 @@
+diff --git a/tmp/9db7c274-1736-4b31-b7c7-147d6be94f6a_buggy.java b/tmp/08f4f83b-8bf9-463f-aa33-2602895044fa_fixed.java
+index ef76662..9e5d190 100644
+--- a/tmp/9db7c274-1736-4b31-b7c7-147d6be94f6a_buggy.java
++++ b/tmp/08f4f83b-8bf9-463f-aa33-2602895044fa_fixed.java
+@@ -1,17 +1,17 @@
+ void read(Tokeniser t, CharacterReader r) {
+     char c = r.consume();
+     switch (c) {
+         case '>':
+             t.tagPending.selfClosing = true;
+             t.emitTagPending();
+             t.transition(Data);
+             break;
+         case eof:
+             t.eofError(this);
+             t.transition(Data);
+             break;
+         default:
+-                    t.error(this);
++            r.unconsume(); // unconsume the character so it can be processed as part of the attribute name
+             t.transition(BeforeAttributeName);
+     }
+ }
+\ No newline at end of file

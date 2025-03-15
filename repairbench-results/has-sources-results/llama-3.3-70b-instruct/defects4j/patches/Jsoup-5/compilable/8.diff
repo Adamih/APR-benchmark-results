@@ -1,0 +1,40 @@
+diff --git a/tmp/435e5979-3a97-41ae-a86d-539db7d5100d_buggy.java b/tmp/a41af183-9921-402f-9dfb-dba1da7d4dab_fixed.java
+index 39dd8e7..f888dd7 100644
+--- a/tmp/435e5979-3a97-41ae-a86d-539db7d5100d_buggy.java
++++ b/tmp/a41af183-9921-402f-9dfb-dba1da7d4dab_fixed.java
+@@ -1,30 +1,33 @@
+ private Attribute parseAttribute() {
+     tq.consumeWhitespace();
+     String key = tq.consumeAttributeKey();
+     String value = "";
+     tq.consumeWhitespace();
+     if (tq.matchChomp("=")) {
+         tq.consumeWhitespace();
+ 
+         if (tq.matchChomp(SQ)) {
+             value = tq.chompTo(SQ);
++            tq.matchChomp(SQ); // Consume the closing quote
+         } else if (tq.matchChomp(DQ)) {
+             value = tq.chompTo(DQ);
++            tq.matchChomp(DQ); // Consume the closing quote
+         } else {
+             StringBuilder valueAccum = new StringBuilder();
+             // no ' or " to look for, so scan to end tag or space (or end of stream)
+             while (!tq.matchesAny("<", "/>", ">") &&!tq.matchesWhitespace() &&!tq.isEmpty()) {
+                 valueAccum.append(tq.consume());
+             }
+             value = valueAccum.toString();
+         }
+         tq.consumeWhitespace();
+     }
+     if (key.length()!= 0)
+         return Attribute.createFromEncoded(key, value);
+     else {
++        if (!tq.isEmpty()) {
+             tq.consume();
+-                
++        }
+         return null;
+     }
+ }
+\ No newline at end of file

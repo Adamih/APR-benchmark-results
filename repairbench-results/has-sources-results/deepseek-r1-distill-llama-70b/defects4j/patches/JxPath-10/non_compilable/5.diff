@@ -1,0 +1,30 @@
+diff --git a/tmp/4f9e8798-e316-467f-bae7-ebc8ae3a5c2a_buggy.java b/tmp/34a99c9e-37be-4c23-9a53-25e7b1bee622_fixed.java
+index b86b44d..ed502d6 100644
+--- a/tmp/4f9e8798-e316-467f-bae7-ebc8ae3a5c2a_buggy.java
++++ b/tmp/34a99c9e-37be-4c23-9a53-25e7b1bee622_fixed.java
+@@ -1,4 +1,22 @@
+ public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    Object left = args[0].computeValue(context);
++    Object right = args[1].computeValue(context);
++
++    if (isNodeSetEmpty(left) || isNodeSetEmpty(right)) {
++        if (isEqualsOperation()) {
++            return (isNodeSetEmpty(left) && isNodeSetEmpty(right)) ? Boolean.TRUE : Boolean.FALSE;
++        } else {
++            return Boolean.FALSE;
++        }
++    }
++
++    return compute(left, right) ? Boolean.TRUE : Boolean.FALSE;
++}
++
++private boolean isNodeSetEmpty(Object obj) {
++    return obj instanceof NodeSet && ((NodeSet) obj).isEmpty();
++}
++
++private boolean isEqualsOperation() {
++    return this instanceof Equals;
+ }
+\ No newline at end of file

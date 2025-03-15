@@ -1,0 +1,54 @@
+diff --git a/tmp/a46015f3-b24e-4d6a-a125-780fc9b43d82_buggy.java b/tmp/71c4d331-81e0-4671-b44a-7f3b434ce0e8_fixed.java
+index d87dd79..59065a8 100644
+--- a/tmp/a46015f3-b24e-4d6a-a125-780fc9b43d82_buggy.java
++++ b/tmp/71c4d331-81e0-4671-b44a-7f3b434ce0e8_fixed.java
+@@ -1,47 +1,47 @@
+ @Override
+ protected Object decode(
+         ChannelHandlerContext ctx, Channel channel, ByteBuf buf) throws Exception {
+ 
+     int endIndex = -1;
+     for (int i = buf.writerIndex() - 1; i >= buf.readerIndex(); i--) {
+         if (buf.getByte(i) == ']') {
+-                endIndex = i + 1;
++            endIndex = i;
+             break;
+         }
+     }
+ 
+     if (endIndex > 0) {
+         ByteBuf frame = Unpooled.buffer();
+         while (buf.readerIndex() < endIndex) {
+             byte b1 = buf.readByte();
+             if (b1 == '}') {
+                 byte b2 = buf.readByte();
+                 switch (b2) {
+                     case 0x01:
+                         frame.writeByte('}');
+                         break;
+                     case 0x02:
+                         frame.writeByte('[');
+                         break;
+                     case 0x03:
+                         frame.writeByte(']');
+                         break;
+                     case 0x04:
+                         frame.writeByte(',');
+                         break;
+                     case 0x05:
+                         frame.writeByte('*');
+                         break;
+                     default:
+                         throw new IllegalArgumentException(String.format(
+                                 "unexpected byte at %d: 0x%02x", buf.readerIndex() - 1, b2));
+                 }
+             } else {
+                 frame.writeByte(b1);
+             }
+         }
+         return frame;
+     }
+ 
+     return null;
+ }
+\ No newline at end of file

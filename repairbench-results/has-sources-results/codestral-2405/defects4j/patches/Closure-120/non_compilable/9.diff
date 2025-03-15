@@ -1,0 +1,39 @@
+diff --git a/tmp/eaa5575d-5cff-4818-81d0-70ba7d26f98b_buggy.java b/tmp/ce3f34d2-c89f-41d8-a528-2eb1bfe935f8_fixed.java
+index 07b0792..1289f7d 100644
+--- a/tmp/eaa5575d-5cff-4818-81d0-70ba7d26f98b_buggy.java
++++ b/tmp/ce3f34d2-c89f-41d8-a528-2eb1bfe935f8_fixed.java
+@@ -1,22 +1,26 @@
+-    /**
+-     * @return Whether the variable is only assigned a value once for its
+-     *     lifetime.
+-     */
+ boolean isAssignedOnceInLifetime() {
+   Reference ref = getOneAndOnlyAssignment();
+   if (ref == null) {
+     return false;
+   }
+ 
+   // Make sure this assignment is not in a loop.
+   for (BasicBlock block = ref.getBasicBlock();
+-           block != null; block = block.getParent()) {
+-        if (block.isFunction) {
++       block != null; block = block.getEnclosingBlock()) {
++    if (block.isFunction()) {
+       break;
+-        } else if (block.isLoop) {
++    } else if (block.isLoop()) {
++      return false;
++    }
++  }
++
++  // Check if the variable is reassigned after the initial assignment.
++  List<Reference> allReferences = getAllReferences();
++  for (Reference reference : allReferences) {
++    if (!reference.equals(ref) && reference.isAssignment()) {
+       return false;
+     }
+   }
+ 
+   return true;
+ }
+\ No newline at end of file

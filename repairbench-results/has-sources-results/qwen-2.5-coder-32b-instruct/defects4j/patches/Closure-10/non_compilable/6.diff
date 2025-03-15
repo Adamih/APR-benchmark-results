@@ -1,0 +1,36 @@
+diff --git a/tmp/533a53a2-f011-456e-a923-83af616f6a46_buggy.java b/tmp/3611f3ce-bd03-45a2-bb6d-68481d634c7b_fixed.java
+index 6fecc90..e6f80ed 100644
+--- a/tmp/533a53a2-f011-456e-a923-83af616f6a46_buggy.java
++++ b/tmp/3611f3ce-bd03-45a2-bb6d-68481d634c7b_fixed.java
+@@ -1,7 +1,30 @@
+   static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+       return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+     } else {
++      switch (n.getToken()) {
++        case NAME:
++        case STRING:
++          return true;
++        case NUMBER:
++        case TRUE:
++        case FALSE:
++        case NULL:
++        case THIS:
++        case VOID:
++        case REGEXP:
++          return false;
++        case ADD:
++          // If either child of an ADD node may be a string, the result may be a string.
++          return mayBeString(n.getFirstChild(), false) || mayBeString(n.getSecondChild(), false);
++        case OR:
++        case AND:
++        case HOOK:
++          // For OR, AND, and HOOK (ternary) nodes, we need to check both possible paths.
++          return mayBeString(n.getFirstChild(), false) || mayBeString(n.getSecondChild(), false) ||
++                 (n.hasMoreThanOneChild() && mayBeString(n.getLastChild(), false));
++        default:
+           return mayBeStringHelper(n);
+       }
+     }
++  }
+\ No newline at end of file

@@ -1,0 +1,42 @@
+diff --git a/tmp/85544aa4-6952-4d44-a742-754e37d4b5f0_buggy.java b/tmp/19ec416c-dad0-488d-8183-9b8f74a82414_fixed.java
+index 39dd8e7..0902c23 100644
+--- a/tmp/85544aa4-6952-4d44-a742-754e37d4b5f0_buggy.java
++++ b/tmp/19ec416c-dad0-488d-8183-9b8f74a82414_fixed.java
+@@ -1,30 +1,32 @@
+     private Attribute parseAttribute() {
+         tq.consumeWhitespace();
+         String key = tq.consumeAttributeKey();
+         String value = "";
+         tq.consumeWhitespace();
+         if (tq.matchChomp("=")) {
+             tq.consumeWhitespace();
+ 
+             if (tq.matchChomp(SQ)) {
+                 value = tq.chompTo(SQ);
+             } else if (tq.matchChomp(DQ)) {
+                 value = tq.chompTo(DQ);
+             } else {
+                 StringBuilder valueAccum = new StringBuilder();
+                 // no ' or " to look for, so scan to end tag or space (or end of stream)
+-                while (!tq.matchesAny("<", "/>", ">") && !tq.matchesWhitespace() && !tq.isEmpty()) {
++                while (!tq.matchesAny("<", "/>", ">", "=", "\"", "'") && !tq.matchesWhitespace() && !tq.isEmpty()) {
+                     valueAccum.append(tq.consume());
+                 }
+                 value = valueAccum.toString();
+             }
+             tq.consumeWhitespace();
+         }
+-        if (key.length() != 0)
++        if (key != null && key.length() != 0) { // Added null check for key
+             return Attribute.createFromEncoded(key, value);
+-        else {
++        } else {
++            // If no valid key is found, handle by skipping unexpected tokens.
++            while (!tq.isEmpty() && !tq.matchesAny(">", "/>", "<") && !tq.matchesWhitespace()) {
+                 tq.consume();
+-                
++            }
+             return null;
+         }
+     }
+\ No newline at end of file

@@ -1,0 +1,22 @@
+diff --git a/tmp/c9c9e2d9-02aa-46c8-a8a2-cbf17b3f7bf4_buggy.java b/tmp/426b2383-f1ee-47db-90a9-44ee9a7778f0_fixed.java
+index 3ba614a..9219e53 100644
+--- a/tmp/c9c9e2d9-02aa-46c8-a8a2-cbf17b3f7bf4_buggy.java
++++ b/tmp/426b2383-f1ee-47db-90a9-44ee9a7778f0_fixed.java
+@@ -1,9 +1,14 @@
+ @Override
+ public int read() throws IOException {
+     int current = super.read();
+-        if (current == '\n') {
++    if (current == '\r') {
+         lineCounter++;
++    } else if (current == '\n') {
++        // When a CR is immediately followed by an LF, we count it only once.
++        if (lastChar != '\r') {
++            lineCounter++;
++        }
+     }
+     lastChar = current;
+-        return lastChar;
++    return current;
+ }
+\ No newline at end of file

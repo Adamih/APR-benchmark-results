@@ -1,0 +1,13 @@
+diff --git a/tmp/5076a1c0-5d67-4f89-888d-d54c41ddf046_buggy.java b/tmp/63264de9-78cb-4419-b9cb-9599f5ddfd59_fixed.java
+index f1d02c1..b13c03b 100644
+--- a/tmp/5076a1c0-5d67-4f89-888d-d54c41ddf046_buggy.java
++++ b/tmp/63264de9-78cb-4419-b9cb-9599f5ddfd59_fixed.java
+@@ -1,4 +1,7 @@
+ @Override
+ protected JSType caseTopType(JSType topType) {
++  if (topType.isObject() && topType.hasProperty("length") && topType.getPropertyType("length").isNumber()) {
++    return getNativeType(JSTypeNative.ARRAY_TYPE);
++  }
+   return topType;
+ }
+\ No newline at end of file

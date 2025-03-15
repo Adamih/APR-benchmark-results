@@ -1,0 +1,35 @@
+diff --git a/tmp/6745435a-2312-4ddd-b60b-8c60a7e0c54b_buggy.java b/tmp/47dc7aea-68f3-4977-9d0c-b61febe5a5fb_fixed.java
+index 1a63a66..bbde0fc 100644
+--- a/tmp/6745435a-2312-4ddd-b60b-8c60a7e0c54b_buggy.java
++++ b/tmp/47dc7aea-68f3-4977-9d0c-b61febe5a5fb_fixed.java
+@@ -1,21 +1,16 @@
+ @Override
+ @Deprecated
+ protected JavaType _narrow(Class<?> subclass)
+ {
+     if (_class == subclass) {
+         return this;
+     }
+-        // Should we check that there is a sub-class relationship?
+-        // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+-        //    placeholder values (`Void`, `NoClass`), so can not quite do yet.
+-        // TODO: fix in 2.8
+-            /*
+-            throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+-                    +_class.getName());
+-                    */
+-            return new SimpleType(subclass, _bindings, this, _superInterfaces,
+-                    _valueHandler, _typeHandler, _asStatic);
+-        // Otherwise, stitch together the hierarchy. First, super-class
+-        // if not found, try a super-interface
+-        // should not get here but...
++
++    // Creating a new array with the old superInterfaces and the subclass's interfaces
++    HashSet<JavaType> newSuperInterfaces = new HashSet<>(_superInterfaces);
++    for(JavaType interfaceType : _bindings.getRegisteredSubtypes(subclass)) {
++        newSuperInterfaces.add(interfaceType);
++    }
++
++    return new SimpleType(subclass, _bindings, this, newSuperInterfaces, _valueHandler, _typeHandler, _asStatic);
+ }
+\ No newline at end of file

@@ -1,0 +1,52 @@
+diff --git a/tmp/ce285e6e-bc18-4520-9c7c-52cb534cee55_buggy.java b/tmp/776bd5f8-dc64-4afb-8510-62c3b8357c7d_fixed.java
+index b98f0a7..9ea33ad 100644
+--- a/tmp/ce285e6e-bc18-4520-9c7c-52cb534cee55_buggy.java
++++ b/tmp/776bd5f8-dc64-4afb-8510-62c3b8357c7d_fixed.java
+@@ -1,29 +1,38 @@
+ private FlowScope traverseNew(Node n, FlowScope scope) {
+-
+     Node constructor = n.getFirstChild();
+     scope = traverse(constructor, scope);
+     JSType constructorType = constructor.getJSType();
+     JSType type = null;
+     if (constructorType != null) {
+         constructorType = constructorType.restrictByNotNullOrUndefined();
+         if (constructorType.isUnknownType()) {
+             type = getNativeType(UNKNOWN_TYPE);
+         } else {
+             FunctionType ct = constructorType.toMaybeFunctionType();
+             if (ct == null && constructorType instanceof FunctionType) {
+-          // If constructorType is a NoObjectType, then toMaybeFunctionType will
+-          // return null. But NoObjectType implements the FunctionType
+-          // interface, precisely because it can validly construct objects.
+                 ct = (FunctionType) constructorType;
+             }
+             if (ct != null && ct.isConstructor()) {
+                 type = ct.getInstanceType();
+-        }
+-      }
+-    }
+-    n.setJSType(type);
++
++                // Add this block to handle parameter type inference
++                int paramIndex = 0;
+                 for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
++                    if (paramIndex < ct.getParameters().size()) {
++                        JSType paramType = ct.getParameters().get(paramIndex).getJSType();
++                        if (paramType != null) {
+                             scope = traverse(arg, scope);
++                            JSType argType = arg.getJSType();
++                            if (argType != null) {
++                                scope = scope.inferTypeFromPattern(paramType, argType);
+                             }
++                        }
++                    }
++                    paramIndex++;
++                }
++            }
++        }
++    }
++    n.setJSType(type);
+     return scope;
+ }
+\ No newline at end of file

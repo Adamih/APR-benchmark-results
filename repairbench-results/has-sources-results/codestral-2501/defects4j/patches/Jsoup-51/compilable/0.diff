@@ -1,0 +1,17 @@
+diff --git a/tmp/52677e57-89b2-44cd-b767-27cd2c88c720_buggy.java b/tmp/d312dc63-7b5d-4391-974e-a6051f59a4f1_fixed.java
+index 84989ca..83feadb 100644
+--- a/tmp/52677e57-89b2-44cd-b767-27cd2c88c720_buggy.java
++++ b/tmp/d312dc63-7b5d-4391-974e-a6051f59a4f1_fixed.java
+@@ -1,6 +1,10 @@
+ boolean matchesLetter() {
+     if (isEmpty())
+         return false;
+     char c = input[pos];
+-        return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
++    return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
++           (c >= '\u00C0' && c <= '\u00FF') || // Latin-1 Supplement
++           (c >= '\u0100' && c <= '\u017F') || // Latin Extended-A
++           (c >= '\u0180' && c <= '\u024F') || // Latin Extended-B
++           (c >= '\u1E00' && c <= '\u1EFF');   // Latin Extended Additional
+ }
+\ No newline at end of file

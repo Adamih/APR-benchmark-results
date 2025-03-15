@@ -1,0 +1,34 @@
+diff --git a/tmp/2ba63cc0-5a21-46c2-afc7-58b57ead5d13_buggy.java b/tmp/b5af382c-b161-46db-9f6a-8439df97cc7f_fixed.java
+index 511560e..7ef1046 100644
+--- a/tmp/2ba63cc0-5a21-46c2-afc7-58b57ead5d13_buggy.java
++++ b/tmp/b5af382c-b161-46db-9f6a-8439df97cc7f_fixed.java
+@@ -1,21 +1,19 @@
+ private boolean inSpecificScope(String[] targetNames, String[] baseTypes, String[] extraTypes) {
+-        // https://html.spec.whatwg.org/multipage/parsing.html#has-an-element-in-the-specific-scope
+-        int bottom = stack.size() -1;
+-        if (bottom > MaxScopeSearchDepth) {
+-            bottom = MaxScopeSearchDepth;
+-        }
+-        final int top = bottom > MaxScopeSearchDepth ? bottom - MaxScopeSearchDepth : 0;
+-        // don't walk too far up the tree
++    // The intent is to check only the last MaxScopeSearchDepth elements on the stack,
++    // starting at the current node (stack top). This follows the spec for “has an element
++    // in the specific scope.” If the stack is very deep, we only examine the most recent elements.
++    int size = stack.size();
++    int bottom = size - 1;
++    int top = Math.max(size - MaxScopeSearchDepth, 0);
+ 
+     for (int pos = bottom; pos >= top; pos--) {
+-            final String elName = stack.get(pos).nodeName();
++        String elName = stack.get(pos).nodeName();
+         if (inSorted(elName, targetNames))
+             return true;
+         if (inSorted(elName, baseTypes))
+             return false;
+         if (extraTypes != null && inSorted(elName, extraTypes))
+             return false;
+     }
+-        //Validate.fail("Should not be reachable"); // would end up false because hitting 'html' at root (basetypes)
+     return false;
+ }
+\ No newline at end of file

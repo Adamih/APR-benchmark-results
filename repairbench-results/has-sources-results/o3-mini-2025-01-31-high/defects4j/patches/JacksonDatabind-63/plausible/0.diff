@@ -1,0 +1,55 @@
+diff --git a/tmp/f2a983a1-4a6d-41d4-af0c-00b48726eb10_buggy.java b/tmp/4a354e68-a70f-403e-8acd-cdccd8ac5f50_fixed.java
+index f955f47..c490308 100644
+--- a/tmp/f2a983a1-4a6d-41d4-af0c-00b48726eb10_buggy.java
++++ b/tmp/4a354e68-a70f-403e-8acd-cdccd8ac5f50_fixed.java
+@@ -1,34 +1,37 @@
+ public String getDescription() {
+     if (_desc == null) {
+         StringBuilder sb = new StringBuilder();
+ 
+         if (_from == null) { // can this ever occur?
+             sb.append("UNKNOWN");
+         } else {
+             Class<?> cls = (_from instanceof Class<?>) ? (Class<?>) _from : _from.getClass();
+-                    // Hmmh. Although Class.getName() is mostly ok, it does look
+-                    // butt-ugly for arrays.
+-                    // 06-Oct-2016, tatu: as per [databind#1403], `getSimpleName()` not so good
+-                    //   as it drops enclosing class. So let's try bit different approach
+-                    String pkgName = com.fasterxml.jackson.databind.util.ClassUtil.getPackageName(cls);
+-                    if (pkgName != null) {
+-                        sb.append(pkgName);
+-                        sb.append('.');
++            if (cls.isArray()) {
++                int dims = 0;
++                Class<?> componentType = cls;
++                while (componentType.isArray()) {
++                    ++dims;
++                    componentType = componentType.getComponentType();
++                }
++                sb.append(componentType.getName());
++                for (int i = 0; i < dims; i++) {
++                    sb.append("[]");
++                }
++            } else {
++                // Use getName() so that for inner classes we get the full name including the enclosing class.
++                sb.append(cls.getName());
+             }
+-                    sb.append(cls.getSimpleName());
+         }
+         sb.append('[');
+         if (_fieldName != null) {
+-                    sb.append('"');
+-                    sb.append(_fieldName);
+-                    sb.append('"');
++            sb.append('"').append(_fieldName).append('"');
+         } else if (_index >= 0) {
+             sb.append(_index);
+         } else {
+             sb.append('?');
+         }
+         sb.append(']');
+         _desc = sb.toString();
+     }
+     return _desc;
+ }
+\ No newline at end of file

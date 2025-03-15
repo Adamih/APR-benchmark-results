@@ -1,0 +1,38 @@
+diff --git a/tmp/6ea92376-01ae-4c1d-a14a-6f6111682f55_buggy.java b/tmp/7886ac76-dfb8-44b0-a4b8-06e6a81ac6aa_fixed.java
+index f47d784..02eabbe 100644
+--- a/tmp/6ea92376-01ae-4c1d-a14a-6f6111682f55_buggy.java
++++ b/tmp/7886ac76-dfb8-44b0-a4b8-06e6a81ac6aa_fixed.java
+@@ -1,12 +1,32 @@
+   @Override
+   public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
++
++    // Fix: Restore the "arguments" variable if shadowed after process
++    restoreShadowedArguments(root);
++  }
++
++  private void restoreShadowedArguments(Node root) {
++    NodeTraversal.traverse(compiler, root, new NodeTraversal.Callback() {
++      @Override
++      public boolean shouldTraverse(NodeTraversal t, Node n, Node parent) {
++        return true;
++      }
++
++      @Override
++      public void visit(NodeTraversal t, Node n, Node parent) {
++        if (n.isName() && "arguments".equals(n.getString())) {
++          // Perform necessary fix to restore the original "arguments"
++          n.putBooleanProp(Node.IS_ARGUMENTS, true);
++        }
++      }
++    });
+   }
+\ No newline at end of file

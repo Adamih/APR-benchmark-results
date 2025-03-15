@@ -1,0 +1,29 @@
+diff --git a/tmp/e194c611-2a5b-4528-ae55-c0c88587e979_buggy.java b/tmp/343440ba-de62-4367-890f-f462f29c0e1f_fixed.java
+index 8afddc6..314f349 100644
+--- a/tmp/e194c611-2a5b-4528-ae55-c0c88587e979_buggy.java
++++ b/tmp/343440ba-de62-4367-890f-f462f29c0e1f_fixed.java
+@@ -1,22 +1,22 @@
+   @Override
+   protected CompilerOptions createOptions() {
+     CompilerOptions options = new CompilerOptions();
+     options.setCodingConvention(new ClosureCodingConvention());
+     CompilationLevel level = flags.compilation_level;
+     level.setOptionsForCompilationLevel(options);
+     if (flags.debug) {
+       level.setDebugOptionsForCompilationLevel(options);
+     }
+ 
+     WarningLevel wLevel = flags.warning_level;
+     wLevel.setOptionsForWarningLevel(options);
+     for (FormattingOption formattingOption : flags.formatting) {
+       formattingOption.applyToOptions(options);
+     }
+     if (flags.process_closure_primitives) {
+-      options.closurePass = true;
++      options.setProcessClosurePrimitives(flags.process_closure_primitives);
+     }
+ 
+     initOptionsFromFlags(options);
+     return options;
+   }
+\ No newline at end of file

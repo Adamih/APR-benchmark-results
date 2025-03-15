@@ -1,0 +1,47 @@
+diff --git a/tmp/e3f76605-4a52-4223-834b-5bf7b9cdb969_buggy.java b/tmp/df4559f1-a863-48c5-9e38-c3ab2370363c_fixed.java
+index b2db1d6..d57c591 100644
+--- a/tmp/e3f76605-4a52-4223-834b-5bf7b9cdb969_buggy.java
++++ b/tmp/df4559f1-a863-48c5-9e38-c3ab2370363c_fixed.java
+@@ -1,29 +1,29 @@
+ protected void _addMethodMixIns(Class<?> targetClass, AnnotatedMethodMap methods,
+-            Class<?> mixInCls, AnnotatedMethodMap mixIns)
+-    {
+-        List<Class<?>> parents = new ArrayList<Class<?>>();
++        Class<?> mixInCls, AnnotatedMethodMap mixIns) {
++    List<Class<?>> parents = new ArrayList<>();
+     parents.add(mixInCls);
+     ClassUtil.findSuperTypes(mixInCls, targetClass, parents);
+     for (Class<?> mixin : parents) {
+         for (Method m : mixin.getDeclaredMethods()) {
+             if (!_isIncludableMemberMethod(m)) {
+                 continue;
+             }
+             AnnotatedMethod am = methods.find(m);
+-                /* Do we already have a method to augment (from sub-class
+-                 * that will mask this mixIn)? If so, add if visible
+-                 * without masking (no such annotation)
+-                 */
++            // Check if the method is already present in the target methods
+             if (am != null) {
+                 _addMixUnders(m, am);
+-                    /* Otherwise will have precedence, but must wait
+-                     * until we find the real method (mixIn methods are
+-                     * just placeholder, can't be called)
+-                     */
++                // If already present, no need to add to mixIns
+             } else {
+-                    // Well, or, as per [Issue#515], multi-level merge within mixins...
++                // Check if the method is already present in mixIns
++                AnnotatedMethod existingMixIn = mixIns.find(m);
++                if (existingMixIn != null) {
++                    // Merge the new mixin method with the existing one
++                    _mergeMixIns(existingMixIn, _constructMethod(m));
++                } else {
++                    // Add the new mixin method to the mixIns map
+                     mixIns.add(_constructMethod(m));
+                 }
+             }
+         }
+     }
++}
+\ No newline at end of file

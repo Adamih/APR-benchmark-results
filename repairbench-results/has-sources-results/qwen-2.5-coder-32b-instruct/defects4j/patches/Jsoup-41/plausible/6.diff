@@ -1,0 +1,21 @@
+diff --git a/tmp/5f9195b4-c908-43c0-80bf-e189d02bd880_buggy.java b/tmp/d7a5e4b2-479c-4d3e-a4f2-9dd0f32e90ef_fixed.java
+index d457dbe..d1c8035 100644
+--- a/tmp/5f9195b4-c908-43c0-80bf-e189d02bd880_buggy.java
++++ b/tmp/d7a5e4b2-479c-4d3e-a4f2-9dd0f32e90ef_fixed.java
+@@ -1,10 +1,14 @@
+ @Override
+ public boolean equals(Object o) {
+     if (this == o) return true;
+     if (o == null || getClass() != o.getClass()) return false;
+     if (!super.equals(o)) return false;
+ 
+     Element element = (Element) o;
+ 
+-        return this == o;
++    // Compare the necessary fields of the Element class
++    return Objects.equals(attributes(), element.attributes()) &&
++           Objects.equals(tagName(), element.tagName()) &&
++           Objects.equals(baseUri(), element.baseUri()) &&
++           Objects.equals(childNodes(), element.childNodes());
+ }
+\ No newline at end of file

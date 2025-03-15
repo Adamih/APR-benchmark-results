@@ -1,0 +1,23 @@
+diff --git a/tmp/1bf156ee-e614-49ae-9ba7-2599731376a9_buggy.java b/tmp/98d57b85-4b0e-4822-ac6e-d4e00f0933ea_fixed.java
+index c9c2b44..7ff85f5 100644
+--- a/tmp/1bf156ee-e614-49ae-9ba7-2599731376a9_buggy.java
++++ b/tmp/98d57b85-4b0e-4822-ac6e-d4e00f0933ea_fixed.java
+@@ -1,13 +1,14 @@
+ @Override
+ public boolean matches(Element root, Element element) {
++    Element currentElement = element;
+     // evaluate from last to first
+     for (int i = evaluators.size() - 1; i >= 0; --i) {
+-                if (element == null)
++        if (currentElement == null)
+             return false;
+         Evaluator eval = evaluators.get(i);
+-                if (!eval.matches(root, element))
++        if (!eval.matches(root, currentElement))
+             return false;
+-                element = element.parent();
++        currentElement = currentElement.parent();
+     }
+     return true;
+ }
+\ No newline at end of file

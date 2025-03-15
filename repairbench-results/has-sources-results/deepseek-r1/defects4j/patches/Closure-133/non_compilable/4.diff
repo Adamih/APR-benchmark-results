@@ -1,0 +1,25 @@
+diff --git a/tmp/a6b2f859-669f-48e3-9fc1-2f145f98750e_buggy.java b/tmp/ab66b015-e99a-46b0-8917-6eafb6b160ca_fixed.java
+index 42d4174..52a2863 100644
+--- a/tmp/a6b2f859-669f-48e3-9fc1-2f145f98750e_buggy.java
++++ b/tmp/ab66b015-e99a-46b0-8917-6eafb6b160ca_fixed.java
+@@ -1,7 +1,17 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
+-    String result = stream.getRemainingJSDocLine();
+-    return result;
++    StringBuilder sb = new StringBuilder();
++    while (!stream.eof() && stream.peek() != '\n' && stream.peek() != '\r') {
++      sb.append(stream.getNextChar());
++    }
++    // Consume the line terminator(s)
++    if (!stream.eof()) {
++      char c = stream.getNextChar();
++      if (c == '\r' && !stream.eof() && stream.peek() == '\n') {
++        stream.getNextChar();
++      }
++    }
++    return sb.toString();
+   }
+\ No newline at end of file

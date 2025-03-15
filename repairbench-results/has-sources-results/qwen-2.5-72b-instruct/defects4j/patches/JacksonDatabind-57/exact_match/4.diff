@@ -1,0 +1,20 @@
+diff --git a/tmp/e728d739-5119-4680-8c72-8cf80c56f8a2_buggy.java b/tmp/b6294140-0cea-4850-a054-ac6336efac3e_fixed.java
+index 08a41cf..4e92db9 100644
+--- a/tmp/e728d739-5119-4680-8c72-8cf80c56f8a2_buggy.java
++++ b/tmp/b6294140-0cea-4850-a054-ac6336efac3e_fixed.java
+@@ -1,12 +1,13 @@
+     /**
+      * Overloaded version of {@link #readValue(InputStream)}.
+      */
+     public <T> MappingIterator<T> readValues(byte[] src, int offset, int length)
+         throws IOException, JsonProcessingException
+     {
+         if (_dataFormatReaders != null) {
+             return _detectBindAndReadValues(_dataFormatReaders.findFormat(src, offset, length), false);
+         }
+-        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src),
++        // Ensure the parser is created with the correct range of the byte array
++        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src, offset, length),
+                 true));
+     }
+\ No newline at end of file

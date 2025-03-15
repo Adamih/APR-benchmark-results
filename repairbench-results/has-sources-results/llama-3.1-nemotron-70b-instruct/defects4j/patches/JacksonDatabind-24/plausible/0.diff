@@ -1,0 +1,23 @@
+diff --git a/tmp/018256a3-1bd8-4222-ac57-fc62b475595f_buggy.java b/tmp/b539f9a0-b08b-47d9-a442-38b9530572aa_fixed.java
+index 0502fea..0cc6a1e 100644
+--- a/tmp/018256a3-1bd8-4222-ac57-fc62b475595f_buggy.java
++++ b/tmp/b539f9a0-b08b-47d9-a442-38b9530572aa_fixed.java
+@@ -1,9 +1,16 @@
++/**
++ * Method for changing the underlying Date Format used for serialization and deserialization.
++ * Note that calling this method will not change settings of existing mapper instances.
++ *
++ * @param df Date format to use for serialization and deserialization
++ * @return Modified mapper instance (this, to allow chaining)
++ */
+ public BaseSettings withDateFormat(DateFormat df) {
+     if (_dateFormat == df) {
+         return this;
+     }
+-        TimeZone tz = (df == null) ? _timeZone : df.getTimeZone();
++    TimeZone tz = _timeZone; // Always use the existing time zone, not the one from the provided DateFormat
+     return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+             _typeResolverBuilder, df, _handlerInstantiator, _locale,
+             tz, _defaultBase64);
+ }
+\ No newline at end of file

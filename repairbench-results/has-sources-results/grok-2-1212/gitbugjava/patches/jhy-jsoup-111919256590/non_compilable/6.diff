@@ -1,0 +1,15 @@
+diff --git a/tmp/472054a4-ca89-453f-acb2-43ffbe953de3_buggy.java b/tmp/7d278368-db4a-4127-b5d4-c40fb10d9008_fixed.java
+index e807cbf..05bcd53 100644
+--- a/tmp/472054a4-ca89-453f-acb2-43ffbe953de3_buggy.java
++++ b/tmp/7d278368-db4a-4127-b5d4-c40fb10d9008_fixed.java
+@@ -1,7 +1,8 @@
+ private boolean isInlineable(Document.OutputSettings out) {
+     if (!tag.isInline())
+         return false;
+     return (parent() == null || parent().isBlock())
+         && !isEffectivelyFirst()
+-            && !out.outline();
++        && !out.prettyPrint() // Changed from out.outline() to out.prettyPrint()
++        || tag.getName().equals("br"); // Added this condition for <br> elements
+ }
+\ No newline at end of file

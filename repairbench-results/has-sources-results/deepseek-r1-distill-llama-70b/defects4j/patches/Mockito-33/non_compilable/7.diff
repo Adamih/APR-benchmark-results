@@ -1,0 +1,16 @@
+diff --git a/tmp/ab0a4531-996e-4eab-81d7-906acbd34d61_buggy.java b/tmp/ded8df13-10b0-472f-aa38-5882963625a1_fixed.java
+index e1fc51f..fa0338c 100644
+--- a/tmp/ab0a4531-996e-4eab-81d7-906acbd34d61_buggy.java
++++ b/tmp/ded8df13-10b0-472f-aa38-5882963625a1_fixed.java
+@@ -1,9 +1,5 @@
+     public boolean hasSameMethod(Invocation candidate) {        
+-        //not using method.equals() for 1 good reason:
+-        //sometimes java generates forwarding methods when generics are in play see JavaGenericsForwardingMethodsTest
+         Method m1 = invocation.getMethod();
+         Method m2 = candidate.getMethod();
+-        
+-        	/* Avoid unnecessary cloning */
+-        return m1.equals(m2);
++        return org.mockito.util.Util.sameMethod(m1, m2);
+     }
+\ No newline at end of file

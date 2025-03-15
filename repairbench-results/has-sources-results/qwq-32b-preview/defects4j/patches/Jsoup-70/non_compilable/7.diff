@@ -1,0 +1,22 @@
+diff --git a/tmp/dcb07b72-a654-4f32-a9d5-691e8d33e134_buggy.java b/tmp/177d52f3-b4c9-4e3b-9b02-71d2908944ca_fixed.java
+index 6c87721..28b97fa 100644
+--- a/tmp/dcb07b72-a654-4f32-a9d5-691e8d33e134_buggy.java
++++ b/tmp/177d52f3-b4c9-4e3b-9b02-71d2908944ca_fixed.java
+@@ -1,11 +1,6 @@
+-    static boolean preserveWhitespace(Node node) {
+-        // looks only at this element and five levels up, to prevent recursion & needless stack searches
+-        if (node != null && node instanceof Element) {
+-            Element el = (Element) node;
+-                if (el.tag.preserveWhitespace())
+-                    return true;
+-                else
+-                    return el.parent() != null && el.parent().tag.preserveWhitespace();
+-        }
+-        return false;
++@Test public void testKeepsPreTextAtDepth() {
++    String h = "<pre><code><span><b>code\n\ncode</b></span></code></pre>";
++    Document doc = Jsoup.parse(h);
++    assertEquals("code\n\ncode", doc.text());
++    assertEquals("<pre><code><span><b>code\n\ncode</b></span></code></pre>", doc.body().html());
+ }
+\ No newline at end of file

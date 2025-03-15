@@ -1,0 +1,36 @@
+diff --git a/tmp/565625c6-57e6-4ea9-ac91-7adc3973b09b_buggy.java b/tmp/8046bf81-5b2d-4299-9e8c-5140e471f533_fixed.java
+index a7f0d46..f662adc 100644
+--- a/tmp/565625c6-57e6-4ea9-ac91-7adc3973b09b_buggy.java
++++ b/tmp/8046bf81-5b2d-4299-9e8c-5140e471f533_fixed.java
+@@ -1,22 +1,23 @@
++/**
++ * Appends new code to the output, ensuring proper spacing after word characters or backslashes.
++ * 
++ * @param newcode the code to append
++ */
+ void add(String newcode) {
+     maybeEndStatement();
+ 
+     if (newcode.length() == 0) {
+       return;
+     }
+ 
+     char c = newcode.charAt(0);
+     if ((isWordChar(c) || c == '\\') &&
+         isWordChar(getLastChar())) {
+-      // need space to separate. This is not pretty printing.
+-      // For example: "return foo;"
++      // need space to separate, but skip if following a DIV (forward slash)
++      if (getLastChar()!= '/' ||!(c == ' ' && newcode.length() > 1 && newcode.charAt(1) == '/')) {
+         append(" ");
+-      // Do not allow a forward slash to appear after a DIV.
+-      // For example,
+-      // REGEXP DIV REGEXP
+-      // is valid and should print like
+-      // / // / /
++      }
+     }
+ 
+     append(newcode);
+ }
+\ No newline at end of file

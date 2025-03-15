@@ -1,0 +1,22 @@
+diff --git a/tmp/754ba9ac-d8f7-41db-a766-7b252b04cf2a_buggy.java b/tmp/5a9e7fe0-a489-4b94-b813-d1ac7f501156_fixed.java
+index c9c2b44..b14aae5 100644
+--- a/tmp/754ba9ac-d8f7-41db-a766-7b252b04cf2a_buggy.java
++++ b/tmp/5a9e7fe0-a489-4b94-b813-d1ac7f501156_fixed.java
+@@ -1,13 +1,15 @@
+ @Override
+ public boolean matches(Element root, Element element) {
++    Element originalElement = element;
+     // evaluate from last to first
+     for (int i = evaluators.size() - 1; i >= 0; --i) {
+         if (element == null)
+             return false;
+         Evaluator eval = evaluators.get(i);
+         if (!eval.matches(root, element))
+             return false;
++        if (i > 0) // Only move up the tree if there are more evaluators
+             element = element.parent();
+     }
+-            return true;
++    return element == root || element.isDescendantOf(root);
+ }
+\ No newline at end of file

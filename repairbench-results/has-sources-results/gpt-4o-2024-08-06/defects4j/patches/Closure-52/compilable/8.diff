@@ -1,0 +1,24 @@
+diff --git a/tmp/47141cba-81b6-4c79-8797-2755411dfede_buggy.java b/tmp/add19a9c-9d92-4b61-a1d9-7f259aa88560_fixed.java
+index 4b7f469..9924e2d 100644
+--- a/tmp/47141cba-81b6-4c79-8797-2755411dfede_buggy.java
++++ b/tmp/add19a9c-9d92-4b61-a1d9-7f259aa88560_fixed.java
+@@ -1,10 +1,16 @@
+   static boolean isSimpleNumber(String s) {
+     int len = s.length();
++    boolean containsDigit = false;
+     for (int index = 0; index < len; index++) {
+       char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++      if (c >= '0' && c <= '9') {
++        containsDigit = true;
++      } else if (index == 0 && (c == '-' || c == '.')) {
++        // Allow '-' or '.' only at the start
++        continue;
++      } else {
+         return false;
+       }
+     }
+-    return len > 0;
++    return containsDigit;
+   }
+\ No newline at end of file

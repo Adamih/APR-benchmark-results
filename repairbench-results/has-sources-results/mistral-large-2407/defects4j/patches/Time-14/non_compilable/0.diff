@@ -1,0 +1,40 @@
+diff --git a/tmp/c835394d-062f-41ee-a474-06021a635a49_buggy.java b/tmp/67d522cd-b6bd-469c-9924-8c23aab0ff43_fixed.java
+index 10616db..00d513a 100644
+--- a/tmp/c835394d-062f-41ee-a474-06021a635a49_buggy.java
++++ b/tmp/67d522cd-b6bd-469c-9924-8c23aab0ff43_fixed.java
+@@ -1,19 +1,33 @@
+     //-----------------------------------------------------------------------
+     public int[] add(ReadablePartial partial, int fieldIndex, int[] values, int valueToAdd) {
+         // overridden as superclass algorithm can't handle
+         // 2004-02-29 + 48 months -> 2008-02-29 type dates
+         if (valueToAdd == 0) {
+             return values;
+         }
+         // month is largest field and being added to, such as month-day
+         if (DateTimeUtils.isContiguous(partial)) {
+             long instant = 0L;
+             for (int i = 0, isize = partial.size(); i < isize; i++) {
+                 instant = partial.getFieldType(i).getField(iChronology).set(instant, values[i]);
+             }
+             instant = add(instant, valueToAdd);
+-            return iChronology.get(partial, instant);
++            int[] newValues = iChronology.get(partial, instant);
++            return adjustForLeapYear(partial, newValues);
+         } else {
+             return super.add(partial, fieldIndex, values, valueToAdd);
+         }
+     }
++
++    private int[] adjustForLeapYear(ReadablePartial partial, int[] values) {
++        // Handle leap year adjustments
++        int month = values[0]; // Assuming month is the first value
++        int day = values[1]; // Assuming day is the second value
++        int year = iChronology.year().get(instant);
++        if (month == 2 && day == 29) {
++            if (!iChronology.year().isLeap(year)) {
++                values[1] = iChronology.dayOfMonth().getMaximumValue(year, month);
++            }
++        }
++        return values;
++    }
+\ No newline at end of file

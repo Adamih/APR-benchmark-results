@@ -1,0 +1,20 @@
+diff --git a/tmp/9d8b60fe-fb37-4c38-8eed-2dec8fcfe2cc_buggy.java b/tmp/a3dc3a14-c912-43e8-bc35-37978668c76a_fixed.java
+index 6c3142f..15324b1 100644
+--- a/tmp/9d8b60fe-fb37-4c38-8eed-2dec8fcfe2cc_buggy.java
++++ b/tmp/a3dc3a14-c912-43e8-bc35-37978668c76a_fixed.java
+@@ -1,10 +1,13 @@
+ static boolean isSimpleNumber(String s) {
++    // Allow for object property syntax (e.g., {[0]: 1})
++    if (s.startsWith("{") && s.endsWith("}")) return true;
++    
+     int len = s.length();
+     for (int index = 0; index < len; index++) {
+       char c = s.charAt(index);
+       if (c < '0' || c > '9') {
+         return false;
+       }
+     }
+-    return len > 0 && s.charAt(0) != '0';
++    return len > 0 && (len > 1 || s.charAt(0)!= '0');
+ }
+\ No newline at end of file

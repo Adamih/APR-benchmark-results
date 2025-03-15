@@ -1,0 +1,31 @@
+diff --git a/tmp/9f6e83db-1a18-4bee-8cd5-5be1384ce149_buggy.java b/tmp/b7bc2652-78f7-4add-b81d-7d77955e9b52_fixed.java
+index 8afddc6..43ef021 100644
+--- a/tmp/9f6e83db-1a18-4bee-8cd5-5be1384ce149_buggy.java
++++ b/tmp/b7bc2652-78f7-4add-b81d-7d77955e9b52_fixed.java
+@@ -1,22 +1,22 @@
+ @Override
+ protected CompilerOptions createOptions() {
+   CompilerOptions options = new CompilerOptions();
+   options.setCodingConvention(new ClosureCodingConvention());
+   CompilationLevel level = flags.compilation_level;
+   level.setOptionsForCompilationLevel(options);
+   if (flags.debug) {
+     level.setDebugOptionsForCompilationLevel(options);
+   }
+ 
+   WarningLevel wLevel = flags.warning_level;
+   wLevel.setOptionsForWarningLevel(options);
+   for (FormattingOption formattingOption : flags.formatting) {
+     formattingOption.applyToOptions(options);
+   }
+-    if (flags.process_closure_primitives) {
+-      options.closurePass = true;
+-    }
++
++  // Fix: Added the condition check for the primitive processing option
++  options.closurePass = flags.process_closure_primitives;
+ 
+   initOptionsFromFlags(options);
+   return options;
+ }
+\ No newline at end of file

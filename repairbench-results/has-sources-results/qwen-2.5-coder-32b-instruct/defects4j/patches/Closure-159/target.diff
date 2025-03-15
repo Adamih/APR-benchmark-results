@@ -1,0 +1,26 @@
+diff --git a/tmp/f65bc849-7864-4186-a2d9-3d0ada00da2d_buggy.java b/tmp/868f7854-bec2-422e-8534-c99af4ecd2f1_fixed.java
+index de9af32..5ff03c8 100644
+--- a/tmp/f65bc849-7864-4186-a2d9-3d0ada00da2d_buggy.java
++++ b/tmp/868f7854-bec2-422e-8534-c99af4ecd2f1_fixed.java
+@@ -1,18 +1,17 @@
+   /**
+    * @see #findCalledFunctions(Node)
+    */
+   private void findCalledFunctions(
+       Node node, Set<String> changed) {
+     Preconditions.checkArgument(changed != null);
+     // For each referenced function, add a new reference
+-    if (node.getType() == Token.CALL) {
+-      Node child = node.getFirstChild();
+-      if (child.getType() == Token.NAME) {
+-        changed.add(child.getString());
++    if (node.getType() == Token.NAME) {
++      if (isCandidateUsage(node)) {
++        changed.add(node.getString());
+       }
+     }
+ 
+     for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+       findCalledFunctions(c, changed);
+     }
+   }

@@ -1,0 +1,28 @@
+diff --git a/tmp/46ab1352-f899-4c3c-a11c-d5aff73c2ede_buggy.java b/tmp/5f92f3e8-5d49-4cdc-a1d9-4bb2bf8ce674_fixed.java
+index 55391e1..87b98c1 100644
+--- a/tmp/46ab1352-f899-4c3c-a11c-d5aff73c2ede_buggy.java
++++ b/tmp/5f92f3e8-5d49-4cdc-a1d9-4bb2bf8ce674_fixed.java
+@@ -1,19 +1,6 @@
+-    /**
+-     * Returns a clone of the time series.
+-     * <P>
+-     * Notes:
+-     * <ul>
+-     *   <li>no need to clone the domain and range descriptions, since String 
+-     *     object is immutable;</li>
+-     *   <li>we pass over to the more general method clone(start, end).</li>
+-     * </ul>
+-     *
+-     * @return A clone of the time series.
+-     * 
+-     * @throws CloneNotSupportedException not thrown by this class, but 
+-     *         subclasses may differ.
+-     */
+     public Object clone() throws CloneNotSupportedException {
+-        Object clone = createCopy(0, getItemCount() - 1);
++        int itemCount = getItemCount();
++        int end = Math.max(0, itemCount - 1);
++        Object clone = createCopy(0, end);
+         return clone;
+     }
+\ No newline at end of file

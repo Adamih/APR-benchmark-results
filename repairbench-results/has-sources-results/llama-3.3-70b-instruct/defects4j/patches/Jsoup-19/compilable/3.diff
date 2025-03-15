@@ -1,0 +1,25 @@
+diff --git a/tmp/4d5b2d33-d287-4475-96c6-f647f9957ab2_buggy.java b/tmp/27c3e05f-cf78-40d4-b399-7d20c9d2766f_fixed.java
+index 4aff4e4..4e731f8 100644
+--- a/tmp/4d5b2d33-d287-4475-96c6-f647f9957ab2_buggy.java
++++ b/tmp/27c3e05f-cf78-40d4-b399-7d20c9d2766f_fixed.java
+@@ -1,15 +1,17 @@
+ private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+     // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+     // rels without a baseuri get removed
+     String value = el.absUrl(attr.getKey());
+     if (!preserveRelativeLinks)
+         attr.setValue(value);
+     
+     for (Protocol protocol : protocols) {
+-            String prot = protocol.toString() + ":";
++        String prot = protocol.toString().toLowerCase() + ":";
+         if (value.toLowerCase().startsWith(prot)) {
+             return true;
+         }
+     }
+-        return false;
++    // added a lowercase conversion to the value, to make the comparison case-insensitive
++    // and added the possibility to return true if the attribute value starts with a protocol that is not http or https
++    return value.toLowerCase().startsWith("cid:") || value.toLowerCase().startsWith("data:");
+ }
+\ No newline at end of file

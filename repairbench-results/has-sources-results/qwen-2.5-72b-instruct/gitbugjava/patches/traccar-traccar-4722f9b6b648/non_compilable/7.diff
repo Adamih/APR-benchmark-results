@@ -1,0 +1,46 @@
+diff --git a/tmp/a183db61-5123-4303-b3f9-bf12b5928357_buggy.java b/tmp/a664f0ef-9d8a-4de1-be11-163fa0761394_fixed.java
+index c84c989..82a7822 100644
+--- a/tmp/a183db61-5123-4303-b3f9-bf12b5928357_buggy.java
++++ b/tmp/a664f0ef-9d8a-4de1-be11-163fa0761394_fixed.java
+@@ -1,27 +1,39 @@
+ private Position decodeIridiumPosition(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
+ 
+     buf.readUnsignedShortLE(); // length
+ 
+     buf.skipBytes(3); // identification header
+     buf.readUnsignedIntLE(); // index
+ 
+     DeviceSession deviceSession = getDeviceSession(
+             channel, remoteAddress, buf.readSlice(15).toString(StandardCharsets.US_ASCII));
+     if (deviceSession == null) {
+         return null;
+     }
+ 
+     Position position = new Position(getProtocolName());
+     position.setDeviceId(deviceSession.getDeviceId());
+ 
+     buf.readUnsignedByte(); // session status
+     buf.skipBytes(4); // reserved
+-        buf.readUnsignedIntLE(); // date and time
++
++    int dateTimeInt = buf.readUnsignedIntLE(); // date and time
++    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
++    calendar.clear();
++    calendar.set(
++        (dateTimeInt >> 26) & 0x3f, // year
++        (dateTimeInt >> 22) & 0x0f, // month
++        (dateTimeInt >> 17) & 0x1f, // day
++        (dateTimeInt >> 12) & 0x1f, // hour
++        (dateTimeInt >> 6) & 0x3f, // minute
++        (dateTimeInt >> 0) & 0x3f   // second
++    );
++    position.setTime(calendar.getTime());
+ 
+     buf.skipBytes(23); // coordinates block
+ 
+     buf.skipBytes(3); // data tag header
+     decodeMinimalDataSet(position, buf);
+ 
+     return position;
+ }
+\ No newline at end of file

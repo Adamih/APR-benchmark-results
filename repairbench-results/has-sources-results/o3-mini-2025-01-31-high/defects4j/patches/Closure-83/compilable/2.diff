@@ -1,0 +1,30 @@
+diff --git a/tmp/b526f9bb-b13d-4f37-be04-b8264091780f_buggy.java b/tmp/eaa76085-3863-4701-bc6d-34a4a522108a_fixed.java
+index 072c672..687556f 100644
+--- a/tmp/b526f9bb-b13d-4f37-be04-b8264091780f_buggy.java
++++ b/tmp/eaa76085-3863-4701-bc6d-34a4a522108a_fixed.java
+@@ -1,20 +1,22 @@
+ @Override
+ public int parseArguments(Parameters params) throws CmdLineException {
++  // If there is no parameter or if the next token looks like an option (starts with "-"),
++  // then do not consume any parameter value.
+   String param = params.getParameter(0);
+-
+-        if (param == null) {
++  if (param == null || param.startsWith("-")) {
+     setter.addValue(true);
+     return 0;
+   } else {
+     String lowerParam = param.toLowerCase();
+     if (TRUES.contains(lowerParam)) {
+       setter.addValue(true);
+     } else if (FALSES.contains(lowerParam)) {
+       setter.addValue(false);
+     } else {
++      // Unrecognized value -> treat it as if no explicit boolean value was provided.
+       setter.addValue(true);
+       return 0;
+     }
+     return 1;
+   }
+ }
+\ No newline at end of file

@@ -1,0 +1,64 @@
+diff --git a/tmp/6df0f893-9547-4661-a611-e76ea7f430eb_buggy.java b/tmp/301d1053-433e-4f21-8a76-1aea10548791_fixed.java
+index 904dba7..bf7cb27 100644
+--- a/tmp/6df0f893-9547-4661-a611-e76ea7f430eb_buggy.java
++++ b/tmp/301d1053-433e-4f21-8a76-1aea10548791_fixed.java
+@@ -1,46 +1,56 @@
+ private String format(JSError error, boolean warning) {
+     // extract source excerpt
+     SourceExcerptProvider source = getSource();
+     String sourceExcerpt = source == null ? null :
+         excerpt.get(
+             source, error.sourceName, error.lineNumber, excerptFormatter);
+ 
+     // formatting the message
+     StringBuilder b = new StringBuilder();
+     if (error.sourceName != null) {
+       b.append(error.sourceName);
+       if (error.lineNumber > 0) {
+         b.append(':');
+         b.append(error.lineNumber);
+       }
+       b.append(": ");
+     }
+ 
+     b.append(getLevelName(warning ? CheckLevel.WARNING : CheckLevel.ERROR));
+     b.append(" - ");
+ 
+     b.append(error.description);
+     b.append('\n');
+     if (sourceExcerpt != null) {
+       b.append(sourceExcerpt);
+       b.append('\n');
+       int charno = error.getCharno();
+ 
+       // padding equal to the excerpt and arrow at the end
+-      // charno == sourceExpert.length() means something is missing
++      // charno == sourceExcerpt.length() means something is missing
+       // at the end of the line
+-      if (excerpt.equals(LINE)
++      if (excerpt.equals(SourceExcerptProvider.Excerpt.LINE)
+           && 0 <= charno && charno < sourceExcerpt.length()) {
+         for (int i = 0; i < charno; i++) {
+           char c = sourceExcerpt.charAt(i);
+           if (Character.isWhitespace(c)) {
+             b.append(c);
+           } else {
+             b.append(' ');
+           }
+         }
+         b.append("^\n");
++      } else if (charno == sourceExcerpt.length()) {
++        for (int i = 0; i < charno; i++) {
++          char c = sourceExcerpt.charAt(i);
++          if (Character.isWhitespace(c)) {
++            b.append(c);
++          } else {
++            b.append(' ');
++          }
++        }
++        b.append("^\n");
+       }
+     }
+     return b.toString();
+   }
+\ No newline at end of file

@@ -1,0 +1,38 @@
+diff --git a/tmp/65b5d0a2-2468-4309-ad9a-d29d7d901731_buggy.java b/tmp/7c4e3ae1-5725-4bd8-aa6f-5432a41030ba_fixed.java
+index 1ea204a..825119e 100644
+--- a/tmp/65b5d0a2-2468-4309-ad9a-d29d7d901731_buggy.java
++++ b/tmp/7c4e3ae1-5725-4bd8-aa6f-5432a41030ba_fixed.java
+@@ -1,17 +1,21 @@
+-  private static String extractClassNameIfGoog(Node node, Node parent,
+-      String functionName){
++/**
++ * Extracts the class name if the node is related to a Goog function call.
++ * 
++ * @param node         the current node to check
++ * @param parent       the parent node of the current node
++ * @param functionName the name of the Goog function (e.g., "goog.require")
++ * @return the extracted class name, or null if not found
++ */
++private static String extractClassNameIfGoog(Node node, Node parent, String functionName) {
+   String className = null;
+-    if (NodeUtil.isExprCall(parent)) {
+-      Node callee = node.getFirstChild();
+-      if (callee != null && callee.getType() == Token.GETPROP) {
+-        String qualifiedName = callee.getQualifiedName();
+-        if (functionName.equals(qualifiedName)) {
+-          Node target = callee.getNext();
+-          if (target != null) {
+-            className = target.getString();
+-          }
++  if (NodeUtil.isExprCall(parent) && parent.getFirstChild().getString().equals(functionName)) {
++    Node args = parent.getNext();
++    if (args!= null && args.hasChildNodes()) {
++      Node firstArg = args.getFirstChild();
++      if (firstArg.getType() == Token.STRING) {
++        className = firstArg.getString();
+       }
+     }
+   }
+   return className;
+ }
+\ No newline at end of file

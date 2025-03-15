@@ -1,0 +1,38 @@
+diff --git a/tmp/f49a6072-365f-4221-9d66-ca355340144f_buggy.java b/tmp/3721951f-74b2-4f62-a995-9b06fb0d73dd_fixed.java
+index 39dd8e7..ccd703c 100644
+--- a/tmp/f49a6072-365f-4221-9d66-ca355340144f_buggy.java
++++ b/tmp/3721951f-74b2-4f62-a995-9b06fb0d73dd_fixed.java
+@@ -1,30 +1,31 @@
+     private Attribute parseAttribute() {
+         tq.consumeWhitespace();
+         String key = tq.consumeAttributeKey();
+         String value = "";
+         tq.consumeWhitespace();
+         if (tq.matchChomp("=")) {
+             tq.consumeWhitespace();
+ 
+             if (tq.matchChomp(SQ)) {
+                 value = tq.chompTo(SQ);
+             } else if (tq.matchChomp(DQ)) {
+                 value = tq.chompTo(DQ);
+             } else {
+                 StringBuilder valueAccum = new StringBuilder();
+                 // no ' or " to look for, so scan to end tag or space (or end of stream)
+                 while (!tq.matchesAny("<", "/>", ">") && !tq.matchesWhitespace() && !tq.isEmpty()) {
+                     valueAccum.append(tq.consume());
+                 }
+                 value = valueAccum.toString();
+             }
+             tq.consumeWhitespace();
+         }
+         if (key.length() != 0)
+             return Attribute.createFromEncoded(key, value);
+-        else {
++        else if (!tq.isEmpty()) { // added check for empty to avoid consuming last char
+             tq.consume();
+-                
++            return null;
++        } else {
+             return null;
+         }
+     }

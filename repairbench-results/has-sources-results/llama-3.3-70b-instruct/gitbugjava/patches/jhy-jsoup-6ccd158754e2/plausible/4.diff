@@ -1,0 +1,30 @@
+diff --git a/tmp/54ff667d-5937-4c56-a51a-f8dc1371dc29_buggy.java b/tmp/b8d5678d-6735-4927-be89-1af0488482d1_fixed.java
+index 23f078d..8cd7295 100644
+--- a/tmp/54ff667d-5937-4c56-a51a-f8dc1371dc29_buggy.java
++++ b/tmp/b8d5678d-6735-4927-be89-1af0488482d1_fixed.java
+@@ -1,14 +1,23 @@
++/**
++ * Appends the given string to the provided string builder as ASCII, with space normalization.
++ * 
++ * @param s the string to append
++ * @param spaceAsPlus whether to encode spaces as '+' (e.g., for query params)
++ * @param sb the string builder to append to
++ * @throws UnsupportedEncodingException if the encoding fails
++ */
+ private static void appendToAscii(String s, boolean spaceAsPlus, StringBuilder sb) throws UnsupportedEncodingException {
+     // minimal normalization of Unicode -> Ascii, and space normal. Existing escapes are left as-is.
+     for (int i = 0; i < s.length(); i++) {
+         int c = s.codePointAt(i);
+         if (c == ' ') {
+             sb.append(spaceAsPlus? '+' : "%20");
+         } else if (c > 127) { // out of ascii range
+-                sb.append(URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name()));
++            String encoded = URLEncoder.encode(new String(Character.toChars(c)), UTF_8.name());
++            sb.append(encoded.replace("%3F", ""));
+             // ^^ is a bit heavy-handed - if perf critical, we could optimize
+         } else {
+             sb.append((char) c);
+         }
+     }
+ }
+\ No newline at end of file

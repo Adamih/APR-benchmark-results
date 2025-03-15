@@ -1,0 +1,29 @@
+diff --git a/tmp/7f8cc3f3-615d-4aef-aa31-752e026ffba4_buggy.java b/tmp/dd369735-c649-48c0-b08b-bee8b742ed21_fixed.java
+index 939f49b..c87704d 100644
+--- a/tmp/7f8cc3f3-615d-4aef-aa31-752e026ffba4_buggy.java
++++ b/tmp/dd369735-c649-48c0-b08b-bee8b742ed21_fixed.java
+@@ -1,21 +1,21 @@
+ private boolean isPrototypePropertyAssign(Node assign) {
+   Node n = assign.getFirstChild();
+   if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+       && n.getType() == Token.GETPROP
+   ) {
+     // We want to exclude the assignment itself from the usage list
+     boolean isChainedProperty =
+         n.getFirstChild().getType() == Token.GETPROP;
+ 
+     if (isChainedProperty) {
+-          Node child = n.getFirstChild().getFirstChild().getNext();
++      Node child = n.getFirstChild().getNext();
+ 
+-          if (child.getType() == Token.STRING &&
++      if (child != null && child.getType() == Token.STRING &&
+           child.getString().equals("prototype")) {
+         return true;
+       }
+     }
+   }
+ 
+   return false;
+ }
+\ No newline at end of file

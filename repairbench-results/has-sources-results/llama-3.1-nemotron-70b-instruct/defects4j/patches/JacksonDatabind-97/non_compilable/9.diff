@@ -1,0 +1,25 @@
+diff --git a/tmp/00e7ea28-b64e-455d-9c2b-8a6db38d8fe9_buggy.java b/tmp/00689458-8f3c-4f3e-aa56-759503a046d2_fixed.java
+index dda9103..d716449 100644
+--- a/tmp/00e7ea28-b64e-455d-9c2b-8a6db38d8fe9_buggy.java
++++ b/tmp/00689458-8f3c-4f3e-aa56-759503a046d2_fixed.java
+@@ -1,13 +1,16 @@
+ @Override
+ public final void serialize(JsonGenerator gen, SerializerProvider ctxt) throws IOException
+ {
+     if (_value == null) {
+         ctxt.defaultSerializeNull(gen);
+     } else if (_value instanceof JsonSerializable) {
+         ((JsonSerializable) _value).serialize(gen, ctxt);
+     } else {
+-            // 25-May-2018, tatu: [databind#1991] do not call via generator but through context;
+-            //    this to preserve contextual information
+-            gen.writeObject(_value);
++        // Preserve contextual attributes when serializing POJOs
++        SerializerProvider ctxtWithAttrs = ctxt;
++        if (gen.getCurrentValue()!= null) { // if we're serializing as a property value
++            ctxtWithAttrs = ctxt.withAttributes(gen.getAttributes());
++        }
++        ctxtWithAttrs.defaultSerializeAny(_value, gen);
+     }
+ }
+\ No newline at end of file

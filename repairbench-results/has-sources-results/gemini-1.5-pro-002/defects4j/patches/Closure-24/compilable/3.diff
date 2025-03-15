@@ -1,0 +1,33 @@
+diff --git a/tmp/49bd5aff-f68a-4b79-867a-9c9ac085a30c_buggy.java b/tmp/c8c35969-8d16-4958-b34d-16d2a56d2b26_fixed.java
+index 602226b..6849596 100644
+--- a/tmp/49bd5aff-f68a-4b79-867a-9c9ac085a30c_buggy.java
++++ b/tmp/c8c35969-8d16-4958-b34d-16d2a56d2b26_fixed.java
+@@ -1,26 +1,26 @@
+     private void findAliases(NodeTraversal t) {
+       Scope scope = t.getScope();
+       for (Var v : scope.getVarIterable()) {
+         Node n = v.getNode();
+         int type = n.getType();
+         Node parent = n.getParent();
+-        if (parent.isVar()) {
++        if (parent.isVar() || parent.isFunction()) {
+           if (n.hasChildren() && n.getFirstChild().isQualifiedName()) {
+             String name = n.getString();
+             Var aliasVar = scope.getVar(name);
+             aliases.put(name, aliasVar);
+ 
+             String qualifiedName =
+                 aliasVar.getInitialValue().getQualifiedName();
+             transformation.addAlias(name, qualifiedName);
+             // Bleeding functions already get a BAD_PARAMETERS error, so just
+             // do nothing.
+             // Parameters of the scope function also get a BAD_PARAMETERS
+             // error.
+-        } else {
++          } else if (parent.isVar()) {
+             // TODO(robbyw): Support using locals for private variables.
+             report(t, n, GOOG_SCOPE_NON_ALIAS_LOCAL, n.getString());
+           }
+         }
+       }
+     }

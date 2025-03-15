@@ -1,0 +1,23 @@
+diff --git a/tmp/bc5c3373-cc9a-41ad-b0f9-5b8f6f9fb8f9_buggy.java b/tmp/d6b83cea-708c-4286-b4d6-b37189b658a5_fixed.java
+index 29d025a..1bb4c1f 100644
+--- a/tmp/bc5c3373-cc9a-41ad-b0f9-5b8f6f9fb8f9_buggy.java
++++ b/tmp/d6b83cea-708c-4286-b4d6-b37189b658a5_fixed.java
+@@ -1,13 +1,15 @@
+ private void _verifySharing()
+ {
+     if (_hashShared) {
+         _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+         _names = Arrays.copyOf(_names, _names.length);
+         _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
++        // reset primary and secondary lookup tables so they get correctly updated
++        _mainHash = new int[_hashArea.length >> 1];
++        _mainHashMask = _mainHash.length - 1;
++        _spilloverEnd = 0;
+     }
+     if (_needRehash) {
+         rehash();
+     }
+ }
+\ No newline at end of file

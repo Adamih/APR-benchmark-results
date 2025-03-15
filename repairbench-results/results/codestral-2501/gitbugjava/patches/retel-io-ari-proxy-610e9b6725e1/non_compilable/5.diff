@@ -1,0 +1,42 @@
+diff --git a/tmp/82f8776c-9962-4560-8fcf-1feacd9ed395_buggy.java b/tmp/374278a1-f72e-40a7-b2c5-098580f8e07d_fixed.java
+index eb0a5c8..59b2c3b 100644
+--- a/tmp/82f8776c-9962-4560-8fcf-1feacd9ed395_buggy.java
++++ b/tmp/374278a1-f72e-40a7-b2c5-098580f8e07d_fixed.java
+@@ -1,27 +1,36 @@
+ public static Try<Done> registerCallContext(
+     final ActorRef<CallContextProviderMessage> callContextProvider,
+     final String callContext,
+     final AriCommand ariCommand) {
+ 
+   if (!ariCommand.extractCommandType().isCreationCommand()) {
+     return Try.success(Done.done());
+   }
+ 
+   final Option<AriResource> maybeResource =
+       ariCommand
+           .extractResourceRelations()
+           .find(AriResourceRelation::isCreated)
+           .map(AriResourceRelation::getResource);
+ 
+   if (maybeResource.isEmpty()) {
+     return Try.failure(
+         new RuntimeException(
+             String.format(
+                 "Failed to extract resourceId from command '%s'", ariCommand.toString())));
+   }
+ 
+   final AriResource resource = maybeResource.get();
+ 
++  // Ensure that the resource ID is not null before attempting to register the call context
++  if (resource.getId() != null) {
+     callContextProvider.tell(new RegisterCallContext(resource.getId(), callContext));
++  } else {
++    return Try.failure(
++        new RuntimeException(
++            String.format(
++                "Resource ID is null for command '%s'", ariCommand.toString())));
++  }
++
+   return Try.success(Done.done());
+ }
+\ No newline at end of file

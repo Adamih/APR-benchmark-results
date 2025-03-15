@@ -1,0 +1,25 @@
+diff --git a/tmp/9ff14812-33aa-4d4e-96ed-d0596dcd35c7_buggy.java b/tmp/fd3ca30b-231f-4d13-8a64-4b750a572d5e_fixed.java
+index ae6c2b1..5887499 100644
+--- a/tmp/9ff14812-33aa-4d4e-96ed-d0596dcd35c7_buggy.java
++++ b/tmp/fd3ca30b-231f-4d13-8a64-4b750a572d5e_fixed.java
+@@ -1,10 +1,17 @@
+ public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+     String str = text.substring(position);
++    String best = null;
+     for (String id : ALL_IDS) {
+         if (str.startsWith(id)) {
+-                    bucket.setZone(DateTimeZone.forID(id));
+-                    return position + id.length();
++            // Choose the longest match in case of multiple hits.
++            if (best == null || id.length() > best.length()) {
++                best = id;
+             }
+         }
++    }
++    if (best != null) {
++        bucket.setZone(DateTimeZone.forID(best));
++        return position + best.length();
++    }
+     return ~position;
+ }
+\ No newline at end of file

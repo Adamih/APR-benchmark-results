@@ -1,0 +1,30 @@
+diff --git a/tmp/54489c7c-0f9e-4109-a92c-cbd955abcf41_buggy.java b/tmp/658f24f5-78c1-4950-9b51-2d6f82bc232e_fixed.java
+index a37dc7a..fb9b32e 100644
+--- a/tmp/54489c7c-0f9e-4109-a92c-cbd955abcf41_buggy.java
++++ b/tmp/658f24f5-78c1-4950-9b51-2d6f82bc232e_fixed.java
+@@ -1,10 +1,19 @@
+ protected void addChildren(int index, Node... children) {
+     Validate.noNullElements(children);
+     ensureChildNodes();
+-        for (int i = children.length - 1; i >= 0; i--) {
+-            Node in = children[i];
+-            reparentChild(in);
+-            childNodes.add(index, in);
++    int origIndex = index;
++    for (Node child : children) {
++        // if the child is already a child of this element,
++        // and it comes from before the insertion point,
++        // then its removal will cause the insertion point to shift left.
++        if (child.parent == this) {
++            int childIndex = childNodes.indexOf(child);
++            if (childIndex < index)
++                index--;
+         }
+-        reindexChildren(index);
++        reparentChild(child);
++        childNodes.add(index, child);
++        index++;
++    }
++    reindexChildren(origIndex);
+ }
+\ No newline at end of file

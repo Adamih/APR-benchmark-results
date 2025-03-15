@@ -1,0 +1,28 @@
+diff --git a/tmp/51258196-4b3d-4353-856d-b4ae1c6686aa_buggy.java b/tmp/1a5a8850-6002-4ed2-9563-7206dc226f14_fixed.java
+index 5bf31b1..ae30816 100644
+--- a/tmp/51258196-4b3d-4353-856d-b4ae1c6686aa_buggy.java
++++ b/tmp/1a5a8850-6002-4ed2-9563-7206dc226f14_fixed.java
+@@ -1,17 +1,21 @@
+     private String consumeSubQuery() {
+         StringBuilder sq = StringUtil.borrowBuilder();
+         while (!tq.isEmpty()) {
+             if (tq.matches("("))
+                 sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+             else if (tq.matches("["))
+                 sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
++            else if (tq.matchesAny(Combinators)) {
+                 if (sq.length() > 0)
+                     break;
+-                else
++                else {
++                    if (!tq.matches(",")) // only consume combinators if not a comma
+                         tq.consume();
++                    else break; // break if comma
++                }
++            }
+             else
+                 sq.append(tq.consume());
+         }
+         return StringUtil.releaseBuilder(sq);
+     }

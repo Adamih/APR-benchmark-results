@@ -1,0 +1,42 @@
+diff --git a/tmp/f7e793f5-14ca-42bd-8ec4-a8c860bb3526_buggy.java b/tmp/f2d15b76-f319-4f6d-8bfa-f8d1043f27e2_fixed.java
+index 7de6748..b3ed096 100644
+--- a/tmp/f7e793f5-14ca-42bd-8ec4-a8c860bb3526_buggy.java
++++ b/tmp/f2d15b76-f319-4f6d-8bfa-f8d1043f27e2_fixed.java
+@@ -1,23 +1,34 @@
+         final void newAttribute() {
+             if (attributes == null)
+                 attributes = new Attributes();
+ 
+             if (pendingAttributeName != null) {
+-                // the tokeniser has skipped whitespace control chars, but trimming could collapse to empty for other control codes, so verify here
+-                pendingAttributeName = pendingAttributeName.trim();
++                // Trim whitespace control chars, but verify if the name is empty
++                String trimmedName = pendingAttributeName.trim();
++                if (trimmedName.isEmpty()) {
++                    // Reset variables and skip attribute creation
++                    pendingAttributeName = null;
++                    hasEmptyAttributeValue = false;
++                    hasPendingAttributeValue = false;
++                    reset(pendingAttributeValue);
++                    pendingAttributeValueS = null;
++                    return;
++                }
++                pendingAttributeName = trimmedName;
++
+                 Attribute attribute;
+                 if (hasPendingAttributeValue)
+                     attribute = new Attribute(pendingAttributeName,
+                         pendingAttributeValue.length() > 0 ? pendingAttributeValue.toString() : pendingAttributeValueS);
+                 else if (hasEmptyAttributeValue)
+                     attribute = new Attribute(pendingAttributeName, "");
+                 else
+                     attribute = new BooleanAttribute(pendingAttributeName);
+                 attributes.put(attribute);
+             }
+             pendingAttributeName = null;
+             hasEmptyAttributeValue = false;
+             hasPendingAttributeValue = false;
+             reset(pendingAttributeValue);
+             pendingAttributeValueS = null;
+         }
+\ No newline at end of file

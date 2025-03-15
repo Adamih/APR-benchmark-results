@@ -1,0 +1,32 @@
+diff --git a/tmp/219be28a-e689-43d4-9c0b-ca7b8b1d7f19_buggy.java b/tmp/febdc581-4388-4621-9b4a-cafe7cbb4503_fixed.java
+index 85f5680..57a797f 100644
+--- a/tmp/219be28a-e689-43d4-9c0b-ca7b8b1d7f19_buggy.java
++++ b/tmp/febdc581-4388-4621-9b4a-cafe7cbb4503_fixed.java
+@@ -1,17 +1,23 @@
+ @Override
+ public Date read(JsonReader in) throws IOException {
+-    if (in.peek() != JsonToken.STRING) {
+-      throw new JsonParseException("The date should be a string value");
++    JsonToken token = in.peek();
++    if (token == JsonToken.NULL) {
++        in.nextNull();
++        return null;
+     }
+-    Date date = deserializeToDate(in.nextString());
++    if (token != JsonToken.STRING) {
++        throw new IllegalStateException("The date should be a string value");
++    }
++    String dateStr = in.nextString();
++    Date date = deserializeToDate(dateStr);
+     if (dateType == Date.class) {
+         return date;
+     } else if (dateType == Timestamp.class) {
+         return new Timestamp(date.getTime());
+     } else if (dateType == java.sql.Date.class) {
+         return new java.sql.Date(date.getTime());
+     } else {
+         // This must never happen: dateType is guarded in the primary constructor
+         throw new AssertionError();
+     }
+ }
+\ No newline at end of file

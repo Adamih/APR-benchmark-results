@@ -1,0 +1,31 @@
+diff --git a/tmp/856edbc4-4033-4739-ba6c-0b59fad18712_buggy.java b/tmp/01dbd583-0f04-412e-8035-def522dd2017_fixed.java
+index a37dc7a..238d024 100644
+--- a/tmp/856edbc4-4033-4739-ba6c-0b59fad18712_buggy.java
++++ b/tmp/01dbd583-0f04-412e-8035-def522dd2017_fixed.java
+@@ -1,10 +1,22 @@
+ protected void addChildren(int index, Node... children) {
+     Validate.noNullElements(children);
+     ensureChildNodes();
+-        for (int i = children.length - 1; i >= 0; i--) {
++    // Compute an effective insertion point. When moving nodes that are already
++    // in this parent, if they currently come *before* the given index then their removal
++    // will shift the remaining nodes left, so we adjust.
++    int effectiveIndex = index;
++    for (Node child : children) {
++        if (child.parent() == this) {
++            int pos = childNodes.indexOf(child);
++            if (pos < effectiveIndex)
++                effectiveIndex--;
++        }
++    }
++    // Insert the nodes in the order they appear in the array.
++    for (int i = 0; i < children.length; i++) {
+         Node in = children[i];
+         reparentChild(in);
+-            childNodes.add(index, in);
++        childNodes.add(effectiveIndex + i, in);
+     }
+-        reindexChildren(index);
++    reindexChildren(0);
+ }
+\ No newline at end of file

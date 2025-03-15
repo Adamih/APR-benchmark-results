@@ -1,0 +1,17 @@
+diff --git a/tmp/8ea12940-7116-434d-ad28-267f32ca804d_buggy.java b/tmp/3fbe64cb-c1cd-4ccf-a566-b86b423bca9d_fixed.java
+index e807cbf..801b784 100644
+--- a/tmp/8ea12940-7116-434d-ad28-267f32ca804d_buggy.java
++++ b/tmp/3fbe64cb-c1cd-4ccf-a566-b86b423bca9d_fixed.java
+@@ -1,7 +1,11 @@
+ private boolean isInlineable(Document.OutputSettings out) {
+     if (!tag.isInline())
+         return false;
++    if (tag.getName().equals("br")) {
++        // For <br>, always allow wrapping
++        return true;
++    }
+     return (parent() == null || parent().isBlock())
+         && !isEffectivelyFirst()
+         && !out.outline();
+ }
+\ No newline at end of file

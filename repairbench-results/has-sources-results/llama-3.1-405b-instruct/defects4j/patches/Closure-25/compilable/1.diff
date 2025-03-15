@@ -1,0 +1,50 @@
+diff --git a/tmp/bd6189ff-d0ed-4444-aff4-cd0fe5404f43_buggy.java b/tmp/60c2fa5f-913e-4ec5-b7df-8148ca96d1c0_fixed.java
+index b98f0a7..9763581 100644
+--- a/tmp/bd6189ff-d0ed-4444-aff4-cd0fe5404f43_buggy.java
++++ b/tmp/60c2fa5f-913e-4ec5-b7df-8148ca96d1c0_fixed.java
+@@ -1,29 +1,44 @@
+ private FlowScope traverseNew(Node n, FlowScope scope) {
+ 
+     Node constructor = n.getFirstChild();
+     scope = traverse(constructor, scope);
+     JSType constructorType = constructor.getJSType();
+     JSType type = null;
+     if (constructorType!= null) {
+       constructorType = constructorType.restrictByNotNullOrUndefined();
+       if (constructorType.isUnknownType()) {
+         type = getNativeType(UNKNOWN_TYPE);
+       } else {
+         FunctionType ct = constructorType.toMaybeFunctionType();
+         if (ct == null && constructorType instanceof FunctionType) {
+           // If constructorType is a NoObjectType, then toMaybeFunctionType will
+           // return null. But NoObjectType implements the FunctionType
+           // interface, precisely because it can validly construct objects.
+           ct = (FunctionType) constructorType;
+         }
+         if (ct!= null && ct.isConstructor()) {
+           type = ct.getInstanceType();
++          // Infer the type of the new expression based on the instance type
++          if (type!= null &&!type.isEmptyType()) {
++            n.setJSType(type);
++          } else {
++            // Otherwise, infer the type from the constructor's parameter
++            Node arg = constructor.getNext();
++            if (arg!= null) {
++              JSType argType = arg.getJSType();
++              if (argType!= null) {
++                type = argType;
++              }
++            }
+           }
+         }
+       }
++    }
++    if (type!= null) {
+       n.setJSType(type);
++    }
+     for (Node arg = constructor.getNext(); arg!= null; arg = arg.getNext()) {
+       scope = traverse(arg, scope);
+     }
+     return scope;
+   }
+\ No newline at end of file

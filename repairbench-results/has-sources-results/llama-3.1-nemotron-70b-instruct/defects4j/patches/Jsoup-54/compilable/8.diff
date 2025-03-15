@@ -1,0 +1,27 @@
+diff --git a/tmp/bb52607d-0955-4bd7-aeac-8e68465f8d66_buggy.java b/tmp/2eb51ff4-92c3-4863-aaf1-498b60dad6c5_fixed.java
+index d5b3da9..818827e 100644
+--- a/tmp/bb52607d-0955-4bd7-aeac-8e68465f8d66_buggy.java
++++ b/tmp/2eb51ff4-92c3-4863-aaf1-498b60dad6c5_fixed.java
+@@ -1,7 +1,21 @@
++/**
++ * Copies attributes from a Jsoup Node to a W3C Element, 
++ * ensuring attribute names conform to XML specifications.
++ * 
++ * @param source Jsoup Node with attributes to copy
++ * @param el     W3C Element to receive the attributes
++ */
+ private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
+     for (Attribute attribute : source.attributes()) {
+         // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+         String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
++        
++        // Ignore attributes with empty or invalid names after sanitization
++        if (!key.isEmpty()) {
+             el.setAttribute(key, attribute.getValue());
++        } else {
++            // Optionally log or handle the ignored attribute for debugging/troubleshooting
++            // System.out.println("Ignored attribute with invalid name: '" + attribute.getKey() + "'");
++        }
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,41 @@
+diff --git a/tmp/cb3edbd4-4f64-4f04-9bf4-74948e892a74_buggy.java b/tmp/8803c758-3720-4561-9cad-984577a3ae8c_fixed.java
+index 4e8b037..d2c1d93 100644
+--- a/tmp/cb3edbd4-4f64-4f04-9bf4-74948e892a74_buggy.java
++++ b/tmp/8803c758-3720-4561-9cad-984577a3ae8c_fixed.java
+@@ -1,20 +1,23 @@
+-    public List getValues(final Option option,
+-                          List defaultValues) {
++public List getValues(final Option option, List defaultValues) {
+     // initialize the return list
+     List valueList = (List) values.get(option);
+ 
+-        // grab the correct default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = defaultValues;
++    if (valueList == null) {
++        valueList = new ArrayList();
+     }
+ 
+-        // augment the list with the default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = (List) this.defaultValues.get(option);
++    // if there are no values or empty values, use the passed default values
++    if (valueList.isEmpty() && defaultValues != null) {
++        valueList.addAll(defaultValues);
+     }
+-                // if there are more default values as specified, add them to
+-                // the list.
+-                    // copy the list first
+ 
+-        return valueList == null ? Collections.EMPTY_LIST : valueList;
++    // if still empty, use the stored default values
++    if (valueList.isEmpty() && this.defaultValues.containsKey(option)) {
++        List storedDefaults = (List) this.defaultValues.get(option);
++        if (storedDefaults != null) {
++            valueList.addAll(storedDefaults);
++        }
++    }
++
++    return valueList.isEmpty() ? Collections.EMPTY_LIST : valueList;
+ }
+\ No newline at end of file

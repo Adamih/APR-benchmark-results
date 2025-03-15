@@ -1,0 +1,27 @@
+diff --git a/tmp/f0d87640-9555-4558-a10c-c7cc74a6e38a_buggy.java b/tmp/bd673dc3-c62f-4120-a0f9-ee19ac4b7d52_fixed.java
+index 4d0be80..88f6360 100644
+--- a/tmp/f0d87640-9555-4558-a10c-c7cc74a6e38a_buggy.java
++++ b/tmp/bd673dc3-c62f-4120-a0f9-ee19ac4b7d52_fixed.java
+@@ -1,10 +1,19 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
+-
+-        // Return the bare minimum to put the AST in a valid state.
++    // Check if the loop is a for-each loop
++    if (loopNode.isForEach()) {
++        // Handle for-each loop transformation
++        return newNode(
++            Token.FOR_EACH,
++            transform(loopNode.getIterator()),
++            transform(loopNode.getIteratedObject()),
++            transformBlock(loopNode.getBody()));
++    } else {
++        // Handle standard for-in loop transformation
+         return newNode(
+             Token.FOR,
+             transform(loopNode.getIterator()),
+             transform(loopNode.getIteratedObject()),
+             transformBlock(loopNode.getBody()));
+     }
++}
+\ No newline at end of file

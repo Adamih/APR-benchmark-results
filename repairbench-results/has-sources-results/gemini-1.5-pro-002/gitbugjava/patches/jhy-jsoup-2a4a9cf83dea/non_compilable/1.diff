@@ -1,0 +1,19 @@
+diff --git a/tmp/ef650d6d-0d27-479c-8f91-bc2489153e79_buggy.java b/tmp/1249e889-99cf-4417-b39b-355319a3204e_fixed.java
+index c9c2b44..b4d1f04 100644
+--- a/tmp/ef650d6d-0d27-479c-8f91-bc2489153e79_buggy.java
++++ b/tmp/1249e889-99cf-4417-b39b-355319a3204e_fixed.java
+@@ -1,13 +1,13 @@
+         @Override
+         public boolean matches(Element root, Element element) {
+             // evaluate from last to first
+             for (int i = evaluators.size() -1; i >= 0; --i) {
+-                if (element == null)
++                if (element == null || element == root) // added element == root check
+                     return false;
+                 Evaluator eval = evaluators.get(i);
+                 if (!eval.matches(root, element))
+                     return false;
+                 element = element.parent();
+             }
+             return true;
+         }

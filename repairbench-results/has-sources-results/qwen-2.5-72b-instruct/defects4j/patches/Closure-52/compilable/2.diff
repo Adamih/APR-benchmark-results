@@ -1,0 +1,41 @@
+diff --git a/tmp/4555dd64-2628-49b5-a815-93c9cd60657e_buggy.java b/tmp/bfec334b-b5b2-46d4-8af5-b14615d3f5aa_fixed.java
+index 4b7f469..b1dfa17 100644
+--- a/tmp/4555dd64-2628-49b5-a815-93c9cd60657e_buggy.java
++++ b/tmp/bfec334b-b5b2-46d4-8af5-b14615d3f5aa_fixed.java
+@@ -1,10 +1,33 @@
+ static boolean isSimpleNumber(String s) {
+     int len = s.length();
++    if (len == 0) {
++        return false;
++    }
++
++    // Check for hexadecimal numbers
++    if (len > 2 && s.startsWith("0x")) {
++        for (int index = 2; index < len; index++) {
++            char c = s.charAt(index);
++            if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
++                return false;
++            }
++        }
++        return true;
++    }
++
++    // Check for decimal numbers
++    boolean hasDot = false;
+     for (int index = 0; index < len; index++) {
+         char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++        if (c == '.') {
++            if (hasDot) {
++                return false; // Only one dot allowed
++            }
++            hasDot = true;
++        } else if (c < '0' || c > '9') {
+             return false;
+         }
+     }
+-    return len > 0;
++
++    return true;
+ }
+\ No newline at end of file

@@ -1,0 +1,13 @@
+diff --git a/tmp/a5b8a661-7224-4a44-bb2c-f2a7e7ff340e_buggy.java b/tmp/cf0bee2f-8d58-4266-97cd-c0a6b7846335_fixed.java
+index d5b3da9..370420e 100644
+--- a/tmp/a5b8a661-7224-4a44-bb2c-f2a7e7ff340e_buggy.java
++++ b/tmp/cf0bee2f-8d58-4266-97cd-c0a6b7846335_fixed.java
+@@ -1,7 +1,8 @@
+         private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
+             for (Attribute attribute : source.attributes()) {
+                 // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+                 String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
++                if (key.matches("[a-zA-Z_:]{1}[-a-zA-Z0-9_:.]*"))
+                     el.setAttribute(key, attribute.getValue());
+             }
+         }

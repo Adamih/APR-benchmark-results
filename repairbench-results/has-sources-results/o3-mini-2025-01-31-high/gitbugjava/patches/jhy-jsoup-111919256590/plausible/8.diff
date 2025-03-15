@@ -1,0 +1,16 @@
+diff --git a/tmp/9ec43f94-93f2-427a-ac2f-85cb288b8275_buggy.java b/tmp/b0bb2ab6-adb9-44a2-99dd-2694d0a2777e_fixed.java
+index e807cbf..073e503 100644
+--- a/tmp/9ec43f94-93f2-427a-ac2f-85cb288b8275_buggy.java
++++ b/tmp/b0bb2ab6-adb9-44a2-99dd-2694d0a2777e_fixed.java
+@@ -1,7 +1,10 @@
+ private boolean isInlineable(Document.OutputSettings out) {
++    // Always treat <br> as non-inlineable so that it gets printed with a trailing newline.
++    if (tag.getName().equals("br"))
++        return false;
+     if (!tag.isInline())
+         return false;
+     return (parent() == null || parent().isBlock())
+             && !isEffectivelyFirst()
+             && !out.outline();
+ }
+\ No newline at end of file

@@ -1,0 +1,32 @@
+diff --git a/tmp/b30e6929-2216-418f-a3a4-6e37aa24910f_buggy.java b/tmp/93de111e-66ac-4349-8797-8f9408a799df_fixed.java
+index 39c4220..ad59fa7 100644
+--- a/tmp/b30e6929-2216-418f-a3a4-6e37aa24910f_buggy.java
++++ b/tmp/93de111e-66ac-4349-8797-8f9408a799df_fixed.java
+@@ -1,21 +1,19 @@
+ private final static int _parseIndex(String str) {
+     final int len = str.length();
+     // [Issue#133]: beware of super long indexes; assume we never
+     // have arrays over 2 billion entries so ints are fine.
+     if (len == 0 || len > 10) {
+         return -1;
+     }
+     for (int i = 0; i < len; ++i) {
+-            char c = str.charAt(i++);
++        char c = str.charAt(i); // Removed increment of i here
+         if (c > '9' || c < '0') {
+             return -1;
+         }
+     }
+-        if (len == 10) {
+-            long l = NumberInput.parseLong(str);
+-            if (l > Integer.MAX_VALUE) {
+-                return -1;
+-            }
+-        }
++    try {
+         return NumberInput.parseInt(str);
++    } catch (NumberFormatException e) {
++        return -1; // Catch and return -1 for invalid number formats
++    }
+ }
+\ No newline at end of file

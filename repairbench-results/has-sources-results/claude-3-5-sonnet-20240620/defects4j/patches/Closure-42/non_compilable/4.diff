@@ -1,0 +1,24 @@
+diff --git a/tmp/3fddf115-ff31-4d6e-b296-be6b76b7f8c2_buggy.java b/tmp/83010d60-f9c6-4e71-b95f-27c483c83bff_fixed.java
+index 4d0be80..61ac628 100644
+--- a/tmp/3fddf115-ff31-4d6e-b296-be6b76b7f8c2_buggy.java
++++ b/tmp/83010d60-f9c6-4e71-b95f-27c483c83bff_fixed.java
+@@ -1,10 +1,14 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
+-
+-        // Return the bare minimum to put the AST in a valid state.
+-      return newNode(
+-          Token.FOR,
++    // Create the correct structure for a FOR_IN loop
++    Node forIn = IR.forIn(
+         transform(loopNode.getIterator()),
+         transform(loopNode.getIteratedObject()),
+         transformBlock(loopNode.getBody()));
++    
++    // Copy source information from the original node
++    forIn.setLineno(loopNode.getLineno());
++    forIn.setCharno(loopNode.getCharno());
++    
++    return forIn;
+ }
+\ No newline at end of file

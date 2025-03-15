@@ -1,0 +1,17 @@
+diff --git a/tmp/044d0fa6-0143-42c5-b3f4-c5b61a0491b5_buggy.java b/tmp/cfbd6556-f239-4cdd-b5c3-f5d9a3e95662_fixed.java
+index 42d4174..c8d8e12 100644
+--- a/tmp/044d0fa6-0143-42c5-b3f4-c5b61a0491b5_buggy.java
++++ b/tmp/cfbd6556-f239-4cdd-b5c3-f5d9a3e95662_fixed.java
+@@ -1,7 +1,10 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
+-    return result;
++    if (result == null) {
++      throw new IllegalStateException("Unexpected end of JSDoc comment");
++    }
++    return result.trim();
+   }
+\ No newline at end of file

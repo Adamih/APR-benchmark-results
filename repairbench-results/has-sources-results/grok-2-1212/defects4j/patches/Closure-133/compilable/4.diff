@@ -1,0 +1,20 @@
+diff --git a/tmp/1d9a15a1-078a-4a44-9027-73b91fa808c0_buggy.java b/tmp/07bf1520-fc4d-4817-9637-224e367c3a14_fixed.java
+index 42d4174..adca443 100644
+--- a/tmp/1d9a15a1-078a-4a44-9027-73b91fa808c0_buggy.java
++++ b/tmp/07bf1520-fc4d-4817-9637-224e367c3a14_fixed.java
+@@ -1,7 +1,13 @@
+   /**
+-   * Returns the remainder of the line.
++   * Returns the remainder of the line, trimmed of leading and trailing whitespace.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    // Trim the result to remove leading and trailing whitespace
++    result = result.trim();
++    // Remove any trailing newline characters
++    if (result.endsWith("\n")) {
++      result = result.substring(0, result.length() - 1);
++    }
+     return result;
+   }
+\ No newline at end of file

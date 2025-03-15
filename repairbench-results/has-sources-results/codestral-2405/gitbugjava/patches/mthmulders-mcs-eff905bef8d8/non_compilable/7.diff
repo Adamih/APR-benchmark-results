@@ -1,0 +1,17 @@
+diff --git a/tmp/8111d11f-32ac-4743-9851-295ee044e633_buggy.java b/tmp/db95eb53-09c2-4825-a901-9ae55e940f69_fixed.java
+index 1186509..10fb468 100644
+--- a/tmp/8111d11f-32ac-4743-9851-295ee044e633_buggy.java
++++ b/tmp/db95eb53-09c2-4825-a901-9ae55e940f69_fixed.java
+@@ -1,7 +1,10 @@
+ private void printRow(final Help.TextTable table, final SearchResponse.Response.Doc doc) {
+     var lastUpdated = DATE_TIME_FORMATTER.format(
+             Instant.ofEpochMilli(doc.timestamp()).atZone(ZoneId.systemDefault())
+     );
+ 
+-        table.addRowValues(doc.id(), lastUpdated);
++    // Concatenate Group, Artifact, and Version to create the GAV String
++    var gav = doc.groupId() + ":" + doc.artifactId() + ":" + doc.version();
++
++    table.addRowValues(gav, lastUpdated);
+ }
+\ No newline at end of file

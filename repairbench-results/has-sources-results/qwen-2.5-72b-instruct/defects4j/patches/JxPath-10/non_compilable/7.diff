@@ -1,0 +1,18 @@
+diff --git a/tmp/3ed60f04-291b-46f0-a718-c015756bae1b_buggy.java b/tmp/b457ff5f-d72c-438b-b75d-b94a525f59b1_fixed.java
+index b86b44d..f41ca2c 100644
+--- a/tmp/3ed60f04-291b-46f0-a718-c015756bae1b_buggy.java
++++ b/tmp/b457ff5f-d72c-438b-b75d-b94a525f59b1_fixed.java
+@@ -1,4 +1,10 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        Object arg1 = args[0].computeValue(context);
++        Object arg2 = args[1].computeValue(context);
++        
++        if (arg1 instanceof NodeSet && ((NodeSet) arg1).length() == 0) {
++            return Boolean.FALSE;
++        }
++        
++        return compute(arg1, arg2) ? Boolean.TRUE : Boolean.FALSE;
+     }
+\ No newline at end of file

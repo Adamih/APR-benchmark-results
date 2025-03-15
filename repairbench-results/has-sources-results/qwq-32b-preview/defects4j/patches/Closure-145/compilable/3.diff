@@ -1,0 +1,29 @@
+diff --git a/tmp/28db7e8d-cfb1-4b4c-8ff4-c6e99b8b83a8_buggy.java b/tmp/0f44794e-966a-4626-8559-307c7e7b12e5_fixed.java
+index 57f69c5..498e4fd 100644
+--- a/tmp/28db7e8d-cfb1-4b4c-8ff4-c6e99b8b83a8_buggy.java
++++ b/tmp/0f44794e-966a-4626-8559-307c7e7b12e5_fixed.java
+@@ -1,12 +1,15 @@
+   /**
+-   * @return Whether the Node is a DO or FUNCTION (with or without
+-   * labels).
++   * @return Whether the Node is a DO or FUNCTION (with or without labels).
+    */
+   private boolean isOneExactlyFunctionOrDo(Node n) {
+-        // For labels with block children, we need to ensure that a
+-        // labeled FUNCTION or DO isn't generated when extraneous BLOCKs 
+-        // are skipped. 
+-          // Either a empty statement or an block with more than one child,
+-          // way it isn't a FUNCTION or DO.
+-      return (n.getType() == Token.FUNCTION || n.getType() == Token.DO);
++    // Check if the node is a function or a do-while loop.
++    if (n.getType() == Token.FUNCTION || n.getType() == Token.DO) {
++      return true;
++    }
++    // Check if the node is a labeled statement with a function or do-while as its body.
++    if (n.getType() == Token.LABEL && n.getFirstChild() != null) {
++      Node body = n.getFirstChild();
++      return body.getType() == Token.FUNCTION || body.getType() == Token.DO;
++    }
++    return false;
+   }
+\ No newline at end of file

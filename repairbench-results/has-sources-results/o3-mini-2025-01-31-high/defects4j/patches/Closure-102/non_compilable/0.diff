@@ -1,0 +1,24 @@
+diff --git a/tmp/418b58c0-bff8-4fd9-96bd-0db127420ad7_buggy.java b/tmp/99e9cfa9-7917-4571-81f4-3caaf5b3387f_fixed.java
+index f47d784..50f0291 100644
+--- a/tmp/418b58c0-bff8-4fd9-96bd-0db127420ad7_buggy.java
++++ b/tmp/99e9cfa9-7917-4571-81f4-3caaf5b3387f_fixed.java
+@@ -1,12 +1,16 @@
+ @Override
+ public void process(Node externs, Node root) {
++  // First traverse the AST with this pass.
+   NodeTraversal.traverse(compiler, root, this);
++  // Remove duplicate declarations (such as an explicit "var arguments")
++  // before renaming local names. This ensures that the special name
++  // "arguments" isn’t altered.
++  removeDuplicateDeclarations(root);
+   if (MAKE_LOCAL_NAMES_UNIQUE) {
+     MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+     NodeTraversal t = new NodeTraversal(compiler, renamer);
+     t.traverseRoots(externs, root);
+   }
+-    removeDuplicateDeclarations(root);
+-    new PropogateConstantAnnotations(compiler, assertOnChange)
++  new PropagateConstantAnnotations(compiler, assertOnChange)
+       .process(externs, root);
+ }
+\ No newline at end of file

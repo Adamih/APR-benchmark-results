@@ -1,0 +1,18 @@
+diff --git a/tmp/37f3bbe0-7c62-488d-b54c-f8376c9e9212_buggy.java b/tmp/91020c6f-36e1-4f4d-9e3b-90d7aea74bd2_fixed.java
+index 593602f..a4bceff 100644
+--- a/tmp/37f3bbe0-7c62-488d-b54c-f8376c9e9212_buggy.java
++++ b/tmp/91020c6f-36e1-4f4d-9e3b-90d7aea74bd2_fixed.java
+@@ -1,6 +1,11 @@
+     @Override
+     public String toString() {
+-        return rangesList.stream()
++        String result = rangesList.stream()
+             .map(RangesList::formatRanges)
+             .collect(joining(OR_JOINER));
++        // Remove outer parentheses if they exist
++        if (result.startsWith("(") && result.endsWith(")")) {
++            result = result.substring(1, result.length() - 1);
++        }
++        return result;
+     }
+\ No newline at end of file

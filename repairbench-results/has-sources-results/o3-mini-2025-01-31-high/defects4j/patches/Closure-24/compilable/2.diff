@@ -1,0 +1,37 @@
+diff --git a/tmp/ce4efaf1-1893-4757-9212-0f022f721fb0_buggy.java b/tmp/cb490cba-9d9e-4e27-bdab-bc6905fc24c5_fixed.java
+index 602226b..95e7350 100644
+--- a/tmp/ce4efaf1-1893-4757-9212-0f022f721fb0_buggy.java
++++ b/tmp/cb490cba-9d9e-4e27-bdab-bc6905fc24c5_fixed.java
+@@ -1,26 +1,22 @@
+ private void findAliases(NodeTraversal t) {
+   Scope scope = t.getScope();
+   for (Var v : scope.getVarIterable()) {
+     Node n = v.getNode();
+-        int type = n.getType();
+-        Node parent = n.getParent();
+-        if (parent.isVar()) {
++    // If the variable is assigned a qualified name, then it is a valid alias.
+     if (n.hasChildren() && n.getFirstChild().isQualifiedName()) {
+       String name = n.getString();
+       Var aliasVar = scope.getVar(name);
+       aliases.put(name, aliasVar);
+ 
+-          String qualifiedName =
+-              aliasVar.getInitialValue().getQualifiedName();
++      String qualifiedName = aliasVar.getInitialValue().getQualifiedName();
+       transformation.addAlias(name, qualifiedName);
+       // Bleeding functions already get a BAD_PARAMETERS error, so just
+       // do nothing.
+-          // Parameters of the scope function also get a BAD_PARAMETERS
+-          // error.
++      // Parameters of the scope function also get a BAD_PARAMETERS error.
+     } else {
+-          // TODO(robbyw): Support using locals for private variables.
++      // For any variable declaration (or function declaration) that is not a
++      // simple alias of a qualified name, report an error.
+       report(t, n, GOOG_SCOPE_NON_ALIAS_LOCAL, n.getString());
+     }
+   }
+ }
+\ No newline at end of file
+-    }

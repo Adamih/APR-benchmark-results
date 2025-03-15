@@ -1,0 +1,33 @@
+diff --git a/tmp/43dff2fd-8c80-411e-9fcc-6e781a2946fb_buggy.java b/tmp/289ea423-db61-4d57-a45d-ee41c3e3e87e_fixed.java
+index 19fe1b4..ba7e5bc 100644
+--- a/tmp/43dff2fd-8c80-411e-9fcc-6e781a2946fb_buggy.java
++++ b/tmp/289ea423-db61-4d57-a45d-ee41c3e3e87e_fixed.java
+@@ -1,17 +1,24 @@
+     public static boolean isJSIdentifier(String s) {
+         int length = s.length();
+ 
+         if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++            !Character.isJavaIdentifierStart(s.charAt(0)) ||
++            !isValidJSCharacter(s.charAt(0))) {
+             return false;
+         }
+ 
+         for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++            if (!Character.isJavaIdentifierPart(s.charAt(i)) || !isValidJSCharacter(s.charAt(i))) {
+                 return false;
+             }
+         }
+ 
+         return true;
+     }
++
++    private static boolean isValidJSCharacter(char c) {
++        // JavaScript identifiers follow slightly stricter rules
++        // compared to Java. Adding a stricter check to exclude
++        // invalid JS characters like control characters, etc.
++        return c >= 0x20 && c != 0x7F; // Exclude control chars (below 0x20) & DEL (0x7F)
++    }
+\ No newline at end of file

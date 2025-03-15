@@ -1,0 +1,43 @@
+diff --git a/tmp/58d9c92a-2bad-43a5-9c31-b832bf9b38f9_buggy.java b/tmp/5e46a5e9-95f2-4bc9-8a67-c302e0c539b3_fixed.java
+index 710fcc0..27afe7f 100644
+--- a/tmp/58d9c92a-2bad-43a5-9c31-b832bf9b38f9_buggy.java
++++ b/tmp/5e46a5e9-95f2-4bc9-8a67-c302e0c539b3_fixed.java
+@@ -1,37 +1,37 @@
+     Object returnValueFor(Class<?> type) {
+         if (Primitives.isPrimitiveOrWrapper(type)) {
+             return Primitives.defaultValueForPrimitiveOrWrapper(type);
+             //new instances are used instead of Collections.emptyList(), etc.
+             //to avoid UnsupportedOperationException if code under test modifies returned collection
+-        } else if (type == Collection.class) {
++        } else if (type == Collection.class || type == Iterable.class) {
+             return new LinkedList<Object>();
+         } else if (type == Set.class) {
+             return new HashSet<Object>();
+         } else if (type == HashSet.class) {
+             return new HashSet<Object>();
+         } else if (type == SortedSet.class) {
+             return new TreeSet<Object>();
+         } else if (type == TreeSet.class) {
+             return new TreeSet<Object>();
+         } else if (type == LinkedHashSet.class) {
+             return new LinkedHashSet<Object>();
+         } else if (type == List.class) {
+             return new LinkedList<Object>();
+         } else if (type == LinkedList.class) {
+             return new LinkedList<Object>();
+         } else if (type == ArrayList.class) {
+             return new ArrayList<Object>();
+         } else if (type == Map.class) {
+             return new HashMap<Object, Object>();
+         } else if (type == HashMap.class) {
+             return new HashMap<Object, Object>();
+         } else if (type == SortedMap.class) {
+             return new TreeMap<Object, Object>();
+         } else if (type == TreeMap.class) {
+             return new TreeMap<Object, Object>();
+         } else if (type == LinkedHashMap.class) {
+             return new LinkedHashMap<Object, Object>();
+         }
+         //Let's not care about the rest of collections.
+         return null;
+     }

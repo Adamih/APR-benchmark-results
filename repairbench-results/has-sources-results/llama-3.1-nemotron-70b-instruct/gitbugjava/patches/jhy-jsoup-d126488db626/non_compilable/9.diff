@@ -1,0 +1,39 @@
+diff --git a/tmp/47a68fbd-944b-4327-a5b4-00f824431054_buggy.java b/tmp/50d68a46-528b-4266-8a4a-4f4ab76c69e1_fixed.java
+index 5bf31b1..9117829 100644
+--- a/tmp/47a68fbd-944b-4327-a5b4-00f824431054_buggy.java
++++ b/tmp/50d68a46-528b-4266-8a4a-4f4ab76c69e1_fixed.java
+@@ -1,17 +1,29 @@
++/**
++ * Consume a sub-query, handling balancing and combinators.
++ * 
++ * @return the consumed sub-query as a string
++ */
+ private String consumeSubQuery() {
+     StringBuilder sq = StringUtil.borrowBuilder();
++    boolean combinatorConsumed = false; // track if a combinator has been consumed
+     while (!tq.isEmpty()) {
+         if (tq.matches("("))
+             sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+         else if (tq.matches("["))
+             sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++        else if (tq.matchesAny(Combinators)) {
++            if (combinatorConsumed) // if already consumed a combinator, break
+                 break;
++            combinatorConsumed = true; // mark as consumed
++            if (sq.length() > 0) // if sq is not empty, append the combinator and break
++                sq.append(tq.consume());
+             else
+-                    tq.consume();
+-            else
++                tq.consume(); // else just consume the combinator
++        } else {
++            if (combinatorConsumed && tq.matches(">")) // if already consumed a combinator and next is '>', break
++                break;
+             sq.append(tq.consume());
+         }
++    }
+     return StringUtil.releaseBuilder(sq);
+ }
+\ No newline at end of file

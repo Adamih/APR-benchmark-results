@@ -1,0 +1,41 @@
+diff --git a/tmp/456cf768-b6dd-4795-84c7-2c78c5633cea_buggy.java b/tmp/c8cb0a79-81da-4e8f-bf6f-3ce2dd16f337_fixed.java
+index ef76662..1f9a68c 100644
+--- a/tmp/456cf768-b6dd-4795-84c7-2c78c5633cea_buggy.java
++++ b/tmp/c8cb0a79-81da-4e8f-bf6f-3ce2dd16f337_fixed.java
+@@ -1,17 +1,35 @@
+ void read(Tokeniser t, CharacterReader r) {
+     char c = r.consume();
+     switch (c) {
+         case '>':
+             t.tagPending.selfClosing = true;
+             t.emitTagPending();
+             t.transition(Data);
+             break;
++        case '/':
++            c = r.consume();
++            if (c == '>' || Character.isWhitespace(c)) {
++                t.tagPending.selfClosing = true;
++                t.emitTagPending();
++                t.transition(Data);
++                break;
++            } else {
++                // If not end of the tag, put the consumed character back and fall through
++                r.unconsume();
++                // Continue parsing the character as part of the attribute name
++            }
+         case eof:
+             t.eofError(this);
+             t.transition(Data);
+             break;
+         default:
++            // If the character is not a '/', consume it as part of the attribute name
+             t.error(this);
+             t.transition(BeforeAttributeName);
++            // Re-consume the character
++            r.unconsume();
+     }
++    // Process the character based on the new state
++    // This should be the usual flow of the function after handling the character,
++    // which has not changed and should be the same as before if this fix is applied correctly
+ }
+\ No newline at end of file

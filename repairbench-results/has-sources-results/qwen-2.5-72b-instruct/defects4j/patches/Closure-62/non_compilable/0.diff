@@ -1,0 +1,54 @@
+diff --git a/tmp/091be071-e2d2-4d72-bf73-4d48791dd159_buggy.java b/tmp/6975b9ed-256d-47f5-9340-8b6b6b79c6e3_fixed.java
+index 904dba7..4ba19f1 100644
+--- a/tmp/091be071-e2d2-4d72-bf73-4d48791dd159_buggy.java
++++ b/tmp/6975b9ed-256d-47f5-9340-8b6b6b79c6e3_fixed.java
+@@ -1,46 +1,46 @@
+ private String format(JSError error, boolean warning) {
+     // extract source excerpt
+     SourceExcerptProvider source = getSource();
+     String sourceExcerpt = source == null ? null :
+         excerpt.get(
+             source, error.sourceName, error.lineNumber, excerptFormatter);
+ 
+     // formatting the message
+     StringBuilder b = new StringBuilder();
+     if (error.sourceName != null) {
+       b.append(error.sourceName);
+       if (error.lineNumber > 0) {
+         b.append(':');
+         b.append(error.lineNumber);
+       }
+       b.append(": ");
+     }
+ 
+     b.append(getLevelName(warning ? CheckLevel.WARNING : CheckLevel.ERROR));
+     b.append(" - ");
+ 
+     b.append(error.description);
+     b.append('\n');
+     if (sourceExcerpt != null) {
+       b.append(sourceExcerpt);
+       b.append('\n');
+       int charno = error.getCharno();
+ 
+       // padding equal to the excerpt and arrow at the end
+-      // charno == sourceExpert.length() means something is missing
++      // charno == sourceExcerpt.length() means something is missing
+       // at the end of the line
+-      if (excerpt.equals(LINE)
++      if (excerpt.equals(SourceExcerptProvider.Excerpt.LINE)
+           && 0 <= charno && charno < sourceExcerpt.length()) {
+         for (int i = 0; i < charno; i++) {
+           char c = sourceExcerpt.charAt(i);
+           if (Character.isWhitespace(c)) {
+             b.append(c);
+           } else {
+             b.append(' ');
+           }
+         }
+         b.append("^\n");
+       }
+     }
+     return b.toString();
+   }
+\ No newline at end of file

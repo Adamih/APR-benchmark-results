@@ -1,0 +1,18 @@
+diff --git a/tmp/ceec9cfe-7c53-4fc2-bc51-a5371823b2d4_buggy.java b/tmp/a423daee-0e05-4610-bdd6-74eb8819cd2a_fixed.java
+index ee836e4..dd43f6c 100644
+--- a/tmp/ceec9cfe-7c53-4fc2-bc51-a5371823b2d4_buggy.java
++++ b/tmp/a423daee-0e05-4610-bdd6-74eb8819cd2a_fixed.java
+@@ -1,9 +1,12 @@
+ @Override
+ protected String buildCanonicalName()
+ {
+     StringBuilder sb = new StringBuilder();
+     sb.append(_class.getName());
++    if (_referencedType!= null) { // added null check for safety
+         sb.append('<');
+         sb.append(_referencedType.toCanonical());
++        sb.append('>'); // added closing angle bracket
++    }
+     return sb.toString();
+ }
+\ No newline at end of file

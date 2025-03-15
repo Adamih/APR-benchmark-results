@@ -1,0 +1,28 @@
+diff --git a/tmp/86bd5310-6f82-4b21-b77c-5e35f6b2a508_buggy.java b/tmp/9a2a0707-82b1-4ac3-8a82-6d0421f5d1ad_fixed.java
+index 6fecc90..7e4d9b5 100644
+--- a/tmp/86bd5310-6f82-4b21-b77c-5e35f6b2a508_buggy.java
++++ b/tmp/9a2a0707-82b1-4ac3-8a82-6d0421f5d1ad_fixed.java
+@@ -1,7 +1,22 @@
+ static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
++        switch (n.getType()) {
++            case Token.ADD:
++                // If any operand may be a string, the addition may be string concatenation.
++                return mayBeString(n.getFirstChild(), true) ||
++                       mayBeString(n.getLastChild(), true);
++            case Token.COND:
++                // If either the true or false branch may be a string, the conditional may be a string.
++                return mayBeString(n.getSecondChild(), true) ||
++                       mayBeString(n.getThirdChild(), true);
++            case Token.OR:
++                // If any operand may be a string, the OR may result in a string.
++                return mayBeString(n.getFirstChild(), true) ||
++                       mayBeString(n.getLastChild(), true);
++            default:
+                 return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
++        }
+     } else {
+         return mayBeStringHelper(n);
+     }
+ }
+\ No newline at end of file

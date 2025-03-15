@@ -1,0 +1,21 @@
+diff --git a/tmp/e4482713-c120-40fd-a923-4a52fe17eded_buggy.java b/tmp/754f692c-2536-45af-b029-99b13ee0b7f9_fixed.java
+index 6c3142f..b917c29 100644
+--- a/tmp/e4482713-c120-40fd-a923-4a52fe17eded_buggy.java
++++ b/tmp/754f692c-2536-45af-b029-99b13ee0b7f9_fixed.java
+@@ -1,10 +1,13 @@
+ static boolean isSimpleNumber(String s) {
+     int len = s.length();
++    if (len == 0) {
++        return false; // An empty string is not a simple number
++    }
+     for (int index = 0; index < len; index++) {
+         char c = s.charAt(index);
+         if (c < '0' || c > '9') {
+-        return false;
++            return false; // If any character is not a digit, it's not a simple number
+         }
+     }
+-    return len > 0 && s.charAt(0) != '0';
++    return s.charAt(0) != '0' || len == 1; // It's a simple number if it doesn't start with '0', unless it's exactly "0"
+ }
+\ No newline at end of file

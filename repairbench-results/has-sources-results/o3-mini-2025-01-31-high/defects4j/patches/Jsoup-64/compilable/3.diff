@@ -1,0 +1,19 @@
+diff --git a/tmp/7be10f1b-d0b5-40f4-a942-a14bbc312e56_buggy.java b/tmp/1f60b472-24a2-4fbc-8784-c303f285efcd_fixed.java
+index 5eedc11..00ad112 100644
+--- a/tmp/7be10f1b-d0b5-40f4-a942-a14bbc312e56_buggy.java
++++ b/tmp/1f60b472-24a2-4fbc-8784-c303f285efcd_fixed.java
+@@ -1,6 +1,13 @@
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+     tb.insert(startTag);
++    if (startTag.isSelfClosing()) {
++        // For self-closing raw text elements (like <style /> or <noframes />),
++        // do not enter raw text mode—instead, close the element immediately.
++        tb.tokeniser.transition(TokeniserState.Data);
++        tb.pop();
++    } else {
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
+         tb.transition(Text);
+     }
++}
+\ No newline at end of file

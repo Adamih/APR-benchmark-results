@@ -1,0 +1,26 @@
+diff --git a/tmp/bea67a77-9261-49b8-a3df-52b1ba36bed5_buggy.java b/tmp/6a801555-4a99-446d-ab16-7255c20122d5_fixed.java
+index 6fecc90..ccc7549 100644
+--- a/tmp/bea67a77-9261-49b8-a3df-52b1ba36bed5_buggy.java
++++ b/tmp/6a801555-4a99-446d-ab16-7255c20122d5_fixed.java
+@@ -1,7 +1,15 @@
+-  static boolean mayBeString(Node n, boolean recurse) {
+-    if (recurse) {
+-      return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+-    } else {
+-      return mayBeStringHelper(n);
++private static boolean mayBeStringHelper(Node n) {
++    NodeType nodeType = n.getToken().getType();
++
++    switch (nodeType) {
++      case COND:
++        return mayBeStringHelper(n.getFirstChild()) ||
++            mayBeStringHelper(n.getSecondChild().getNext());
++      case NUMBER:
++      case STRING:
++        return nodeType == TokenType.STRING;
++      // Add more cases as necessary
++      default:
++        throw new IllegalStateException("Unhandled node type: " + nodeType);
+     }
+ }
+\ No newline at end of file

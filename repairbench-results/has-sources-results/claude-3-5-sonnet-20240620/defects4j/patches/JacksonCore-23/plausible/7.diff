@@ -1,0 +1,14 @@
+diff --git a/tmp/0b45986e-429c-44cd-98da-c7d165d7b018_buggy.java b/tmp/3fbe2ba2-574b-4704-a608-63811100d942_fixed.java
+index fc49bcd..71cb497 100644
+--- a/tmp/0b45986e-429c-44cd-98da-c7d165d7b018_buggy.java
++++ b/tmp/3fbe2ba2-574b-4704-a608-63811100d942_fixed.java
+@@ -1,4 +1,8 @@
+ @Override
+ public DefaultPrettyPrinter createInstance() {
++    if (getClass() != DefaultPrettyPrinter.class) {
++        throw new IllegalStateException(String.format(
++            "Sub-class %s does not override createInstance()", getClass().getName()));
++    }
+     return new DefaultPrettyPrinter(this);
+ }
+\ No newline at end of file

@@ -1,0 +1,48 @@
+diff --git a/tmp/558496ef-fea2-4ffe-8a61-64753be2c0c4_buggy.java b/tmp/362588f7-59cf-466a-9863-48588441580a_fixed.java
+index 4b7f469..d1aba1b 100644
+--- a/tmp/558496ef-fea2-4ffe-8a61-64753be2c0c4_buggy.java
++++ b/tmp/362588f7-59cf-466a-9863-48588441580a_fixed.java
+@@ -1,10 +1,40 @@
+ static boolean isSimpleNumber(String s) {
++    if (s == null || s.isEmpty()) {
++        return false;
++    }
++
+     int len = s.length();
+-    for (int index = 0; index < len; index++) {
++    int start = 0;
++    boolean isHex = false;
++    boolean isOctal = false;
++
++    // Check for hex prefix
++    if (len > 2 && s.charAt(0) == '0' && (s.charAt(1) == 'x' || s.charAt(1) == 'X')) {
++        start = 2;
++        isHex = true;
++    } 
++    // Check for octal prefix
++    else if (len > 1 && s.charAt(0) == '0') {
++        start = 1;
++        isOctal = true;
++    }
++
++    for (int index = start; index < len; index++) {
+         char c = s.charAt(index);
++        if (isHex) {
++            if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
++                return false;
++            }
++        } else if (isOctal) {
++            if (c < '0' || c > '7') {
++                return false;
++            }
++        } else {
+             if (c < '0' || c > '9') {
+                 return false;
+             }
+         }
+-    return len > 0;
++    }
++
++    return true;
+ }
+\ No newline at end of file

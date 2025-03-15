@@ -1,0 +1,21 @@
+diff --git a/tmp/86b498a5-a4e1-4e8c-95f2-d76d65376cdc_buggy.java b/tmp/10931411-7f92-439a-8f8b-08fe61636735_fixed.java
+index b86b44d..a500e4a 100644
+--- a/tmp/86b498a5-a4e1-4e8c-95f2-d76d65376cdc_buggy.java
++++ b/tmp/10931411-7f92-439a-8f8b-08fe61636735_fixed.java
+@@ -1,4 +1,13 @@
++/**
++ * Fixed function to handle empty node sets correctly.
++ * Returns Boolean.FALSE if either operand is an empty node set.
++ */
+ public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    Object left = args[0].computeValue(context);
++    Object right = args[1].computeValue(context);
++    
++    if (left instanceof NodeType && ((NodeType) left).isEmpty()) return Boolean.FALSE;
++    if (right instanceof NodeType && ((NodeType) right).isEmpty()) return Boolean.FALSE;
++    
++    return compute(left, right)? Boolean.TRUE : Boolean.FALSE;
+ }
+\ No newline at end of file

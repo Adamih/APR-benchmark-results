@@ -1,0 +1,26 @@
+diff --git a/tmp/701c4eee-5253-44fc-b29b-b31415209207_buggy.java b/tmp/cefb4a35-99c4-415b-9197-1271c028c5fa_fixed.java
+index a37dc7a..a93e78f 100644
+--- a/tmp/701c4eee-5253-44fc-b29b-b31415209207_buggy.java
++++ b/tmp/cefb4a35-99c4-415b-9197-1271c028c5fa_fixed.java
+@@ -1,10 +1,19 @@
++/**
++ * Inserts the given child nodes at the specified index, shifting existing child nodes to the right.
++ * 
++ * @param index    the index at which to insert the child nodes
++ * @param children the child nodes to insert
++ */
+ protected void addChildren(int index, Node... children) {
+     Validate.noNullElements(children);
+     ensureChildNodes();
+     for (int i = children.length - 1; i >= 0; i--) {
+         Node in = children[i];
+         reparentChild(in);
++        // Fix: Adjust the insertion index after each insertion to account for the shift
+         childNodes.add(index, in);
++        // Increment index to maintain correct insertion point for subsequent nodes
++        index++;
+     }
+-        reindexChildren(index);
++    reindexChildren(0); // Reindex from the start after all insertions
+ }
+\ No newline at end of file

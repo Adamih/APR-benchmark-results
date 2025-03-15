@@ -1,0 +1,33 @@
+diff --git a/tmp/b2c5402f-c100-4d80-ad6d-d35d60da6d23_buggy.java b/tmp/3491f3b2-ca18-40e1-9552-37e36b9bc000_fixed.java
+index d457dbe..c68db28 100644
+--- a/tmp/b2c5402f-c100-4d80-ad6d-d35d60da6d23_buggy.java
++++ b/tmp/3491f3b2-ca18-40e1-9552-37e36b9bc000_fixed.java
+@@ -1,10 +1,26 @@
+ @Override
+ public boolean equals(Object o) {
+     if (this == o) return true;
+     if (o == null || getClass() != o.getClass()) return false;
+     if (!super.equals(o)) return false;
+ 
+     Element element = (Element) o;
+ 
+-        return this == o;
++    // Compare attributes
++    if (attributes().size() != element.attributes().size()) return false;
++    for (Attribute attr : attributes()) {
++        if (!element.hasAttr(attr.getKey()) || !attr.getValue().equals(element.attr(attr.getKey()))) {
++            return false;
++        }
++    }
++
++    // Compare child nodes
++    if (childNodeSize() != element.childNodeSize()) return false;
++    for (int i = 0; i < childNodeSize(); i++) {
++        if (!childNode(i).equals(element.childNode(i))) {
++            return false;
++        }
++    }
++
++    return true;
+ }
+\ No newline at end of file

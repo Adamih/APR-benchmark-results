@@ -1,0 +1,30 @@
+diff --git a/tmp/ab680cec-d92a-4a40-a50f-c11519a87e61_buggy.java b/tmp/646cd4ac-949e-401b-96e6-61dee92cdf1f_fixed.java
+index 511560e..be33acf 100644
+--- a/tmp/ab680cec-d92a-4a40-a50f-c11519a87e61_buggy.java
++++ b/tmp/646cd4ac-949e-401b-96e6-61dee92cdf1f_fixed.java
+@@ -1,21 +1,4 @@
+-    private boolean inSpecificScope(String[] targetNames, String[] baseTypes, String[] extraTypes) {
+-        // https://html.spec.whatwg.org/multipage/parsing.html#has-an-element-in-the-specific-scope
+-        int bottom = stack.size() -1;
+-        if (bottom > MaxScopeSearchDepth) {
+-            bottom = MaxScopeSearchDepth;
+-        }
+-        final int top = bottom > MaxScopeSearchDepth ? bottom - MaxScopeSearchDepth : 0;
+-        // don't walk too far up the tree
+-
+-        for (int pos = bottom; pos >= top; pos--) {
+-            final String elName = stack.get(pos).nodeName();
+-            if (inSorted(elName, targetNames))
+-                return true;
+-            if (inSorted(elName, baseTypes))
+-                return false;
+-            if (extraTypes != null && inSorted(elName, extraTypes))
+-                return false;
+-        }
+-        //Validate.fail("Should not be reachable"); // would end up false because hitting 'html' at root (basetypes)
+-        return false;
++@Override
++protected JSType caseTopType(JSType topType) {
++  return topType.isTop() ? ARRAY_TYPE : topType;
+ }
+\ No newline at end of file

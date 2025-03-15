@@ -1,0 +1,44 @@
+diff --git a/tmp/e4b290bf-b2a1-4d11-bdcc-edd360ed310d_buggy.java b/tmp/98cf151b-f5c3-4af5-ad66-931b4f1b5106_fixed.java
+index 81a6e8b..50996c8 100644
+--- a/tmp/e4b290bf-b2a1-4d11-bdcc-edd360ed310d_buggy.java
++++ b/tmp/98cf151b-f5c3-4af5-ad66-931b4f1b5106_fixed.java
+@@ -1,19 +1,34 @@
+     /**
+      * Tells if the token looks like a short option.
+      *
+      * @param token
+      */
+     private boolean isShortOption(String token)
+     {
+         // short options (-S, -SV, -S=V, -SV1=V2, -S1S2)
+         if (!token.startsWith("-") || token.length() == 1)
+         {
+             return false;
+         }
+ 
+-        // remove leading "-" and "=value"
+-        int pos = token.indexOf("=");
+-        String optName = pos == -1 ? token.substring(1) : token.substring(1, pos);
+-        return options.hasShortOption(optName);
+         // check for several concatenated short options
++        token = token.substring(1);
++        while (token.length() > 0) {
++            int pos = token.indexOf("=");
++            String optName;
++
++            if (pos == -1) {
++                optName = token.substring(0, 1);
++                token = token.substring(1);
++            } else {
++                optName = token.substring(0, pos);
++                token = token.substring(pos+1);
++                break;
++            }
++
++            if (!options.hasShortOption(optName)) {
++                return false;
++            }
++        }
++        return !token.isEmpty();  // Return true only if token processing leaves nothing
+     }
+\ No newline at end of file

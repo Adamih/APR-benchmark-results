@@ -1,0 +1,43 @@
+diff --git a/tmp/e0a202ab-d17e-471c-9883-fb42c8ad9315_buggy.java b/tmp/35082468-8fd1-46bd-8597-626a7323ad5f_fixed.java
+index 00914da..343594d 100644
+--- a/tmp/e0a202ab-d17e-471c-9883-fb42c8ad9315_buggy.java
++++ b/tmp/35082468-8fd1-46bd-8597-626a7323ad5f_fixed.java
+@@ -1,17 +1,30 @@
+-    // does not recurse.
+ private void normalise(Element element) {
+     List<Node> toMove = new ArrayList<Node>();
+-        for (Node node: element.childNodes) {
++    ListIterator<Node> iterator = element.childNodes.listIterator();
++    TextNode lastTextNode = null;
++    
++    while (iterator.hasNext()) {
++        Node node = iterator.next();
+         if (node instanceof TextNode) {
+             TextNode tn = (TextNode) node;
+-                if (!tn.isBlank())
+-                    toMove.add(tn);
++            if (tn.isBlank()) {
++                iterator.remove();
++            } else {
++                if (lastTextNode != null) {
++                    lastTextNode.text(lastTextNode.text() + tn.text());
++                    iterator.remove();
++                } else {
++                    lastTextNode = tn;
++                }
++            }
++        } else {
++            lastTextNode = null;
++            toMove.add(node);
++            iterator.remove();
+         }
+     }
+     
+     for (Node node: toMove) {
+-            element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++        element.appendChild(node);
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,42 @@
+diff --git a/tmp/d14391b1-4735-41d0-8c7a-0b7bf8bb0a09_buggy.java b/tmp/099ecda8-fbde-456d-a614-ba10d2a83295_fixed.java
+index 7498011..e840a5b 100644
+--- a/tmp/d14391b1-4735-41d0-8c7a-0b7bf8bb0a09_buggy.java
++++ b/tmp/099ecda8-fbde-456d-a614-ba10d2a83295_fixed.java
+@@ -1,12 +1,28 @@
+-    /**
+-     * Retrieves the element's inner HTML. E.g. on a {@code <div>} with one empty {@code <p>}, would return
+-     * {@code <p></p>}. (Whereas {@link #outerHtml()} would return {@code <div><p></p></div>}.)
+-     * 
+-     * @return String of HTML.
+-     * @see #outerHtml()
+-     */
+     public String html() {
+         StringBuilder accum = new StringBuilder();
+-        html(accum);
++        NodeTraversor.traverse(new NodeVisitor() {
++            public void head(Node node, int depth) {
++                if (node instanceof Element) {
++                    Element element = (Element) node;
++                    String tag = element.tagName();
++                    accum.append("<").append(tag);
++                    for (Attribute attribute : element.attributes()) {
++                        accum.append(" ").append(attribute.getKey()).append("=\"").append(attribute.getValue()).append("\"");
++                    }
++                    accum.append(">");
++                } else if (node instanceof TextNode) {
++                    TextNode textNode = (TextNode) node;
++                    accum.append(textNode.getWholeText());
++                }
++            }
++
++            public void tail(Node node, int depth) {
++                if (node instanceof Element) {
++                    Element element = (Element) node;
++                    String tag = element.tagName();
++                    accum.append("</").append(tag).append(">");
++                }
++            }
++        }, this);
+         return accum.toString().trim();
+     }
+\ No newline at end of file

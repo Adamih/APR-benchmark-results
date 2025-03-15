@@ -1,0 +1,44 @@
+diff --git a/tmp/24363741-5207-42a6-a5e6-abad20892eae_buggy.java b/tmp/e81e4123-67f4-4ef4-be8a-04b8d111492d_fixed.java
+index b98f0a7..0e9fc09 100644
+--- a/tmp/24363741-5207-42a6-a5e6-abad20892eae_buggy.java
++++ b/tmp/e81e4123-67f4-4ef4-be8a-04b8d111492d_fixed.java
+@@ -1,29 +1,39 @@
+   private FlowScope traverseNew(Node n, FlowScope scope) {
+ 
+     Node constructor = n.getFirstChild();
+     scope = traverse(constructor, scope);
+     JSType constructorType = constructor.getJSType();
+     JSType type = null;
+     if (constructorType != null) {
+       constructorType = constructorType.restrictByNotNullOrUndefined();
+       if (constructorType.isUnknownType()) {
+         type = getNativeType(UNKNOWN_TYPE);
+       } else {
+         FunctionType ct = constructorType.toMaybeFunctionType();
+         if (ct == null && constructorType instanceof FunctionType) {
+           // If constructorType is a NoObjectType, then toMaybeFunctionType will
+           // return null. But NoObjectType implements the FunctionType
+           // interface, precisely because it can validly construct objects.
+           ct = (FunctionType) constructorType;
+         }
+         if (ct != null && ct.isConstructor()) {
+           type = ct.getInstanceType();
++          // Use the declared type of the argument as the type of the
++          // corresponding parameter in the constructor call.
++          for (Node arg = constructor.getNext(), param = ct.getParametersNode().getFirstChild();
++               arg != null && param != null;
++               arg = arg.getNext(), param = param.getNext()) {
++            JSType paramType = param.getJSType();
++            if (paramType != null) {
++              scope = scope.inferSlotType(arg.getString(), paramType);
++            }
++          }
+         }
+       }
+     }
+     n.setJSType(type);
+     for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
+       scope = traverse(arg, scope);
+     }
+     return scope;
+   }

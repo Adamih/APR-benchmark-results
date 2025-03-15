@@ -1,0 +1,18 @@
+diff --git a/tmp/2c2979f8-65b0-46a1-8bac-da31cae51cd0_buggy.java b/tmp/d8b091d0-8ebd-4866-b4bf-5feea7251f32_fixed.java
+index ae12a4d..0bfa2c5 100644
+--- a/tmp/2c2979f8-65b0-46a1-8bac-da31cae51cd0_buggy.java
++++ b/tmp/d8b091d0-8ebd-4866-b4bf-5feea7251f32_fixed.java
+@@ -1,3 +1,11 @@
+ private boolean isFormatAsBlock(Document.OutputSettings out) {
+-        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
++    return getOwnFormatAsBlock() || (parent() != null && parent().isFormatAsBlock()) || out.outline();
++}
++
++private boolean getOwnFormatAsBlock() {
++    String display = attributes().getIgnoreCase("style");
++    if (display != null && display.toLowerCase().contains("display:block;")) {
++        return true;
++    }
++    return tag.formatAsBlock();
+ }
+\ No newline at end of file

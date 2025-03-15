@@ -1,0 +1,48 @@
+diff --git a/tmp/a572f8d4-e6b4-4570-b7e9-efaf78635507_buggy.java b/tmp/9579983d-335b-420c-a94f-a21aa0850695_fixed.java
+index 1bbc082..a07f942 100644
+--- a/tmp/a572f8d4-e6b4-4570-b7e9-efaf78635507_buggy.java
++++ b/tmp/9579983d-335b-420c-a94f-a21aa0850695_fixed.java
+@@ -1,36 +1,24 @@
+-    /**
+-     * Write an long integer into a buffer as an octal string if this
+-     * will fit, or as a binary number otherwise.
+-     * 
+-     * Uses {@link #formatUnsignedOctalString} to format
+-     * the value as an octal string with leading zeros.
+-     * The converted number is followed by a space.
+-     * 
+-     * @param value The value to write into the buffer.
+-     * @param buf The destination buffer.
+-     * @param offset The starting offset into the buffer.
+-     * @param length The length of the buffer.
+-     * @return The updated offset.
+-     * @throws IllegalArgumentException if the value (and trailer)
+-     * will not fit in the buffer.
+-     * @since 1.4
+-     */
+     public static int formatLongOctalOrBinaryBytes(
+         final long value, final byte[] buf, final int offset, final int length) {
+ 
+         // Check whether we are dealing with UID/GID or SIZE field
+         final long maxAsOctalChar = length == TarConstants.UIDLEN ? TarConstants.MAXID : TarConstants.MAXSIZE;
+ 
+         final boolean negative = value < 0;
+         if (!negative && value <= maxAsOctalChar) { // OK to store as octal chars
+             return formatLongOctalBytes(value, buf, offset, length);
+         }
+ 
+         if (length < 9) {
+-            formatLongBinary(value, buf, offset, length, negative);
++            // If the length is less than 9 bytes, the value is too large to store as binary
++            throw new IllegalArgumentException(
++                "Value " + value + " is too large for " + length + " byte field."
++            );
+         }
++
++        // Format as a binary number if octal representation doesn't fit
+         formatBigIntegerBinary(value, buf, offset, length, negative);
+ 
+         buf[offset] = (byte) (negative ? 0xff : 0x80);
+         return offset + length;
+     }
+\ No newline at end of file

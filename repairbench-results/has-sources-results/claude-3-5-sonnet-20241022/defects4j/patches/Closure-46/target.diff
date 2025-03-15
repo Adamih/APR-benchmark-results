@@ -1,0 +1,21 @@
+diff --git a/tmp/dd17bb7c-667c-4c51-86f1-ac56644f23f1_buggy.java b/tmp/e695a2de-9b13-41e0-8e9c-b220f1b653a1_fixed.java
+index 46817a7..e69de29 100644
+--- a/tmp/dd17bb7c-667c-4c51-86f1-ac56644f23f1_buggy.java
++++ b/tmp/e695a2de-9b13-41e0-8e9c-b220f1b653a1_fixed.java
+@@ -1,16 +0,0 @@
+-  @Override
+-  public JSType getLeastSupertype(JSType that) {
+-    if (!that.isRecordType()) {
+-      return super.getLeastSupertype(that);
+-    }
+-    RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
+-      }
+-    }
+-    return builder.build();
+-  }

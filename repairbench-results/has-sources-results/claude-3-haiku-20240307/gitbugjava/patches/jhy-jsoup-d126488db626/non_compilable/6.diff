@@ -1,0 +1,37 @@
+diff --git a/tmp/fabf83c6-207f-4b4a-8b01-a89a6da333e8_buggy.java b/tmp/ce4820fe-0da4-45e7-9d17-0cb274f52301_fixed.java
+index 5bf31b1..4f668a4 100644
+--- a/tmp/fabf83c6-207f-4b4a-8b01-a89a6da333e8_buggy.java
++++ b/tmp/ce4820fe-0da4-45e7-9d17-0cb274f52301_fixed.java
+@@ -1,17 +1,24 @@
+ private String consumeSubQuery() {
+     StringBuilder sq = StringUtil.borrowBuilder();
+     while (!tq.isEmpty()) {
+-            if (tq.matches("("))
++        if (tq.matches("(")) {
+             sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+-            else if (tq.matches("["))
++        } else if (tq.matches("[")) {
+             sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++        } else if (tq.matchesAny(Combinators)) {
++            if (sq.length() > 0) {
+                 break;
+-                else
++            } else {
+                 tq.consume();
+-            else
+-                sq.append(tq.consume());
++            }
++        } else {
++            String token = tq.consume();
++            if (token.equals(">") || token.equals("+") || token.equals("~")) {
++                sq.append(" ").append(token).append(" ");
++            } else {
++                sq.append(token);
++            }
++        }
+     }
+     return StringUtil.releaseBuilder(sq);
+ }
+\ No newline at end of file

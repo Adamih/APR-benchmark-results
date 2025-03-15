@@ -1,0 +1,14 @@
+diff --git a/tmp/9529c26c-35b7-46b6-b045-a8b940dd4a0d_buggy.java b/tmp/67cef992-2bde-4811-881e-f4e0fd7997e5_fixed.java
+index 5eedc11..1f708ea 100644
+--- a/tmp/9529c26c-35b7-46b6-b045-a8b940dd4a0d_buggy.java
++++ b/tmp/67cef992-2bde-4811-881e-f4e0fd7997e5_fixed.java
+@@ -1,6 +1,7 @@
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+     tb.insert(startTag);
+     tb.tokeniser.transition(TokeniserState.Rawtext);
+     tb.markInsertionMode();
+-        tb.transition(Text);
++    tb.insert(new Token.Character("")); // This line is added to fix the bug
++    tb.transition(TreeBuilder.TEXT);
+ }
+\ No newline at end of file

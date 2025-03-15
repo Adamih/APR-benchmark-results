@@ -1,0 +1,16 @@
+diff --git a/tmp/b159f323-ba0f-4c76-9d90-202b0a860a57_buggy.java b/tmp/23edc075-62bd-493d-83a9-5e3db14eded3_fixed.java
+index 6fecc90..34b96f9 100644
+--- a/tmp/b159f323-ba0f-4c76-9d90-202b0a860a57_buggy.java
++++ b/tmp/23edc075-62bd-493d-83a9-5e3db14eded3_fixed.java
+@@ -1,7 +1,9 @@
+ static boolean mayBeString(Node n, boolean recurse) {
+   if (recurse) {
+-      return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
++    // Recurse, but also handle the case where n is a binary expression with a string operand
++    return allResultsMatch(n, MAY_BE_STRING_PREDICATE) 
++           || (n.isBinaryExpression() && (mayBeStringHelper(n.getFirstChild()) || mayBeStringHelper(n.getSecondChild())));
+   } else {
+     return mayBeStringHelper(n);
+   }
+ }
+\ No newline at end of file

@@ -1,0 +1,40 @@
+diff --git a/tmp/e2f97d98-87f0-4d5e-b996-859233ae5b52_buggy.java b/tmp/e601a57d-0e46-4670-a08c-9357dcb155e2_fixed.java
+index c84c989..28d5d98 100644
+--- a/tmp/e2f97d98-87f0-4d5e-b996-859233ae5b52_buggy.java
++++ b/tmp/e601a57d-0e46-4670-a08c-9357dcb155e2_fixed.java
+@@ -1,27 +1,33 @@
+ private Position decodeIridiumPosition(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
+ 
+     buf.readUnsignedShortLE(); // length
+ 
+     buf.skipBytes(3); // identification header
+     buf.readUnsignedIntLE(); // index
+ 
+     DeviceSession deviceSession = getDeviceSession(
+             channel, remoteAddress, buf.readSlice(15).toString(StandardCharsets.US_ASCII));
+     if (deviceSession == null) {
+         return null;
+     }
+ 
+     Position position = new Position(getProtocolName());
+     position.setDeviceId(deviceSession.getDeviceId());
+ 
+     buf.readUnsignedByte(); // session status
+     buf.skipBytes(4); // reserved
+-        buf.readUnsignedIntLE(); // date and time
++    long dateTime = buf.readUnsignedIntLE(); // date and time
++
++    // Fix: Apply correct conversion from Iridium epoch (2000-01-01) to Java's epoch (1970-01-01)
++    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
++    calendar.set(2000, 0, 1, 0, 0, (int) (dateTime % 86400)); // 86400 = 60 * 60 * 24
++    calendar.add(Calendar.SECOND, (int) (dateTime / 86400) * 86400);
++    position.setFixTime(calendar.getTime());
+ 
+     buf.skipBytes(23); // coordinates block
+ 
+     buf.skipBytes(3); // data tag header
+     decodeMinimalDataSet(position, buf);
+ 
+     return position;
+ }
+\ No newline at end of file

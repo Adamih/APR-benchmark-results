@@ -1,0 +1,20 @@
+diff --git a/tmp/9b40be0f-4baf-4dd5-a1e9-8bd5a2707845_buggy.java b/tmp/ddbd110e-1752-4342-a944-bdea25307c60_fixed.java
+index 0502fea..d3be3d3 100644
+--- a/tmp/9b40be0f-4baf-4dd5-a1e9-8bd5a2707845_buggy.java
++++ b/tmp/ddbd110e-1752-4342-a944-bdea25307c60_fixed.java
+@@ -1,9 +1,12 @@
+     public BaseSettings withDateFormat(DateFormat df) {
+         if (_dateFormat == df) {
+             return this;
+         }
+-        TimeZone tz = (df == null) ? _timeZone : df.getTimeZone();
++        // Preserve the current time zone if DateFormat is being updated
++        if (df != null) {
++            df.setTimeZone(_timeZone);
++        }
+         return new BaseSettings(_classIntrospector, _annotationIntrospector, _visibilityChecker, _propertyNamingStrategy, _typeFactory,
+                 _typeResolverBuilder, df, _handlerInstantiator, _locale,
+-                tz, _defaultBase64);
++                _timeZone, _defaultBase64);
+     }
+\ No newline at end of file

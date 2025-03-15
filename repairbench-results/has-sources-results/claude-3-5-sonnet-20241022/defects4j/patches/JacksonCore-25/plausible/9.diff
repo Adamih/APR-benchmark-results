@@ -1,0 +1,51 @@
+diff --git a/tmp/58f6b674-b0ac-4f34-9b37-e6b384f12191_buggy.java b/tmp/2d1dfb4e-a1a3-40ca-871f-e8ad706cea94_fixed.java
+index 8dfbd84..aa0f347 100644
+--- a/tmp/58f6b674-b0ac-4f34-9b37-e6b384f12191_buggy.java
++++ b/tmp/2d1dfb4e-a1a3-40ca-871f-e8ad706cea94_fixed.java
+@@ -1,43 +1,41 @@
+     private String _handleOddName2(int startPtr, int hash, int[] codes) throws IOException
+     {
+         _textBuffer.resetWithShared(_inputBuffer, startPtr, (_inputPtr - startPtr));
+         char[] outBuf = _textBuffer.getCurrentSegment();
+         int outPtr = _textBuffer.getCurrentSegmentSize();
+         final int maxCode = codes.length;
+ 
+         while (true) {
+             if (_inputPtr >= _inputEnd) {
+                 if (!_loadMore()) { // acceptable for now (will error out later)
+                     break;
+                 }
+             }
+             char c = _inputBuffer[_inputPtr];
+             int i = (int) c;
+-            if (i <= maxCode) {
+-                if (codes[i] != 0) {
++            if (i >= 0 && i < maxCode && codes[i] != 0) {
+                 break;
+-                }
+-            } else if (!Character.isJavaIdentifierPart(c)) {
++            } else if (i >= maxCode && !Character.isJavaIdentifierPart(c)) {
+                 break;
+             }
+             ++_inputPtr;
+             hash = (hash * CharsToNameCanonicalizer.HASH_MULT) + i;
+             // Ok, let's add char to output:
+             outBuf[outPtr++] = c;
+ 
+             // Need more room?
+             if (outPtr >= outBuf.length) {
+                 outBuf = _textBuffer.finishCurrentSegment();
+                 outPtr = 0;
+             }
+         }
+         _textBuffer.setCurrentLength(outPtr);
+         {
+             TextBuffer tb = _textBuffer;
+             char[] buf = tb.getTextBuffer();
+             int start = tb.getTextOffset();
+             int len = tb.size();
+ 
+             return _symbols.findSymbol(buf, start, len, hash);
+         }
+     }
+\ No newline at end of file

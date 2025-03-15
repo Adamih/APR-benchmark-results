@@ -1,0 +1,49 @@
+diff --git a/tmp/fb719add-3e4f-4950-8dae-3ba250568846_buggy.java b/tmp/844f1450-6247-47f5-9a35-0b26c417c18c_fixed.java
+index 5f8ac1a..b1ce1e6 100644
+--- a/tmp/fb719add-3e4f-4950-8dae-3ba250568846_buggy.java
++++ b/tmp/844f1450-6247-47f5-9a35-0b26c417c18c_fixed.java
+@@ -1,34 +1,37 @@
+ private int compareNodePointers(
+     NodePointer p1,
+     int depth1,
+     NodePointer p2,
+     int depth2) 
+ {
+     if (depth1 < depth2) {
+         int r = compareNodePointers(p1, depth1, p2.parent, depth2 - 1);
+         return r == 0 ? -1 : r;
+     }
+     if (depth1 > depth2) {
+         int r = compareNodePointers(p1.parent, depth1 - 1, p2, depth2);
+         return r == 0 ? 1 : r;
+     }
+     if (p1 == null && p2 == null) {
+         return 0;
+     }
+-
+     if (p1 != null && p1.equals(p2)) {
+         return 0;
+     }
+-
+     if (depth1 == 1) {
+-            throw new JXPathException(
+-                    "Cannot compare pointers that do not belong to the same tree: '"
+-                            + p1 + "' and '" + p2 + "'");
++        // Instead of throwing an exception for pointers from different trees,
++        // we compare their string representations (and as a fallback, their identity)
++        String s1 = (p1 == null ? "" : p1.toString());
++        String s2 = (p2 == null ? "" : p2.toString());
++        int cmp = s1.compareTo(s2);
++        if (cmp != 0) {
++            return cmp;
++        }
++        return Integer.compare(System.identityHashCode(p1), System.identityHashCode(p2));
+     }
+     int r = compareNodePointers(p1.parent, depth1 - 1, p2.parent, depth2 - 1);
+     if (r != 0) {
+         return r;
+     }
+-
+     return p1.parent.compareChildNodePointers(p1, p2);
+ }
+\ No newline at end of file

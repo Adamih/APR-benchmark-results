@@ -1,0 +1,13 @@
+diff --git a/tmp/48e4a349-ff84-4da8-a669-00963124a56c_buggy.java b/tmp/f4bcf063-7337-47b3-bafb-18859533a515_fixed.java
+index f1d02c1..50c2e83 100644
+--- a/tmp/48e4a349-ff84-4da8-a669-00963124a56c_buggy.java
++++ b/tmp/f4bcf063-7337-47b3-bafb-18859533a515_fixed.java
+@@ -1,4 +1,6 @@
+ @Override
+ protected JSType caseTopType(JSType topType) {
+-          return topType;
++  // When the input is the "top" type (i.e. ALL_TYPE) and we are in the true branch
++  // for goog.isArray, we must narrow it to the native array type.
++  return getNativeType(JSTypeNative.ARRAY_TYPE);
+ }
+\ No newline at end of file

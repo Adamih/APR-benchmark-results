@@ -1,0 +1,54 @@
+diff --git a/tmp/f7ef9925-0ed1-4d5f-8302-885ffeda297e_buggy.java b/tmp/3699065d-7119-4af0-9270-dee5be54cfb7_fixed.java
+index b98f0a7..76db407 100644
+--- a/tmp/f7ef9925-0ed1-4d5f-8302-885ffeda297e_buggy.java
++++ b/tmp/3699065d-7119-4af0-9270-dee5be54cfb7_fixed.java
+@@ -1,29 +1,48 @@
+ private FlowScope traverseNew(Node n, FlowScope scope) {
+ 
+     Node constructor = n.getFirstChild();
+     scope = traverse(constructor, scope);
+     JSType constructorType = constructor.getJSType();
+     JSType type = null;
+     if (constructorType != null) {
+         constructorType = constructorType.restrictByNotNullOrUndefined();
+         if (constructorType.isUnknownType()) {
+             type = getNativeType(UNKNOWN_TYPE);
+         } else {
+             FunctionType ct = constructorType.toMaybeFunctionType();
+             if (ct == null && constructorType instanceof FunctionType) {
+                 // If constructorType is a NoObjectType, then toMaybeFunctionType will
+                 // return null. But NoObjectType implements the FunctionType
+                 // interface, precisely because it can validly construct objects.
+                 ct = (FunctionType) constructorType;
+             }
+             if (ct != null && ct.isConstructor()) {
+                 type = ct.getInstanceType();
++                // Perform backwards inference for the arguments
++                NodeList arguments = n.getSecondChild();
++                if (arguments != null) {
++                    FunctionType paramType = ct;
++                    for (Node arg = arguments.getFirstChild(); arg != null; arg = arg.getNext()) {
++                        paramType = paramType.getParameterType(arg.getChildIndex());
++                        JSType argType = arg.getJSType();
++                        if (argType != null && !argType.isUnknownType()) {
++                            scope = inferForArguments(scope, arg, paramType);
++                        }
++                    }
++                }
+             }
+         }
+     }
+     n.setJSType(type);
+     for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
+         scope = traverse(arg, scope);
+     }
+     return scope;
+ }
++
++private FlowScope inferForArguments(FlowScope scope, Node arg, JSType paramType) {
++    if (paramType != null && !paramType.isUnknownType()) {
++        scope = scope.inferSlotType(arg.getString(), paramType);
++    }
++    return scope;
++}
+\ No newline at end of file

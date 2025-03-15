@@ -1,0 +1,32 @@
+diff --git a/tmp/640c1a56-fe03-4fb5-9a2e-67a8bd426260_buggy.java b/tmp/e5360250-8ee0-443f-8410-683f97241234_fixed.java
+index dc93be3..5df584a 100644
+--- a/tmp/640c1a56-fe03-4fb5-9a2e-67a8bd426260_buggy.java
++++ b/tmp/e5360250-8ee0-443f-8410-683f97241234_fixed.java
+@@ -1,14 +1,23 @@
+ Element insert(Token.StartTag startTag) {
+-        // handle empty unknown tags
+-        // when the spec expects an empty tag, will directly hit insertEmpty, so won't generate this fake end tag.
+     if (startTag.isSelfClosing()) {
++        if (isKnownEmptyTag(startTag.name())) {
+             Element el = insertEmpty(startTag);
+             stack.add(el);
+-            tokeniser.emit(new Token.EndTag(el.tagName()));  // ensure we get out of whatever state we are in. emitted for yielded processing
++            tokeniser.emit(new Token.EndTag(el.tagName()));
+             return el;
++        } else {
++            Element el = insertEmpty(startTag);
++            stack.add(el);
++            return el;
++        }
+     }
+     
+     Element el = new Element(Tag.valueOf(startTag.name()), baseUri, startTag.attributes);
+     insert(el);
+     return el;
+ }
++
++boolean isKnownEmptyTag(String tagName) {
++    String[] knownSelfClosingTags = {"img", "br", "hr", "meta", "link", "input", "area", "base", "param"};
++    return Arrays.asList(knownSelfClosingTags).contains(tagName.toLowerCase());
++}
+\ No newline at end of file

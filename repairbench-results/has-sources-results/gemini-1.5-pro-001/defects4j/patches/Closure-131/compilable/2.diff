@@ -1,0 +1,33 @@
+diff --git a/tmp/7da3addc-0bbf-4a32-a31f-668d2b7a1673_buggy.java b/tmp/88a37288-4f46-4b59-be93-9332b9b5c1ce_fixed.java
+index 19fe1b4..37a3bfd 100644
+--- a/tmp/7da3addc-0bbf-4a32-a31f-668d2b7a1673_buggy.java
++++ b/tmp/88a37288-4f46-4b59-be93-9332b9b5c1ce_fixed.java
+@@ -1,17 +1,23 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++      if (length == 0) {
+         return false;
+       }
+ 
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++      // unicode escape sequences are legal identifier starts
++      // but not valid start characters
++      if (!Character.isUnicodeIdentifierStart(s.codePointAt(0))) {
++        return false;
++      }
++
++      for (int i = 0; i < length; i++) {
++        // unicode escape sequences are legal identifier parts
++        // but not valid identifier parts
++        if (!Character.isUnicodeIdentifierPart(s.codePointAt(i))) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }

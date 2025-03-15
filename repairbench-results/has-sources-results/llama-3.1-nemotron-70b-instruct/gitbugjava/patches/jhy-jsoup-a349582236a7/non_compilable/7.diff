@@ -1,0 +1,19 @@
+diff --git a/tmp/f047dedf-77c6-4b7b-b1e0-d4f1d009edc4_buggy.java b/tmp/312d446a-b762-4142-baae-21371a442a9c_fixed.java
+index 3ecd591..2be2c17 100644
+--- a/tmp/f047dedf-77c6-4b7b-b1e0-d4f1d009edc4_buggy.java
++++ b/tmp/312d446a-b762-4142-baae-21371a442a9c_fixed.java
+@@ -1,6 +1,12 @@
++/**
++ * Fixes the inlineability check to correctly handle nested inline elements.
++ * 
++ * @param out the current output settings
++ * @return whether the current element is inlineable
++ */
+ private boolean isInlineable(Document.OutputSettings out) {
+     return tag().isInline()
+         && (parent() == null || parent().isBlock())
+-            && previousSibling() != null
++        && (previousSibling() == null || previousSibling().isInline())
+         &&!out.outline();
+ }
+\ No newline at end of file

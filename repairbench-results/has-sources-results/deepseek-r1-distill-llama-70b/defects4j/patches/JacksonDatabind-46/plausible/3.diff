@@ -1,0 +1,22 @@
+diff --git a/tmp/1ebc24aa-f586-4330-afc4-eb532d44c23a_buggy.java b/tmp/a16f0fbe-5edc-44c5-ae27-bf4b5e93c0f5_fixed.java
+index 6f49dcb..814db57 100644
+--- a/tmp/1ebc24aa-f586-4330-afc4-eb532d44c23a_buggy.java
++++ b/tmp/a16f0fbe-5edc-44c5-ae27-bf4b5e93c0f5_fixed.java
+@@ -1,9 +1,14 @@
+ @Override
+-    public StringBuilder getGenericSignature(StringBuilder sb)
+-    {
++public StringBuilder getGenericSignature(StringBuilder sb) {
++    if (sb == null) {
++        sb = new StringBuilder();
++    }
+     _classSignature(_class, sb, false);
+     sb.append('<');
++    if (_referencedType != null) {
+         sb = _referencedType.getGenericSignature(sb);
++    }
++    sb.append('>');
+     sb.append(';');
+     return sb;
+ }
+\ No newline at end of file

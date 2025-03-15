@@ -1,0 +1,31 @@
+diff --git a/tmp/f42d9bb1-d9ca-4da7-a7d7-21c8c2bf84cf_buggy.java b/tmp/8235f08b-6fce-4b79-b4b0-d011a52077e7_fixed.java
+index 19fe1b4..0705d9c 100644
+--- a/tmp/f42d9bb1-d9ca-4da7-a7d7-21c8c2bf84cf_buggy.java
++++ b/tmp/8235f08b-6fce-4b79-b4b0-d011a52077e7_fixed.java
+@@ -1,17 +1,23 @@
+ public static boolean isJSIdentifier(String s) {
+   int length = s.length();
+ 
+   if (length == 0 ||
+      !Character.isJavaIdentifierStart(s.charAt(0))) {
+     return false;
+   }
+ 
+   for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++    char c = s.charAt(i);
++    if (!Character.isJavaIdentifierPart(c) || 
++        (c >= 0x0000 && c <= 0x001F) || 
++        (c >= 0x007F && c <= 0x009F) || 
++        (c >= 0x00A0 && c <= 0x10FFFF && 
++         (Character.getType(c) == Character.SURROGATE || 
++          Character.getType(c) == Character.MODIFIER_LETTER || 
++          Character.getType(c) == Character.NON_SPACING_MARK))) {
+       return false;
+     }
+   }
+ 
+   return true;
+ }
+\ No newline at end of file

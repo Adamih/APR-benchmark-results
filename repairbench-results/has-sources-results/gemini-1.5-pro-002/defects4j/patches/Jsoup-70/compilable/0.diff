@@ -1,0 +1,22 @@
+diff --git a/tmp/5a49067f-c2cc-43dd-8d13-094ee9c7b79f_buggy.java b/tmp/af21fd51-5e0d-43ce-a95f-426fac209a8c_fixed.java
+index 6c87721..8cf4d6d 100644
+--- a/tmp/5a49067f-c2cc-43dd-8d13-094ee9c7b79f_buggy.java
++++ b/tmp/af21fd51-5e0d-43ce-a95f-426fac209a8c_fixed.java
+@@ -1,11 +1,14 @@
+     static boolean preserveWhitespace(Node node) {
+         // looks only at this element and five levels up, to prevent recursion & needless stack searches
+-        if (node != null && node instanceof Element) {
++        int depth = 0;
++        while (node != null && depth < 6) {
++            if (node instanceof Element) {
+                 Element el = (Element) node;
+                 if (el.tag.preserveWhitespace())
+                     return true;
+-                else
+-                    return el.parent() != null && el.parent().tag.preserveWhitespace();
++            }
++            node = node.parent();
++            depth++;
+         }
+         return false;
+     }

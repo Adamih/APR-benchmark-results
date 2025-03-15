@@ -1,0 +1,34 @@
+diff --git a/tmp/d2e04816-10f3-4c01-8db5-58d6766c4ecd_buggy.java b/tmp/7f6733ce-5d49-41ae-8229-ead2f1dcb6b2_fixed.java
+index e1fc51f..d1bc242 100644
+--- a/tmp/d2e04816-10f3-4c01-8db5-58d6766c4ecd_buggy.java
++++ b/tmp/7f6733ce-5d49-41ae-8229-ead2f1dcb6b2_fixed.java
+@@ -1,9 +1,24 @@
+     public boolean hasSameMethod(Invocation candidate) {        
+-        //not using method.equals() for 1 good reason:
+-        //sometimes java generates forwarding methods when generics are in play see JavaGenericsForwardingMethodsTest
+         Method m1 = invocation.getMethod();
+         Method m2 = candidate.getMethod();
+         
+-        	/* Avoid unnecessary cloning */
+-        return m1.equals(m2);
++        Method resolvedM1 = resolveBridgeMethod(m1);
++        Method resolvedM2 = resolveBridgeMethod(m2);
++        
++        return resolvedM1.equals(resolvedM2);
++    }
++    
++    private Method resolveBridgeMethod(Method method) {
++        if (!method.isBridge()) {
++            return method;
++        }
++        Class<?> declaringClass = method.getDeclaringClass();
++        for (Method m : declaringClass.getDeclaredMethods()) {
++            if (!m.isBridge() 
++                    && m.getName().equals(method.getName())
++                    && Arrays.equals(m.getParameterTypes(), method.getParameterTypes())) {
++                return m;
++            }
++        }
++        return method;
+     }
+\ No newline at end of file

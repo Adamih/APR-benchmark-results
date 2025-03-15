@@ -1,0 +1,48 @@
+diff --git a/tmp/415f0cad-46b2-4aad-9f0c-24423657415d_buggy.java b/tmp/9f627cf8-3109-4b41-9be3-3958df2f0b96_fixed.java
+index 546f262..79ce54f 100644
+--- a/tmp/415f0cad-46b2-4aad-9f0c-24423657415d_buggy.java
++++ b/tmp/9f627cf8-3109-4b41-9be3-3958df2f0b96_fixed.java
+@@ -1,29 +1,41 @@
+     /**
+      * <p>Throws a {@link MissingOptionException} if all of the
+      * required options are no present.</p>
+      *
+      * @throws MissingOptionException if any of the required Options
+      * are not present.
+      */
+     protected void checkRequiredOptions()
+         throws MissingOptionException
+     {
+         // if there are required options that have not been
+         // processsed
+         if (getRequiredOptions().size() > 0)
+         {
+             Iterator iter = getRequiredOptions().iterator();
+             StringBuffer buff = new StringBuffer("Missing required option");
+             buff.append(getRequiredOptions().size() == 1 ? "" : "s");
+             buff.append(": ");
+             
++            // stores the missing options
++            ArrayList missingOptions = new ArrayList();
+ 
+             // loop through the required options
+             while (iter.hasNext())
+             {
+-                buff.append(iter.next());
++                missingOptions.add(iter.next());
++            }
++            
++            Iterator missingOptionsIter = missingOptions.iterator();
++            while (missingOptionsIter.hasNext())
++            {
++                buff.append(missingOptionsIter.next());
++                if (missingOptionsIter.hasNext())
++                {
++                    buff.append(", ");
++                }
+             }
+ 
+             throw new MissingOptionException(buff.toString());
+         }
+     }
+\ No newline at end of file

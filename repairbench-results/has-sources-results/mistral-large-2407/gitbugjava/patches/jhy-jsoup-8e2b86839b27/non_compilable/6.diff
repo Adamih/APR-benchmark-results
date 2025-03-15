@@ -1,0 +1,15 @@
+diff --git a/tmp/37966a9e-cc31-4e76-b944-ac14ff42e49c_buggy.java b/tmp/38d22f64-09a7-4f93-b6f6-ce5036d53167_fixed.java
+index ae12a4d..cf96df1 100644
+--- a/tmp/37966a9e-cc31-4e76-b944-ac14ff42e49c_buggy.java
++++ b/tmp/38d22f64-09a7-4f93-b6f6-ce5036d53167_fixed.java
+@@ -1,3 +1,8 @@
+ private boolean isFormatAsBlock(Document.OutputSettings out) {
+-        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
++    return tag.formatAsBlock() ||
++           (parent() != null &&
++            parent().tag().formatAsBlock() &&
++            !this.tag().isInline()       // Check if the current element itself is inline
++           ) ||
++           out.outline();
+ }
+\ No newline at end of file

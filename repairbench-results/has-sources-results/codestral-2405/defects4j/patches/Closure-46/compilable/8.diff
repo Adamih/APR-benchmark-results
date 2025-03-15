@@ -1,0 +1,32 @@
+diff --git a/tmp/bd7cc0d9-7189-4efb-bb36-383cb14b1288_buggy.java b/tmp/f8f2f715-39dd-4295-9f7a-2057ee161df2_fixed.java
+index 46817a7..42dd144 100644
+--- a/tmp/bd7cc0d9-7189-4efb-bb36-383cb14b1288_buggy.java
++++ b/tmp/f8f2f715-39dd-4295-9f7a-2057ee161df2_fixed.java
+@@ -1,16 +1,23 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
+-    RecordTypeBuilder builder = new RecordTypeBuilder(registry);
++    RecordTypeBuilder commonBuilder = new RecordTypeBuilder(registry);
++    boolean isDifferentType = false;
+     for (String property : properties.keySet()) {
+         if (that.toMaybeRecordType().hasProperty(property) &&
+             that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+                 getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
++            commonBuilder.addProperty(property, getPropertyType(property),
+                 getPropertyNode(property));
++        } else if (that.toMaybeRecordType().hasProperty(property)) {
++            isDifferentType = true;
+         }
+     }
+-    return builder.build();
++    if (isDifferentType) {
++        return registry.createUnionType(this, that);
++    } else {
++        return commonBuilder.build();
++    }
+ }
+\ No newline at end of file

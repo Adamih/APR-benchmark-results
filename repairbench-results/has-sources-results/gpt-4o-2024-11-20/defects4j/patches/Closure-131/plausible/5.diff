@@ -1,0 +1,48 @@
+diff --git a/tmp/1db2cc60-72ff-4550-ae89-d9e1fe1fefc4_buggy.java b/tmp/f05c87f3-9c3a-465d-a65b-b83c4d31e28a_fixed.java
+index 19fe1b4..4c454b2 100644
+--- a/tmp/1db2cc60-72ff-4550-ae89-d9e1fe1fefc4_buggy.java
++++ b/tmp/f05c87f3-9c3a-465d-a65b-b83c4d31e28a_fixed.java
+@@ -1,17 +1,38 @@
+     public static boolean isJSIdentifier(String s) {
+         int length = s.length();
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++        // An identifier cannot be empty
++        if (length == 0) {
+             return false;
+         }
+ 
++        // The first character must be a valid start for a JavaScript identifier
++        if (!Character.isJavaIdentifierStart(s.charAt(0)) || !isValidJSCharacter(s.charAt(0))) {
++            return false;
++        }
++
++        // The remaining characters must be valid parts of a JavaScript identifier
+         for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++            if (!Character.isJavaIdentifierPart(s.charAt(i)) || !isValidJSCharacter(s.charAt(i))) {
+                 return false;
+             }
+         }
+ 
+         return true;
+     }
++
++    private static boolean isValidJSCharacter(char c) {
++        // Additional checks for characters that are allowed in Java but not in JavaScript
++        // disallow ASCII control characters (0x00-0x1F) and delete (0x7F)
++        if (c <= 0x1F || c == 0x7F) {
++            return false;
++        }
++
++        // JavaScript identifiers allow Unicode letters and digits, 
++        // but restrict some characters like '\u1D17A' (phonetic extensions)
++        if (Character.isLetterOrDigit(c) || c == '$' || c == '_') {
++            return true;
++        }
++
++        return false;
++    }
+\ No newline at end of file

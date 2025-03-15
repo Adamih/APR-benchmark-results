@@ -1,0 +1,29 @@
+diff --git a/tmp/ae3963db-5d58-4fa9-9c8f-9dc29d83f179_buggy.java b/tmp/21d8f3f3-63dc-4999-9322-6f5a0c3b8d45_fixed.java
+index e5ad041..95b9ce0 100644
+--- a/tmp/ae3963db-5d58-4fa9-9c8f-9dc29d83f179_buggy.java
++++ b/tmp/21d8f3f3-63dc-4999-9322-6f5a0c3b8d45_fixed.java
+@@ -1,19 +1,12 @@
+     @Override
+     protected JavaType _narrow(Class<?> subclass)
+     {
+         if (_class == subclass) {
+             return this;
+         }
+-        // Should we check that there is a sub-class relationship?
+-        // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+-        //    placeholder values, so no.
+-        /*
+-        if (!_class.isAssignableFrom(subclass)) {
+-            throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+-                    +_class.getName());
+-        }
+-        */
+-        // 15-Jan-2015, tatu: Not correct; should really re-resolve...
+-        return new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
++        // Create a new SimpleType instance configured for deserialization
++        SimpleType nt = new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
+                               _valueHandler, _typeHandler, _asStatic);
++        nt.configureForDeserialization();
++        return nt;
+     }
+\ No newline at end of file

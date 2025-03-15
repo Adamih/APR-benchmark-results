@@ -1,0 +1,36 @@
+diff --git a/tmp/c9e845f1-3370-4780-b4dc-7570d0dbc076_buggy.java b/tmp/78c7163c-8c4d-4ca2-9188-e86de727b0e4_fixed.java
+index 4aff4e4..1cc272e 100644
+--- a/tmp/c9e845f1-3370-4780-b4dc-7570d0dbc076_buggy.java
++++ b/tmp/78c7163c-8c4d-4ca2-9188-e86de727b0e4_fixed.java
+@@ -1,15 +1,28 @@
++/**
++ * Tests if the provided attribute value starts with any of the allowed protocols.
++ * 
++ * @param el         Element containing the attribute
++ * @param attr       Attribute to check
++ * @param protocols  Set of allowed protocols
++ * @return true if the attribute value starts with an allowed protocol, false otherwise
++ */
+ private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+     // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+     // rels without a baseuri get removed
+     String value = el.absUrl(attr.getKey());
+     if (!preserveRelativeLinks)
+         attr.setValue(value);
+     
++    // Check for custom protocols (e.g., 'cid', 'data') without a colon (:)
+     for (Protocol protocol : protocols) {
+-            String prot = protocol.toString() + ":";
+-            if (value.toLowerCase().startsWith(prot)) {
++        String protWithColon = protocol.toString() + ":";
++        String protWithoutColon = protocol.toString();
++        
++        if (value.toLowerCase().startsWith(protWithColon) || 
++            // Special case for protocols without a colon (e.g., 'cid', 'data')
++            (value.toLowerCase().equals(protWithoutColon) || value.toLowerCase().startsWith(protWithoutColon + "/"))) {
+             return true;
+         }
+     }
+     return false;
+ }
+\ No newline at end of file

@@ -1,0 +1,25 @@
+diff --git a/tmp/c36d4fd5-fbe5-4f12-95cd-47667a9ac4aa_buggy.java b/tmp/2fd7e57d-b19d-42a4-a931-d5c315243623_fixed.java
+index b86b44d..2d818d7 100644
+--- a/tmp/c36d4fd5-fbe5-4f12-95cd-47667a9ac4aa_buggy.java
++++ b/tmp/2fd7e57d-b19d-42a4-a931-d5c315243623_fixed.java
+@@ -1,4 +1,17 @@
+ public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    Object left = args[0].computeValue(context);
++    Object right = args[1].computeValue(context);
++
++    // If either operand is an empty node-set (or null), then the result must be false.
++    boolean leftEmpty = (left == null)
++            || (left instanceof Collection && ((Collection<?>) left).isEmpty())
++            || (left.getClass().isArray() && java.lang.reflect.Array.getLength(left) == 0);
++    boolean rightEmpty = (right == null)
++            || (right instanceof Collection && ((Collection<?>) right).isEmpty())
++            || (right.getClass().isArray() && java.lang.reflect.Array.getLength(right) == 0);
++
++    if (leftEmpty || rightEmpty) {
++        return Boolean.FALSE;
++    }
++    return compute(left, right) ? Boolean.TRUE : Boolean.FALSE;
+ }
+\ No newline at end of file

@@ -1,0 +1,16 @@
+diff --git a/tmp/9ae81c06-12c4-4f39-ab1a-d32210a7438d_buggy.java b/tmp/67cc9a33-fcba-43ae-948a-8e39a22e1883_fixed.java
+index 0878b6b..bc5bb3a 100644
+--- a/tmp/9ae81c06-12c4-4f39-ab1a-d32210a7438d_buggy.java
++++ b/tmp/67cc9a33-fcba-43ae-948a-8e39a22e1883_fixed.java
+@@ -1,3 +1,9 @@
+ public final boolean isEmptyType() {
+-    return isNoType() || isNoObjectType() || isNoResolvedType();
++  if (isNoType() || isNoObjectType() || isNoResolvedType()) {
++    return true;
++  }
++  if (isFunctionType() && getProperties().isEmpty()) {
++    return true;
++  }
++  return false;
+ }
+\ No newline at end of file

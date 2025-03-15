@@ -1,0 +1,26 @@
+diff --git a/tmp/29970ccc-8022-4693-b4b3-95b5af1e999a_buggy.java b/tmp/5bd5fb59-cbd1-44ad-b76d-c66bfe9f3a52_fixed.java
+index 26a24c6..ecaed34 100644
+--- a/tmp/29970ccc-8022-4693-b4b3-95b5af1e999a_buggy.java
++++ b/tmp/5bd5fb59-cbd1-44ad-b76d-c66bfe9f3a52_fixed.java
+@@ -1,13 +1,19 @@
+     @Override
+     public Number read(JsonReader in) throws IOException {
+       JsonToken jsonToken = in.peek();
+       switch (jsonToken) {
+       case NULL:
+         in.nextNull();
+         return null;
+       case NUMBER:
+-        return new LazilyParsedNumber(in.nextString());
++      case STRING:
++        String value = in.nextString();
++        try {
++            return new LazilyParsedNumber(value);
++        } catch (NumberFormatException e) {
++            throw new JsonSyntaxException("String value '" + value + "' is not a valid number", e);
++        }
+       default:
+         throw new JsonSyntaxException("Expecting number, got: " + jsonToken);
+       }
+     }
+\ No newline at end of file

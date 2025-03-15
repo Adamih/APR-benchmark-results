@@ -1,0 +1,22 @@
+diff --git a/tmp/32273326-e005-4651-8b2b-0cfd39277014_buggy.java b/tmp/f96a2ba0-f0e8-4ff4-8ca7-647179c87cbd_fixed.java
+index 6e155da..3d62040 100644
+--- a/tmp/32273326-e005-4651-8b2b-0cfd39277014_buggy.java
++++ b/tmp/f96a2ba0-f0e8-4ff4-8ca7-647179c87cbd_fixed.java
+@@ -1,10 +1,16 @@
+   @Override public void skipValue() throws IOException {
+     if (peek() == JsonToken.NAME) {
+       nextName();
++      if (stackSize > 1) {
+         pathNames[stackSize - 2] = "null";
++      }
+     } else {
+       popStack();
++      if (stackSize > 0) {
+         pathNames[stackSize - 1] = "null";
+       }
++    }
++    if (stackSize > 0) {
+       pathIndices[stackSize - 1]++;
+     }
++  }
+\ No newline at end of file

@@ -1,0 +1,45 @@
+diff --git a/tmp/991e916d-704d-485b-8863-5e5c51ad0841_buggy.java b/tmp/90dcfb25-fcca-4ec9-a9f0-5c3016d6e425_fixed.java
+index 1530b34..8c08d91 100644
+--- a/tmp/991e916d-704d-485b-8863-5e5c51ad0841_buggy.java
++++ b/tmp/90dcfb25-fcca-4ec9-a9f0-5c3016d6e425_fixed.java
+@@ -1,23 +1,35 @@
+ /**
+  * Declares all of a function's arguments.
+  */
+ private void declareArguments(Node functionNode) {
+   Node astParameters = functionNode.getFirstChild().getNext();
+   Node body = astParameters.getNext();
+   FunctionType functionType = (FunctionType) functionNode.getJSType();
+   if (functionType!= null) {
+     Node jsDocParameters = functionType.getParametersNode();
+     if (jsDocParameters!= null) {
+       Node jsDocParameter = jsDocParameters.getFirstChild();
+       for (Node astParameter : astParameters.children()) {
++        JSType declaredType = astParameter.getJSType();
+         if (jsDocParameter!= null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++          JSType jsDocType = jsDocParameter.getJSType();
++          if (declaredType!= null && jsDocType!= null) {
++            if (!declaredType.isSubtypeOf(jsDocType)) {
++              // Handle type mismatch
++              // This could be done by logging an error or throwing an exception
++            }
++          }
++          defineSlot(astParameter, functionNode, jsDocType, true);
+           jsDocParameter = jsDocParameter.getNext();
+         } else {
++          defineSlot(astParameter, functionNode, declaredType, true);
++        }
++      }
++    }
++  } else {
++    // Handle the case where functionType is null
++    for (Node astParameter : astParameters.children()) {
+       defineSlot(astParameter, functionNode, null, true);
+     }
+   }
+ }
+\ No newline at end of file
+-      }
+-    } // end declareArguments

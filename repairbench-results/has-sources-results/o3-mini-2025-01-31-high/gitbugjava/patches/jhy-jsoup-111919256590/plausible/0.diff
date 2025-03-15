@@ -1,0 +1,17 @@
+diff --git a/tmp/73bb31d5-b244-4a58-9fe5-114746bf9f2b_buggy.java b/tmp/645bad16-d924-4ab1-b4a3-abf3d2bdbb12_fixed.java
+index e807cbf..d4366e7 100644
+--- a/tmp/73bb31d5-b244-4a58-9fe5-114746bf9f2b_buggy.java
++++ b/tmp/645bad16-d924-4ab1-b4a3-abf3d2bdbb12_fixed.java
+@@ -1,7 +1,11 @@
+ private boolean isInlineable(Document.OutputSettings out) {
+     if (!tag.isInline())
+         return false;
++    // Special-case: if this tag is a <br>, then it should only be inline if its parent is a <p>.
++    // That way a <br> in a paragraph (even if first child) prints inline, but in a div it prints on its own line.
++    if ("br".equals(tag.getName()))
++        return parent() != null && "p".equals(parent().tagName()) && !out.outline();
+     return (parent() == null || parent().isBlock())
+         && !isEffectivelyFirst()
+         && !out.outline();
+ }
+\ No newline at end of file

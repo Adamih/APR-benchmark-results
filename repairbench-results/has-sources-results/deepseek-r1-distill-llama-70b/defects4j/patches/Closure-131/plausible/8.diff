@@ -1,0 +1,26 @@
+diff --git a/tmp/95f42810-f79c-4124-b468-33853ed26b4d_buggy.java b/tmp/bd8bc004-100b-421d-b739-5191fb84c236_fixed.java
+index 19fe1b4..1482fd8 100644
+--- a/tmp/95f42810-f79c-4124-b468-33853ed26b4d_buggy.java
++++ b/tmp/bd8bc004-100b-421d-b739-5191fb84c236_fixed.java
+@@ -1,17 +1,7 @@
+ public static boolean isJSIdentifier(String s) {
+-      int length = s.length();
+-
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++    if (s.isEmpty()) {
+         return false;
+     }
+-
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
+-          return false;
+-        }
+-      }
+-
+-      return true;
++    String pattern = "^[\\$\\p{L}_](?:[\\p{L}\\p{M}\\p{Nd}_$]*$)";
++    return s.matches(pattern);
+ }
+\ No newline at end of file

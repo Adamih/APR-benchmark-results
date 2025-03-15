@@ -1,0 +1,18 @@
+diff --git a/tmp/e37bc545-e980-4d6c-8038-80084ce33122_buggy.java b/tmp/1b437f0d-715d-43ea-bd12-373b1598c7b7_fixed.java
+index ae12a4d..ba28880 100644
+--- a/tmp/e37bc545-e980-4d6c-8038-80084ce33122_buggy.java
++++ b/tmp/1b437f0d-715d-43ea-bd12-373b1598c7b7_fixed.java
+@@ -1,3 +1,11 @@
++/**
++ * Checks if this element should be formatted as a block based on its tag, 
++ * parent's tag (if applicable), and output settings. Ignores inline styles.
++ * 
++ * @param out the output settings
++ * @return true if this element should be formatted as a block, false otherwise
++ */
+ private boolean isFormatAsBlock(Document.OutputSettings out) {
+-        return tag.formatAsBlock() || (parent() != null && parent().tag().formatAsBlock()) || out.outline();
++    // Ignore inline styles, check if tag or parent tag is inherently block-level
++    return (tag.isBlock() || (parent()!= null && parent().tag().isBlock())) || out.outline();
+ }
+\ No newline at end of file

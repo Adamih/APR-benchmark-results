@@ -1,0 +1,31 @@
+diff --git a/tmp/cb3e8ddb-8be3-4b44-bbbc-bfa87724d7a2_buggy.java b/tmp/8c318b41-4c27-4bb9-b940-d5194a8be84c_fixed.java
+index dc93be3..4a72c69 100644
+--- a/tmp/cb3e8ddb-8be3-4b44-bbbc-bfa87724d7a2_buggy.java
++++ b/tmp/8c318b41-4c27-4bb9-b940-d5194a8be84c_fixed.java
+@@ -1,14 +1,22 @@
++    private static final Set<String> VOID_TAGS = new HashSet<>(Arrays.asList(
++        "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr"
++    ));
++
+     Element insert(Token.StartTag startTag) {
+-        // handle empty unknown tags
+-        // when the spec expects an empty tag, will directly hit insertEmpty, so won't generate this fake end tag.
+         if (startTag.isSelfClosing()) {
++            String tagName = startTag.name();
++            if (VOID_TAGS.contains(tagName)) {
++                Element el = insertEmpty(startTag);
++                return el;
++            } else {
+                 Element el = insertEmpty(startTag);
+                 stack.add(el);
+-            tokeniser.emit(new Token.EndTag(el.tagName()));  // ensure we get out of whatever state we are in. emitted for yielded processing
++                tokeniser.emit(new Token.EndTag(el.tagName()));
+                 return el;
+             }
++        }
+         
+         Element el = new Element(Tag.valueOf(startTag.name()), baseUri, startTag.attributes);
+         insert(el);
+         return el;
+     }
+\ No newline at end of file

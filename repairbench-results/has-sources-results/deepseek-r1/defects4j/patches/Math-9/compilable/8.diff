@@ -1,0 +1,17 @@
+diff --git a/tmp/d54be129-b3c2-4d49-bcc9-7666bb6ce578_buggy.java b/tmp/e44f5f87-ef52-4f99-8407-fbaf20d5244e_fixed.java
+index 50f3e2e..8a91792 100644
+--- a/tmp/d54be129-b3c2-4d49-bcc9-7666bb6ce578_buggy.java
++++ b/tmp/e44f5f87-ef52-4f99-8407-fbaf20d5244e_fixed.java
+@@ -1,7 +1,9 @@
+     /** Get a line with reversed direction.
+      * @return a new instance, with reversed direction
+      */
+     public Line revert() {
+-        final Line reverted = new Line(zero, zero.subtract(direction));
+-        return reverted;
++        // Use a large scalar to avoid precision loss when subtracting small direction from large coordinates
++        final Vector3D reversedDirection = direction.negate();
++        final Vector3D secondPoint = zero.add(reversedDirection.scalarMultiply(1.0e8));
++        return new Line(zero, secondPoint);
+     }
+\ No newline at end of file

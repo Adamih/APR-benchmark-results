@@ -1,0 +1,49 @@
+diff --git a/tmp/9cd8eab9-889d-4f3e-b0dc-de6e478e2a82_buggy.java b/tmp/30a4da3f-c8ca-416d-9d9e-5c809d8115ba_fixed.java
+index 8dfbd84..12e232c 100644
+--- a/tmp/9cd8eab9-889d-4f3e-b0dc-de6e478e2a82_buggy.java
++++ b/tmp/30a4da3f-c8ca-416d-9d9e-5c809d8115ba_fixed.java
+@@ -1,43 +1,43 @@
+     private String _handleOddName2(int startPtr, int hash, int[] codes) throws IOException
+     {
+         _textBuffer.resetWithShared(_inputBuffer, startPtr, (_inputPtr - startPtr));
+         char[] outBuf = _textBuffer.getCurrentSegment();
+         int outPtr = _textBuffer.getCurrentSegmentSize();
+         final int maxCode = codes.length;
+ 
+         while (true) {
+             if (_inputPtr >= _inputEnd) {
+                 if (!_loadMore()) { // acceptable for now (will error out later)
+                     break;
+                 }
+             }
+             char c = _inputBuffer[_inputPtr];
+             int i = (int) c;
+-            if (i <= maxCode) {
++            if (i < maxCode) {
+                 if (codes[i] != 0) {
+                     break;
+                 }
+             } else if (!Character.isJavaIdentifierPart(c)) {
+                 break;
+             }
+             ++_inputPtr;
+             hash = (hash * CharsToNameCanonicalizer.HASH_MULT) + i;
+             // Ok, let's add char to output:
+             outBuf[outPtr++] = c;
+ 
+             // Need more room?
+             if (outPtr >= outBuf.length) {
+                 outBuf = _textBuffer.finishCurrentSegment();
+                 outPtr = 0;
+             }
+         }
+         _textBuffer.setCurrentLength(outPtr);
+         {
+             TextBuffer tb = _textBuffer;
+             char[] buf = tb.getTextBuffer();
+             int start = tb.getTextOffset();
+             int len = tb.size();
+ 
+             return _symbols.findSymbol(buf, start, len, hash);
+         }
+     }

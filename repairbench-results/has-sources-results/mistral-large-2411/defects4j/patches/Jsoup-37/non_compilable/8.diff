@@ -1,0 +1,35 @@
+diff --git a/tmp/8ec02d26-2449-40aa-8192-c97f766fbc37_buggy.java b/tmp/45ef05e1-f2e0-486c-9373-4f084a030bf7_fixed.java
+index 7498011..a52b00f 100644
+--- a/tmp/8ec02d26-2449-40aa-8192-c97f766fbc37_buggy.java
++++ b/tmp/45ef05e1-f2e0-486c-9373-4f084a030bf7_fixed.java
+@@ -1,12 +1,20 @@
+-    /**
+-     * Retrieves the element's inner HTML. E.g. on a {@code <div>} with one empty {@code <p>}, would return
+-     * {@code <p></p>}. (Whereas {@link #outerHtml()} would return {@code <div><p></p></div>}.)
+-     * 
+-     * @return String of HTML.
+-     * @see #outerHtml()
+-     */
+     public String html() {
+         StringBuilder accum = new StringBuilder();
+-        html(accum);
+-        return accum.toString().trim();
++        Node node = this.childNodeSize() > 0 ? this.childNode(0) : null;
++        while (node != null) {
++            appendOuterHtml(node, accum);
++            node = node.nextSibling;
++        }
++        return accum.toString();
++    }
++
++    private void appendOuterHtml(Node node, StringBuilder accum) {
++        new NodeTraversor(new NodeVisitor() {
++            public void head(Node node, int depth) {
++                accum.append(node.outerHtml());
++            }
++
++            public void tail(Node node, int depth) {
++            }
++        }).traverse(node);
+     }
+\ No newline at end of file

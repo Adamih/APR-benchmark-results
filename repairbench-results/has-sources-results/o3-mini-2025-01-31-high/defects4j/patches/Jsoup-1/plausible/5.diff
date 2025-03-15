@@ -1,0 +1,30 @@
+diff --git a/tmp/8c281193-1f73-44b3-a402-fbda65ac83fb_buggy.java b/tmp/c8a1191c-5cc7-46f1-bdbe-29ee63725116_fixed.java
+index 00914da..594b637 100644
+--- a/tmp/8c281193-1f73-44b3-a402-fbda65ac83fb_buggy.java
++++ b/tmp/c8a1191c-5cc7-46f1-bdbe-29ee63725116_fixed.java
+@@ -1,17 +1,19 @@
+-    // does not recurse.
+ private void normalise(Element element) {
+     List<Node> toMove = new ArrayList<Node>();
+     for (Node node : element.childNodes) {
+         if (node instanceof TextNode) {
+             TextNode tn = (TextNode) node;
+             if (!tn.isBlank())
+                 toMove.add(tn);
+         }
+     }
+-
+-        for (Node node: toMove) {
++    // Move the collected text nodes to the front of the body in document order.
++    // Using prependChild in reverse order preserves the original ordering.
++    for (int i = toMove.size() - 1; i >= 0; i--) {
++        Node node = toMove.get(i);
+         element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++        // Prepend a whitespace node to ensure separation from what follows.
++        body().prependChild(new TextNode(" ", ""));
++        body().prependChild(node);
+     }
+ }
+\ No newline at end of file

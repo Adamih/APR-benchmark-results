@@ -1,0 +1,18 @@
+diff --git a/tmp/c0abf281-d332-4f7b-888a-226b735bd187_buggy.java b/tmp/dce5be81-c574-4dba-8201-c482de95dd6e_fixed.java
+index 42d4174..47d0e81 100644
+--- a/tmp/c0abf281-d332-4f7b-888a-226b735bd187_buggy.java
++++ b/tmp/dce5be81-c574-4dba-8201-c482de95dd6e_fixed.java
+@@ -1,7 +1,7 @@
+-  /**
+-   * Returns the remainder of the line.
+-   */
+ private String getRemainingJSDocLine() {
+-    String result = stream.getRemainingJSDocLine();
+-    return result;
++  String line = stream.getRemainingJSDocLine();
++  // If the comment terminator is present, remove it along with any trailing whitespace.
++  line = line.replaceFirst("\\*/\\s*$", "");
++  // Remove any leading whitespace followed by a '*' and (optionally) a space.
++  return line.replaceFirst("^\\s*\\*\\s?", "");
+ }
+\ No newline at end of file

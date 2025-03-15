@@ -1,0 +1,16 @@
+diff --git a/tmp/dc49fc22-0909-4190-b971-20c1f64a1dd1_buggy.java b/tmp/ac32ebd5-216f-4a91-ab4b-867228e7f648_fixed.java
+index 27520a0..3046c6d 100644
+--- a/tmp/dc49fc22-0909-4190-b971-20c1f64a1dd1_buggy.java
++++ b/tmp/ac32ebd5-216f-4a91-ab4b-867228e7f648_fixed.java
+@@ -1,7 +1,9 @@
+ protected final boolean _add(Annotation ann) {
+     if (_annotations == null) {
+         _annotations = new HashMap<Class<? extends Annotation>, Annotation>();
+     }
+     Annotation previous = _annotations.put(ann.annotationType(), ann);
+-        return (previous != null) && previous.equals(ann);
++    // The correct logic should be to return true if previous is null, indicating a new annotation was added
++    // or if previous is not null but not equal to ann, indicating an update occurred
++    return previous == null || !previous.equals(ann);
+ }
+\ No newline at end of file

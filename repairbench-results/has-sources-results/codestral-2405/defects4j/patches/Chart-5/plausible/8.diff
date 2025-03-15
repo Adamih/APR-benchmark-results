@@ -1,0 +1,61 @@
+diff --git a/tmp/478cccbe-7292-4e34-8ed7-6155055c86e1_buggy.java b/tmp/d17111c4-1c66-4469-8659-9d66356e9d21_fixed.java
+index fd8eae5..480a1c1 100644
+--- a/tmp/478cccbe-7292-4e34-8ed7-6155055c86e1_buggy.java
++++ b/tmp/d17111c4-1c66-4469-8659-9d66356e9d21_fixed.java
+@@ -1,47 +1,47 @@
+     /**
+      * Adds or updates an item in the series and sends a
+      * {@link SeriesChangeEvent} to all registered listeners.
+      *
+      * @param x  the x-value (<code>null</code> not permitted).
+      * @param y  the y-value (<code>null</code> permitted).
+      *
+      * @return A copy of the overwritten data item, or <code>null</code> if no
+      *         item was overwritten.
+      */
+     public XYDataItem addOrUpdate(Number x, Number y) {
+         if (x == null) {
+             throw new IllegalArgumentException("Null 'x' argument.");
+         }
+ 
+-        // if we get to here, we know that duplicate X values are not permitted
+         XYDataItem overwritten = null;
+         int index = indexOf(x);
+         if (index >= 0 && !this.allowDuplicateXValues) {
+             XYDataItem existing = (XYDataItem) this.data.get(index);
+             try {
+                 overwritten = (XYDataItem) existing.clone();
+             }
+             catch (CloneNotSupportedException e) {
+                 throw new SeriesException("Couldn't clone XYDataItem!");
+             }
+             existing.setY(y);
+         }
+         else {
+-            // if the series is sorted, the negative index is a result from
+-            // Collections.binarySearch() and tells us where to insert the
+-            // new item...otherwise it will be just -1 and we should just
+-            // append the value to the list...
++            // If the series is sorted and we got a negative index,
++            // it tells us where to insert the new item. If we didn't get a negative index,
++            // it means the item was not found and we should just append the value to the list.
+             if (this.autoSort) {
+-                this.data.add(-index - 1, new XYDataItem(x, y));
++                index = (index < 0) ? -index - 1 : this.data.size();
+             }
+             else {
+-                this.data.add(new XYDataItem(x, y));
++                index = this.data.size();
+             }
+-            // check if this addition will exceed the maximum item count...
++            this.data.add(index, new XYDataItem(x, y));
++
++            // Check if this addition will exceed the maximum item count...
+             if (getItemCount() > this.maximumItemCount) {
+                 this.data.remove(0);
+             }
+         }
+         fireSeriesChanged();
+         return overwritten;
+     }
+\ No newline at end of file

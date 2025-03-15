@@ -1,0 +1,18 @@
+diff --git a/tmp/7668c430-e4f5-4b13-855e-595d899e4a22_buggy.java b/tmp/417fc3e6-415c-4175-81ed-afb161c3c002_fixed.java
+index 3ecd591..c1ab17e 100644
+--- a/tmp/7668c430-e4f5-4b13-855e-595d899e4a22_buggy.java
++++ b/tmp/417fc3e6-415c-4175-81ed-afb161c3c002_fixed.java
+@@ -1,6 +1,10 @@
++/**
++ * Fix: relaxed condition for previousSibling to allow for correct handling of nested inline elements
++ *      and added check for parent being an inline element to prevent inlineables from being placed 
++ *      inside other inline elements.
++ */
+ private boolean isInlineable(Document.OutputSettings out) {
+     return tag().isInline() 
+-            && (parent() == null || parent().isBlock())
+-            && previousSibling() != null
++        && (parent() == null || (parent().isBlock() || (parent().isInline() &&!parent().tag().equals(tag()))))
+         &&!out.outline();
+ }
+\ No newline at end of file

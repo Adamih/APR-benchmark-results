@@ -1,0 +1,37 @@
+diff --git a/tmp/a81c7534-e6a2-4734-a2b6-b9de3dc81430_buggy.java b/tmp/3d53e6a0-afa7-48f7-a533-47d6d93d348a_fixed.java
+index 016a7f6..f271001 100644
+--- a/tmp/a81c7534-e6a2-4734-a2b6-b9de3dc81430_buggy.java
++++ b/tmp/3d53e6a0-afa7-48f7-a533-47d6d93d348a_fixed.java
+@@ -1,29 +1,31 @@
+     void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+         final boolean prettyPrint = out.prettyPrint();
+         final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+         final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+         final boolean trimLikeBlock = parent != null && (parent.tag().isBlock() || parent.tag().formatAsBlock());
+         boolean trimLeading = false, trimTrailing = false;
+ 
+         if (normaliseWhite) {
+             trimLeading = (trimLikeBlock && siblingIndex == 0) || parentNode instanceof Document;
+             trimTrailing = trimLikeBlock && nextSibling() == null;
+ 
+             // if this text is just whitespace, and the next node will cause an indent, skip this text:
+             Node next = nextSibling();
+             boolean isBlank = isBlank();
+             boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+                 || (next instanceof TextNode && (((TextNode) next).isBlank())); // next is blank text, from re-parenting
+             if (couldSkip && isBlank) return;
+ 
+             Node prev = previousSibling();
+             if (
+                 (siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank) ||
+                 (out.outline() && siblingNodes().size() > 0 && !isBlank) ||
+                 (siblingIndex > 0 && prev instanceof Element && ((Element) prev).normalName().equals("br")) // special case wrap on inline <br> - doesn't make sense as a block tag
+             )
+                 indent(accum, depth, out);
++            else if (trimLikeBlock && siblingIndex > 0 && prev instanceof TextNode && ((TextNode) prev).isBlank() && isBlank) // avoid extra space between block siblings
++                return;
+         }
+ 
+         Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
+     }
+\ No newline at end of file

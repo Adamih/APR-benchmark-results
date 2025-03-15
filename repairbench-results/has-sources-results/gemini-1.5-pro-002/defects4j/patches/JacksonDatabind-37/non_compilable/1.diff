@@ -1,0 +1,33 @@
+diff --git a/tmp/07aac7db-232d-4a88-b677-44e355adf02d_buggy.java b/tmp/644fd721-c001-4eb6-8db6-d5485bd0c965_fixed.java
+index e5ad041..3817cfa 100644
+--- a/tmp/07aac7db-232d-4a88-b677-44e355adf02d_buggy.java
++++ b/tmp/644fd721-c001-4eb6-8db6-d5485bd0c965_fixed.java
+@@ -1,19 +1,20 @@
+     @Override
+     protected JavaType _narrow(Class<?> subclass)
+     {
+         if (_class == subclass) {
+             return this;
+         }
+         // Should we check that there is a sub-class relationship?
+         // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+         //    placeholder values, so no.
+-        /*
+-        if (!_class.isAssignableFrom(subclass)) {
+-            throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+-                    +_class.getName());
++
++        // 26-Mar-2019, tatu: As per [databind#1083], MUST retain existing
++        //    type bindings. Related to fixing that, MUST actually re-resolve
++        //    bindings if subclass is abstract (due to refinement limitations)
++        TypeFactory tf = _typeFactory;
++        if (tf == null) { // shouldn't happen, but just in case
++            tf = TypeFactory.defaultTypeFactory();
+         }
+-        */
+-        // 15-Jan-2015, tatu: Not correct; should really re-resolve...
+-        return new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
+-                _valueHandler, _typeHandler, _asStatic);
++        JavaType newType = tf.constructSpecializedType(this, subclass);
++        return newType;
+     }

@@ -1,0 +1,44 @@
+diff --git a/tmp/12f835e3-7f80-488e-9307-707f16718899_buggy.java b/tmp/2f752091-493b-47c4-ae20-7dfd3401aaa3_fixed.java
+index 5bf31b1..5a90561 100644
+--- a/tmp/12f835e3-7f80-488e-9307-707f16718899_buggy.java
++++ b/tmp/2f752091-493b-47c4-ae20-7dfd3401aaa3_fixed.java
+@@ -1,17 +1,32 @@
+ private String consumeSubQuery() {
+     StringBuilder sq = StringUtil.borrowBuilder();
++    int depth = 0;
++    boolean insideSubquery = false;
++
+     while (!tq.isEmpty()) {
+-            if (tq.matches("("))
++        if (tq.matches("(")) {
++            depth++;
++            insideSubquery = true;
+             sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+-            else if (tq.matches("["))
++        } else if (tq.matches("[")) {
++            depth++;
++            insideSubquery = true;
+             sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++        } else if (tq.matchesAny(Combinators)) {
++            if (insideSubquery && depth == 0) {
+                 break;
+-                else
++            } else {
+                 tq.consume();
+-            else
++                if (insideSubquery) {
++                    depth--;
++                    if (depth == 0) {
++                        insideSubquery = false;
++                    }
++                }
++            }
++        } else {
+             sq.append(tq.consume());
+         }
++    }
+     return StringUtil.releaseBuilder(sq);
+ }
+\ No newline at end of file

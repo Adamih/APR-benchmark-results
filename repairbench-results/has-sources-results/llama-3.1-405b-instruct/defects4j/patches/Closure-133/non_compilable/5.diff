@@ -1,0 +1,21 @@
+diff --git a/tmp/a2fe1657-fb8a-4732-b0fd-9f8e5e4ecefa_buggy.java b/tmp/649f1663-a76e-476c-9777-f30780cff772_fixed.java
+index 42d4174..9cfc5c7 100644
+--- a/tmp/a2fe1657-fb8a-4732-b0fd-9f8e5e4ecefa_buggy.java
++++ b/tmp/649f1663-a76e-476c-9777-f30780cff772_fixed.java
+@@ -1,7 +1,15 @@
+ /**
+  * Returns the remainder of the line.
+  */
+ private String getRemainingJSDocLine() {
++    // The issue seems to be with recording bad position information.
++    // The previous implementation just delegated the responsibility to the stream.
++    // We need to track the position information correctly.
+     String result = stream.getRemainingJSDocLine();
++    if (result.trim().isEmpty()) {
++        // If the result is empty, it might mean we are at the end of the line.
++        // We should correctly handle this case to avoid incorrect position information.
++        trackingParser.trackingSkipForward();
++    }
+     return result;
+ }
+\ No newline at end of file

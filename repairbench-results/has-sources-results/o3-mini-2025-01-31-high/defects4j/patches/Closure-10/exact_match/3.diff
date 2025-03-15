@@ -1,0 +1,18 @@
+diff --git a/tmp/3aa3162b-cc61-4646-982a-b98518311836_buggy.java b/tmp/3b7b4639-0553-4b69-b5c9-e8fd0537f984_fixed.java
+index 6fecc90..dfe13fb 100644
+--- a/tmp/3aa3162b-cc61-4646-982a-b98518311836_buggy.java
++++ b/tmp/3b7b4639-0553-4b69-b5c9-e8fd0537f984_fixed.java
+@@ -1,7 +1,11 @@
+ static boolean mayBeString(Node n, boolean recurse) {
+   if (recurse) {
+-      return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
++    // Instead of requiring that every possible result is a string,
++    // we now check if any one of the results might be a string.
++    // This avoids wrongly folding expressions like
++    // (Math.random()>0.5 ? "1" : 2) + 3 + 4.
++    return anyResultsMatch(n, MAY_BE_STRING_PREDICATE);
+   } else {
+     return mayBeStringHelper(n);
+   }
+ }
+\ No newline at end of file

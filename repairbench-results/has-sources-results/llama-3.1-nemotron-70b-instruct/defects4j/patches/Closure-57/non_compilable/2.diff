@@ -1,0 +1,30 @@
+diff --git a/tmp/ac3f25b2-a241-43c4-a734-63d22b79485d_buggy.java b/tmp/de2cc25b-d9a6-4da1-a081-d2ec0063bd92_fixed.java
+index 1ea204a..f1c9e4f 100644
+--- a/tmp/ac3f25b2-a241-43c4-a734-63d22b79485d_buggy.java
++++ b/tmp/de2cc25b-d9a6-4da1-a081-d2ec0063bd92_fixed.java
+@@ -1,17 +1,13 @@
+-  private static String extractClassNameIfGoog(Node node, Node parent,
+-      String functionName){
++private static String extractClassNameIfGoog(Node node, Node parent, String functionName) {
+     String className = null;
+-    if (NodeUtil.isExprCall(parent)) {
+-      Node callee = node.getFirstChild();
+-      if (callee != null && callee.getType() == Token.GETPROP) {
+-        String qualifiedName = callee.getQualifiedName();
+-        if (functionName.equals(qualifiedName)) {
+-          Node target = callee.getNext();
+-          if (target != null) {
+-            className = target.getString();
+-          }
++    if (NodeUtil.isExprCall(parent) && functionName.equals(parent.getFirstChild().getString())) {
++      Node args = parent.getChildAtIndex(1); // assuming args are the second child in an ExprCall
++      if (args!= null && args.hasChildNodes()) {
++        Node arg = args.getFirstChild();
++        if (arg.getType() == Token.STRING) {
++          className = arg.getString();
+         }
+       }
+     }
+     return className;
+ }
+\ No newline at end of file

@@ -1,0 +1,24 @@
+diff --git a/tmp/68d874f4-3deb-4adf-b41a-21ecbdf02fa3_buggy.java b/tmp/f636782d-5e62-4719-acba-3154e18f659f_fixed.java
+index 084a224..8eca363 100644
+--- a/tmp/68d874f4-3deb-4adf-b41a-21ecbdf02fa3_buggy.java
++++ b/tmp/f636782d-5e62-4719-acba-3154e18f659f_fixed.java
+@@ -1,7 +1,16 @@
++/**
++ * Converts a Unix epoch time in seconds to a ZipLong, 
++ * ensuring it fits within a signed 32-bit integer.
++ * 
++ * @param l Unix epoch time in seconds
++ * @return ZipLong representation of the input time
++ * @throws IllegalArgumentException if the input time exceeds the maximum value for a signed 32-bit integer
++ */
+ private static ZipLong unixTimeToZipLong(long l) {
+-        final long TWO_TO_32 = 0x100000000L;
+-        if (l >= TWO_TO_32) {
++    final long MAX_SIGNED_32BIT = 0x7FFFFFFFL; // Maximum value for a signed 32-bit integer
++    if (l > MAX_SIGNED_32BIT) {
+         throw new IllegalArgumentException("X5455 timestamps must fit in a signed 32 bit integer: " + l);
+     }
++    // No need for explicit check for negative values, as they are valid for signed 32-bit integers
+     return new ZipLong(l);
+ }
+\ No newline at end of file

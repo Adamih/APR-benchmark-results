@@ -1,0 +1,44 @@
+diff --git a/tmp/f5e786b8-117e-48b6-ae73-529b1fde0ced_buggy.java b/tmp/d906519c-0303-4f07-81ea-0db90b0b3679_fixed.java
+index 4e8b037..a35a574 100644
+--- a/tmp/f5e786b8-117e-48b6-ae73-529b1fde0ced_buggy.java
++++ b/tmp/d906519c-0303-4f07-81ea-0db90b0b3679_fixed.java
+@@ -1,20 +1,33 @@
+-    public List getValues(final Option option,
+-                          List defaultValues) {
++public List getValues(final Option option, List defaultValues) {
+     // initialize the return list
+     List valueList = (List) values.get(option);
+ 
+     // grab the correct default values
+     if ((valueList == null) || valueList.isEmpty()) {
+         valueList = defaultValues;
+     }
+ 
+     // augment the list with the default values
+     if ((valueList == null) || valueList.isEmpty()) {
+         valueList = (List) this.defaultValues.get(option);
+     }
+-                // if there are more default values as specified, add them to
+-                // the list.
+-                    // copy the list first
++
++    // if there are more default values as specified, add them to the list.
++    if (valueList!= null &&!valueList.isEmpty()) {
++        List defaultList = (List) this.defaultValues.get(option);
++        if (defaultList!= null &&!defaultList.isEmpty()) {
++            int min = ((Argument) option.getArgument()).getMinimum();
++            int max = ((Argument) option.getArgument()).getMaximum();
++            int required = max - valueList.size();
++            for (int i = 0; i < required; i++) {
++                if (defaultList.isEmpty()) {
++                    break;
++                }
++                valueList.add(defaultList.get(0));
++                defaultList.remove(0);
++            }
++        }
++    }
+ 
+     return valueList == null? Collections.EMPTY_LIST : valueList;
+ }
+\ No newline at end of file

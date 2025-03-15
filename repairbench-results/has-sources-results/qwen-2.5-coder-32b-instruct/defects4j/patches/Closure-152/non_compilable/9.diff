@@ -1,0 +1,55 @@
+diff --git a/tmp/74a43fbe-9a3b-4efe-9e5c-718799c3675a_buggy.java b/tmp/3bb704c1-806a-4203-a039-e5596f983db2_fixed.java
+index 58a1651..6fcc925 100644
+--- a/tmp/74a43fbe-9a3b-4efe-9e5c-718799c3675a_buggy.java
++++ b/tmp/3bb704c1-806a-4203-a039-e5596f983db2_fixed.java
+@@ -1,32 +1,46 @@
+ @Override
+ JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+     setResolvedTypeInternal(this);
+ 
+     call = (ArrowType) safeResolve(call, t, scope);
+     prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+     // Warning about typeOfThis if it doesn't resolve to an ObjectType
+     // is handled further upstream.
+     // TODO(nicksantos): Handle this correctly if we have a UnionType.
+-    typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
++    JSType resolvedTypeOfThis = safeResolve(typeOfThis, t, scope);
++    if (resolvedTypeOfThis.isUnionType()) {
++        UnionType unionType = resolvedTypeOfThis.toMaybeUnionType();
++        for (JSType alternative : unionType.getAlternates()) {
++            if (!alternative.isObjectType()) {
++                t.error("Type of @this must be an object or a union of objects. Actual type: " + resolvedTypeOfThis.toString());
++                typeOfThis = null; // or some error type
++                break;
++            }
++        }
++    } else if (!resolvedTypeOfThis.isObjectType()) {
++        t.error("Type of @this must be an object. Actual type: " + resolvedTypeOfThis.toString());
++        typeOfThis = null; // or some error type
++    } else {
++        typeOfThis = resolvedTypeOfThis.toObjectType();
++    }
+ 
+     boolean changed = false;
+-    ImmutableList.Builder<ObjectType> resolvedInterfaces =
+-        ImmutableList.builder();
++    ImmutableList.Builder<ObjectType> resolvedInterfaces = ImmutableList.builder();
+     for (ObjectType iface : implementedInterfaces) {
+         ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+         resolvedInterfaces.add(resolvedIface);
+         changed |= (resolvedIface != iface);
+     }
+     if (changed) {
+         implementedInterfaces = resolvedInterfaces.build();
+     }
+ 
+     if (subTypes != null) {
+         for (int i = 0; i < subTypes.size(); i++) {
+             subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+         }
+     }
+ 
+     return super.resolveInternal(t, scope);
+ }
+\ No newline at end of file

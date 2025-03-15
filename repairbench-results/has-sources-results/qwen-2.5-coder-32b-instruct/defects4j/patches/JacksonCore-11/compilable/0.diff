@@ -1,0 +1,22 @@
+diff --git a/tmp/d86aab72-952b-47e1-a7c0-0ada5e0a9b1d_buggy.java b/tmp/c14b9e97-0222-48a0-b573-ff6cfd1c79e7_fixed.java
+index 29d025a..6ec210a 100644
+--- a/tmp/d86aab72-952b-47e1-a7c0-0ada5e0a9b1d_buggy.java
++++ b/tmp/c14b9e97-0222-48a0-b573-ff6cfd1c79e7_fixed.java
+@@ -1,13 +1,14 @@
+ private void _verifySharing()
+ {
+     if (_hashShared) {
+-            _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+-            _names = Arrays.copyOf(_names, _names.length);
++        // Double the size of the arrays to handle potential expansion during rehashing
++        _hashArea = Arrays.copyOf(_hashArea, _hashArea.length * 2);
++        _names = Arrays.copyOf(_names, _names.length * 2);
+         _hashShared = false;
+         // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+         //    we rehash as needed, as need-rehash flag is not copied from parent
+     }
+     if (_needRehash) {
+         rehash();
+     }
+ }
+\ No newline at end of file

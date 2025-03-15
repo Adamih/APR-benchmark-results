@@ -1,0 +1,43 @@
+diff --git a/tmp/a0847c61-3621-428b-bf80-dcd75d10ab23_buggy.java b/tmp/ca59278d-092f-4969-9ac1-9bdb7d8cb713_fixed.java
+index 07b0792..07d18f8 100644
+--- a/tmp/a0847c61-3621-428b-bf80-dcd75d10ab23_buggy.java
++++ b/tmp/ca59278d-092f-4969-9ac1-9bdb7d8cb713_fixed.java
+@@ -1,22 +1,35 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+       // Make sure this assignment is not in a loop.
+-      for (BasicBlock block = ref.getBasicBlock();
+-           block != null; block = block.getParent()) {
++      BasicBlock block = ref.getBasicBlock();
++      while (block != null) {
+         if (block.isFunction) {
+           break;
+         } else if (block.isLoop) {
+           return false;
+         }
++        block = block.getParent();
++      }
++
++      if (getScope().isGlobal()) {
++        return true;
++      }
++
++      for (Reference maybeOuterRef : getReferences(getScope().getParent())) {
++        if (maybeOuterRef.isVarDeclaration() || maybeOuterRef.isLetDeclaration()
++            || maybeOuterRef.isConstDeclaration() || maybeOuterRef.isParamList()) {
++          continue;
++        }
++        return false;
+       }
+       
+       return true;
+     }
+\ No newline at end of file

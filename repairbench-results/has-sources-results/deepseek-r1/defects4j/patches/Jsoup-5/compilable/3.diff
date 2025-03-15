@@ -1,0 +1,38 @@
+diff --git a/tmp/9e56242b-b303-4b9e-87f1-846535b94d47_buggy.java b/tmp/8c36446f-335f-433c-b52c-e6c8f41b8993_fixed.java
+index 39dd8e7..295ab81 100644
+--- a/tmp/9e56242b-b303-4b9e-87f1-846535b94d47_buggy.java
++++ b/tmp/8c36446f-335f-433c-b52c-e6c8f41b8993_fixed.java
+@@ -1,30 +1,31 @@
+     private Attribute parseAttribute() {
+         tq.consumeWhitespace();
+         String key = tq.consumeAttributeKey();
+         String value = "";
+         tq.consumeWhitespace();
+         if (tq.matchChomp("=")) {
+             tq.consumeWhitespace();
+ 
+             if (tq.matchChomp(SQ)) {
+                 value = tq.chompTo(SQ);
+             } else if (tq.matchChomp(DQ)) {
+                 value = tq.chompTo(DQ);
+             } else {
+                 StringBuilder valueAccum = new StringBuilder();
+                 // no ' or " to look for, so scan to end tag or space (or end of stream)
+                 while (!tq.matchesAny("<", "/>", ">") && !tq.matchesWhitespace() && !tq.isEmpty()) {
+                     valueAccum.append(tq.consume());
+                 }
+                 value = valueAccum.toString();
+             }
+             tq.consumeWhitespace();
+         }
+         if (key.length() != 0)
+             return Attribute.createFromEncoded(key, value);
+         else {
++            if (!tq.isEmpty()) {
+                 tq.consume();
+-                
++            }
+             return null;
+         }
+     }
+\ No newline at end of file

@@ -1,0 +1,35 @@
+diff --git a/tmp/5bdb551b-2ac6-4010-b74a-f9131bcfbcf3_buggy.java b/tmp/bdbcc4f0-aee7-4167-8a8b-66567bc9fb76_fixed.java
+index 1530b34..542bc87 100644
+--- a/tmp/5bdb551b-2ac6-4010-b74a-f9131bcfbcf3_buggy.java
++++ b/tmp/bdbcc4f0-aee7-4167-8a8b-66567bc9fb76_fixed.java
+@@ -1,23 +1,29 @@
+ /**
+  * Declares all of a function's arguments.
+  */
+ private void declareArguments(Node functionNode) {
+   Node astParameters = functionNode.getFirstChild().getNext();
+   Node body = astParameters.getNext();
+   FunctionType functionType = (FunctionType) functionNode.getJSType();
+   if (functionType != null) {
+     Node jsDocParameters = functionType.getParametersNode();
+     if (jsDocParameters != null) {
+       Node jsDocParameter = jsDocParameters.getFirstChild();
+       for (Node astParameter : astParameters.children()) {
+         if (jsDocParameter != null) {
++          // Check for duplicate declarations
++          if (astParameter.getString().equals(jsDocParameter.getString())) {
++            // Handle duplicate local variable declaration
++            // Emit a warning or take necessary action
++            System.err.println("Duplicate variable declaration: " + astParameter.getString());
++          }
+           defineSlot(astParameter, functionNode,
+               jsDocParameter.getJSType(), true);
+           jsDocParameter = jsDocParameter.getNext();
+         } else {
+           defineSlot(astParameter, functionNode, null, true);
+         }
+       }
+     }
+   }
+ } // end declareArguments
+\ No newline at end of file

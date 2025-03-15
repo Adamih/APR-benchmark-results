@@ -1,0 +1,21 @@
+diff --git a/tmp/43b18088-e5d7-45cd-8441-7d9775fef74b_buggy.java b/tmp/abe21f9f-f380-498c-8291-84034d8b491f_fixed.java
+index 3ba614a..7920459 100644
+--- a/tmp/43b18088-e5d7-45cd-8441-7d9775fef74b_buggy.java
++++ b/tmp/abe21f9f-f380-498c-8291-84034d8b491f_fixed.java
+@@ -1,9 +1,14 @@
+ @Override
+ public int read() throws IOException {
+     int current = super.read();
+-        if (current == '\n') {
++    if (current == '\n' || current == '\r') {
+         lineCounter++;
++    } else if (current == '\n' && lastChar == '\r') {
++        // If lastChar is '\r' and current is '\n', then it's a '\r\n' sequence.
++        // In this case, the line counter was already incremented due to '\r'.
++        // So, we don't need to increment it again.
++        lineCounter--;
+     }
+     lastChar = current;
+     return lastChar;
+ }
+\ No newline at end of file

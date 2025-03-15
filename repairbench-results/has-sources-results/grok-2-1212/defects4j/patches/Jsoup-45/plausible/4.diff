@@ -1,0 +1,59 @@
+diff --git a/tmp/74959352-1ac7-4da2-8772-c8c60eaf3e1a_buggy.java b/tmp/6017b9f0-04ec-4019-b01e-add1c7ac23d2_fixed.java
+index 135fc63..3c8cc55 100644
+--- a/tmp/74959352-1ac7-4da2-8772-c8c60eaf3e1a_buggy.java
++++ b/tmp/6017b9f0-04ec-4019-b01e-add1c7ac23d2_fixed.java
+@@ -1,48 +1,52 @@
+ void resetInsertionMode() {
+     boolean last = false;
++    boolean inTableScope = false;
+     for (int pos = stack.size() - 1; pos >= 0; pos--) {
+         Element node = stack.get(pos);
+         if (pos == 0) {
+             last = true;
+             node = contextElement;
+         }
+         String name = node.nodeName();
+         if ("select".equals(name)) {
+             transition(HtmlTreeBuilderState.InSelect);
+             break; // frag
+-            } else if (("td".equals(name) || "td".equals(name) && !last)) {
++        } else if ("td".equals(name) || "th".equals(name)) {
++            if (!inTableScope) {
+                 transition(HtmlTreeBuilderState.InCell);
+                 break;
++            }
+         } else if ("tr".equals(name)) {
+             transition(HtmlTreeBuilderState.InRow);
+             break;
+         } else if ("tbody".equals(name) || "thead".equals(name) || "tfoot".equals(name)) {
+             transition(HtmlTreeBuilderState.InTableBody);
+             break;
+         } else if ("caption".equals(name)) {
+             transition(HtmlTreeBuilderState.InCaption);
+             break;
+         } else if ("colgroup".equals(name)) {
+             transition(HtmlTreeBuilderState.InColumnGroup);
+             break; // frag
+         } else if ("table".equals(name)) {
+             transition(HtmlTreeBuilderState.InTable);
++            inTableScope = true;
+             break;
+         } else if ("head".equals(name)) {
+             transition(HtmlTreeBuilderState.InBody);
+             break; // frag
+         } else if ("body".equals(name)) {
+             transition(HtmlTreeBuilderState.InBody);
+             break;
+         } else if ("frameset".equals(name)) {
+             transition(HtmlTreeBuilderState.InFrameset);
+             break; // frag
+         } else if ("html".equals(name)) {
+             transition(HtmlTreeBuilderState.BeforeHead);
+             break; // frag
+         } else if (last) {
+             transition(HtmlTreeBuilderState.InBody);
+             break; // frag
+         }
+     }
+ }
+\ No newline at end of file

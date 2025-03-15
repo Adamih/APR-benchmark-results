@@ -1,0 +1,36 @@
+diff --git a/tmp/e73ca22e-526f-4e49-ab6d-f555e2aa46c1_buggy.java b/tmp/8c147e2e-d28a-410f-afef-c1d351eb8512_fixed.java
+index de9af32..aed81c7 100644
+--- a/tmp/e73ca22e-526f-4e49-ab6d-f555e2aa46c1_buggy.java
++++ b/tmp/8c147e2e-d28a-410f-afef-c1d351eb8512_fixed.java
+@@ -1,18 +1,24 @@
+-  /**
+-   * @see #findCalledFunctions(Node)
+-   */
+-  private void findCalledFunctions(
+-      Node node, Set<String> changed) {
++private void findCalledFunctions(Node node, Set<String> changed) {
+     Preconditions.checkArgument(changed != null);
+-    // For each referenced function, add a new reference
++    // Check for function calls
+     if (node.getType() == Token.CALL) {
+         Node child = node.getFirstChild();
+         if (child.getType() == Token.NAME) {
++            // Direct function call like func()
+             changed.add(child.getString());
++        } else if (child.getType() == Token.ACCESSOR) {
++            // Method call like obj.method(), so traverse to get the method name
++            for (Node s = child.getPreviousSibling(); s != null; s = s.getPreviousSibling()) {
++                if (s.getType() == Token.NAME) {
++                    // The actual method name before .call or .apply
++                    changed.add(s.getString());
++                    break;
++                }
++            }
+         }
+     }
+ 
+     for (Node c = node.getFirstChild(); c != null; c = c.getNext()) {
+         findCalledFunctions(c, changed);
+     }
+ }
+\ No newline at end of file

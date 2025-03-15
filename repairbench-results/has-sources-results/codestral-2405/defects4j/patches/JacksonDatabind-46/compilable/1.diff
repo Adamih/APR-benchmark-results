@@ -1,0 +1,23 @@
+diff --git a/tmp/4ab2d91f-080a-4235-8b1b-7858c8ef3718_buggy.java b/tmp/4736f996-f380-4d09-b7b8-af24569d319c_fixed.java
+index 6f49dcb..1391ab3 100644
+--- a/tmp/4ab2d91f-080a-4235-8b1b-7858c8ef3718_buggy.java
++++ b/tmp/4736f996-f380-4d09-b7b8-af24569d319c_fixed.java
+@@ -1,9 +1,17 @@
+ @Override
+ public StringBuilder getGenericSignature(StringBuilder sb)
+ {
+     _classSignature(_class, sb, false);
+     sb.append('<');
++    if(_referencedType.getGenericSignature().indexOf("[") == 0) {
++        // If the referencedType is an array type (i.e., its generic signature starts with a '['),
++        // we need to append additional square brackets according to the Java Language Specification.
++        sb.append("[");
++        sb = _referencedType.getGenericSignature(sb);
++        sb.append(">;");
++    } else {
+         sb = _referencedType.getGenericSignature(sb);
+         sb.append(';');
++    }
+     return sb;
+ }
+\ No newline at end of file

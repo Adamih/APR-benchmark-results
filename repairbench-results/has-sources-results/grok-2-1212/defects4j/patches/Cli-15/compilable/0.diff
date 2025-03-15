@@ -1,0 +1,46 @@
+diff --git a/tmp/25cba701-c1dd-460d-b30a-61e6d1b794ff_buggy.java b/tmp/66b2175d-5ab0-4109-a31d-33436a7a5800_fixed.java
+index 4e8b037..2e81595 100644
+--- a/tmp/25cba701-c1dd-460d-b30a-61e6d1b794ff_buggy.java
++++ b/tmp/66b2175d-5ab0-4109-a31d-33436a7a5800_fixed.java
+@@ -1,20 +1,28 @@
+-    public List getValues(final Option option,
+-                          List defaultValues) {
+-        // initialize the return list
++public List getValues(final Option option, List defaultValues) {
++    // Initialize the return list
+     List valueList = (List) values.get(option);
+ 
+-        // grab the correct default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = defaultValues;
++    // If the value list is null or empty, use the provided default values
++    if (valueList == null || valueList.isEmpty()) {
++        valueList = new ArrayList(defaultValues);
++    } else {
++        // If the value list is not empty, append the default values
++        valueList = new ArrayList(valueList);
++        for (Object defaultValue : defaultValues) {
++            if (!valueList.contains(defaultValue)) {
++                valueList.add(defaultValue);
++            }
++        }
+     }
+ 
+-        // augment the list with the default values
+-        if ((valueList == null) || valueList.isEmpty()) {
+-            valueList = (List) this.defaultValues.get(option);
++    // If the list is still empty after the above operations, use the option's default values
++    if (valueList.isEmpty()) {
++        List optionDefaultValues = (List) this.defaultValues.get(option);
++        if (optionDefaultValues != null) {
++            valueList = new ArrayList(optionDefaultValues);
++        }
+     }
+-                // if there are more default values as specified, add them to
+-                // the list.
+-                    // copy the list first
+ 
++    // Return the final list or an empty list if it's still null
+     return valueList == null ? Collections.EMPTY_LIST : valueList;
+ }
+\ No newline at end of file

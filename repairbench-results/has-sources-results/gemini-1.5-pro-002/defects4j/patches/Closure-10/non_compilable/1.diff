@@ -1,0 +1,13 @@
+diff --git a/tmp/f845198b-3b0e-4267-a914-84fadc549b08_buggy.java b/tmp/1f1fac42-6cf4-4bd6-9aec-b9747fb3ecc0_fixed.java
+index 6fecc90..7b54f2c 100644
+--- a/tmp/f845198b-3b0e-4267-a914-84fadc549b08_buggy.java
++++ b/tmp/1f1fac42-6cf4-4bd6-9aec-b9747fb3ecc0_fixed.java
+@@ -1,7 +1,7 @@
+   static boolean mayBeString(Node n, boolean recurse) {
+     if (recurse) {
+       return allResultsMatch(n, MAY_BE_STRING_PREDICATE);
+     } else {
+-      return mayBeStringHelper(n);
++      return mayBeStringHelper(n) || (n.isConditional() && (mayBeString(n.getSecondChild(), false) || mayBeString(n.getThirdChild(), false)));
+     }
+   }

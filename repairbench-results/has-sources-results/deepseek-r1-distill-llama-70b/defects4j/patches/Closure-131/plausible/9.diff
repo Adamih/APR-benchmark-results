@@ -1,0 +1,44 @@
+diff --git a/tmp/4b033443-f696-455a-b349-7a33dde10054_buggy.java b/tmp/8a4095b9-37ad-4755-834a-80534e1717a2_fixed.java
+index 19fe1b4..81b36d9 100644
+--- a/tmp/4b033443-f696-455a-b349-7a33dde10054_buggy.java
++++ b/tmp/8a4095b9-37ad-4755-834a-80534e1717a2_fixed.java
+@@ -1,17 +1,33 @@
+ public static boolean isJSIdentifier(String s) {
+     int length = s.length();
++    if (length == 0) {
++        return false;
++    }
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++    for (int i = 0; i < length; ) {
++        int codePoint = s.codePointAt(i);
++        int charCount = Character.charCount(codePoint);
++        if (i == 0) {
++            // The first character must be a letter, $, or _
++            if (!(codePoint == '_' || codePoint == '$' || Character.isLetter(codePoint))) {
++                return false;
++            }
++        } else {
++            // Subsequent characters must be a letter, digit, $, _, or allowed combining mark
++            if (!(codePoint == '_' || codePoint == '$' || Character.isLetterOrDigit(codePoint) 
++                  || codePoint == '\u200C' || codePoint == '\u200D')) {
+                 return false;
+             }
++        }
+ 
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++        // Ensure the codePoint is not a control character, except for allowed combining marks
++        if (Character.getType(codePoint) == Character.CONTROL 
++            && !(codePoint == '\u200C' || codePoint == '\u200D')) {
+             return false;
+         }
++
++        i += charCount;
+     }
+ 
+     return true;
+ }
+\ No newline at end of file

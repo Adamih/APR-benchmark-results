@@ -1,0 +1,55 @@
+diff --git a/tmp/ac19e6cc-8541-466d-945d-95dc94b8b62c_buggy.java b/tmp/fcd8aa46-00d6-48db-ab72-e0c3ab3416af_fixed.java
+index b98f0a7..6830a03 100644
+--- a/tmp/ac19e6cc-8541-466d-945d-95dc94b8b62c_buggy.java
++++ b/tmp/fcd8aa46-00d6-48db-ab72-e0c3ab3416af_fixed.java
+@@ -1,29 +1,48 @@
+ private FlowScope traverseNew(Node n, FlowScope scope) {
+-
+     Node constructor = n.getFirstChild();
+     scope = traverse(constructor, scope);
+     JSType constructorType = constructor.getJSType();
+     JSType type = null;
+     if (constructorType != null) {
+         constructorType = constructorType.restrictByNotNullOrUndefined();
+         if (constructorType.isUnknownType()) {
+             type = getNativeType(UNKNOWN_TYPE);
+         } else {
+             FunctionType ct = constructorType.toMaybeFunctionType();
+             if (ct == null && constructorType instanceof FunctionType) {
+                 // If constructorType is a NoObjectType, then toMaybeFunctionType will
+                 // return null. But NoObjectType implements the FunctionType
+                 // interface, precisely because it can validly construct objects.
+                 ct = (FunctionType) constructorType;
+             }
+             if (ct != null && ct.isConstructor()) {
+                 type = ct.getInstanceType();
++                // Add backwards inference for constructor parameters
++                Node args = constructor.getNext();
++                if (args != null && type instanceof ObjectType) {
++                    ObjectType instanceType = (ObjectType) type;
++                    FunctionType constructorFn = ct;
++                    Node params = constructorFn.getParametersNode();
++                    int paramIndex = 0;
++                    for (Node arg = args; arg != null; arg = arg.getNext()) {
++                        if (params != null) {
++                            Node param = params.getChildAtIndex(paramIndex);
++                            if (param != null) {
++                                JSType paramType = param.getJSType();
++                                if (paramType != null) {
++                                    arg.setJSType(paramType);
++                                }
++                            }
++                            paramIndex++;
++                        }
++                    }
++                }
+             }
+         }
+     }
+     n.setJSType(type);
+     for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
+         scope = traverse(arg, scope);
+     }
+     return scope;
+ }
+\ No newline at end of file

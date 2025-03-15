@@ -1,0 +1,33 @@
+diff --git a/tmp/e540dfc7-7563-45bb-9060-560b4797c463_buggy.java b/tmp/9a7635e4-d8e5-4e7a-9bb1-fbfb065123bb_fixed.java
+index 1648a8d..62aa0a4 100644
+--- a/tmp/e540dfc7-7563-45bb-9060-560b4797c463_buggy.java
++++ b/tmp/9a7635e4-d8e5-4e7a-9bb1-fbfb065123bb_fixed.java
+@@ -1,9 +1,26 @@
+ /**
+  * Returns an iterator over the unmodifiable list of chromosomes.
+  * <p>Any call to {@link Iterator#remove()} will result in a {@link UnsupportedOperationException}.</p>
+  *
+  * @return chromosome iterator
+  */
+ public Iterator<Chromosome> iterator() {
+-        return chromosomes.iterator();
++    return new Iterator<Chromosome>() {
++        private final Iterator<Chromosome> delegate = chromosomes.iterator();
++
++        @Override
++        public boolean hasNext() {
++            return delegate.hasNext();
++        }
++
++        @Override
++        public Chromosome next() {
++            return delegate.next();
++        }
++
++        @Override
++        public void remove() {
++            throw new UnsupportedOperationException();
++        }
++    };
+ }
+\ No newline at end of file

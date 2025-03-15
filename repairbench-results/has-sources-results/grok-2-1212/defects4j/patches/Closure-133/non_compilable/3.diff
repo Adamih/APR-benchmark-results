@@ -1,0 +1,18 @@
+diff --git a/tmp/eef1be14-1ec9-4d30-868e-5449f07f333e_buggy.java b/tmp/fff9b125-f8f8-4695-ab50-b0d0921f5620_fixed.java
+index 42d4174..4c9dacb 100644
+--- a/tmp/eef1be14-1ec9-4d30-868e-5449f07f333e_buggy.java
++++ b/tmp/fff9b125-f8f8-4695-ab50-b0d0921f5620_fixed.java
+@@ -1,7 +1,11 @@
+ /**
+-   * Returns the remainder of the line.
++ * Returns the remainder of the line, ensuring correct position tracking.
+  */
+ private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    if (result == null || result.isEmpty()) {
++        return "";
++    }
++    stream.updatePosition(result.length());
+     return result;
+ }
+\ No newline at end of file

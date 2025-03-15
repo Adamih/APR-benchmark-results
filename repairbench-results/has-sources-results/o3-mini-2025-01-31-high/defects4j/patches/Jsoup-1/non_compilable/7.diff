@@ -1,0 +1,33 @@
+diff --git a/tmp/fb1c8da3-5bb9-4ede-8ffb-7e2d5e137ca7_buggy.java b/tmp/21dc0073-467f-4958-b226-b37dd9211c16_fixed.java
+index 00914da..88b0c63 100644
+--- a/tmp/fb1c8da3-5bb9-4ede-8ffb-7e2d5e137ca7_buggy.java
++++ b/tmp/21dc0073-467f-4958-b226-b37dd9211c16_fixed.java
+@@ -1,17 +1,22 @@
+-    // does not recurse.
+ private void normalise(Element element) {
+     List<Node> toMove = new ArrayList<Node>();
+     for (Node node : element.childNodes) {
+         if (node instanceof TextNode) {
+             TextNode tn = (TextNode) node;
+-                if (!tn.isBlank())
++            if (!tn.isBlank()) {
+                 toMove.add(tn);
+             }
+         }
+-
++    }
++    if (!toMove.isEmpty()) {
++        // Build a list of nodes to insert in the body so that stray text nodes
++        // appear at the beginning (in their original order)
++        List<Node> insertion = new ArrayList<Node>();
+         for (Node node : toMove) {
+             element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++            insertion.add(new TextNode(" ", ""));
++            insertion.add(node);
++        }
++        body().insertChildren(0, insertion);
+     }
+ }
+\ No newline at end of file

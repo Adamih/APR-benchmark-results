@@ -1,0 +1,21 @@
+diff --git a/tmp/aa13a5bd-acc1-4b57-ab64-7e866b55d2ca_buggy.java b/tmp/45181ec2-68ec-48dc-88ca-6579ff927af4_fixed.java
+index dcc36a4..e3b34f0 100644
+--- a/tmp/aa13a5bd-acc1-4b57-ab64-7e866b55d2ca_buggy.java
++++ b/tmp/45181ec2-68ec-48dc-88ca-6579ff927af4_fixed.java
+@@ -1,12 +1,15 @@
+ protected void replaceChild(Node out, Node in) {
+     Validate.isTrue(out.parentNode == this);
+     Validate.notNull(in);
++    if (in == out) {
++        return; // No replacement needed
++    }
+     if (in.parentNode != null)
+         in.parentNode.removeChild(in);
+ 
+     final int index = out.siblingIndex;
+     ensureChildNodes().set(index, in);
+     in.parentNode = this;
+     in.setSiblingIndex(index);
+     out.parentNode = null;
+ }
+\ No newline at end of file

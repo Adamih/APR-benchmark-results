@@ -1,0 +1,20 @@
+diff --git a/tmp/c03ecbc4-ce33-4733-8920-b21a91c0dd46_buggy.java b/tmp/ba2f1d37-b08e-46f6-b0d1-c05e41c08348_fixed.java
+index 4d0be80..53f13dd 100644
+--- a/tmp/c03ecbc4-ce33-4733-8920-b21a91c0dd46_buggy.java
++++ b/tmp/ba2f1d37-b08e-46f6-b0d1-c05e41c08348_fixed.java
+@@ -1,10 +1,11 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
++    // Create a new VAR node for the iterator variable
++    Node varNode = newNode(Token.VAR, transform(loopNode.getIterator()));
+ 
+-        // Return the bare minimum to put the AST in a valid state.
++    // Create a new FOR node with the appropriate children
+     return newNode(
+         Token.FOR,
+-          transform(loopNode.getIterator()),
+-          transform(loopNode.getIteratedObject()),
++        newNode(Token.LP, varNode, newNode(Token.IN, transform(loopNode.getIteratedObject()))),
+         transformBlock(loopNode.getBody()));
+ }
+\ No newline at end of file

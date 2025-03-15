@@ -1,0 +1,41 @@
+diff --git a/tmp/df73d9db-6b33-4a08-91f3-8b55a3de5a74_buggy.java b/tmp/6ac68beb-21f6-44a6-8880-35856b7558c1_fixed.java
+index 546f262..e9f3056 100644
+--- a/tmp/df73d9db-6b33-4a08-91f3-8b55a3de5a74_buggy.java
++++ b/tmp/6ac68beb-21f6-44a6-8880-35856b7558c1_fixed.java
+@@ -1,29 +1,34 @@
+     /**
+      * <p>Throws a {@link MissingOptionException} if all of the
+      * required options are no present.</p>
+      *
+      * @throws MissingOptionException if any of the required Options
+      * are not present.
+      */
+     protected void checkRequiredOptions()
+         throws MissingOptionException
+     {
+         // if there are required options that have not been
+         // processsed
+         if (getRequiredOptions().size() > 0)
+         {
+             Iterator iter = getRequiredOptions().iterator();
+             StringBuffer buff = new StringBuffer("Missing required option");
+             buff.append(getRequiredOptions().size() == 1 ? "" : "s");
+             buff.append(": ");
+ 
+-
++            boolean first = true;
+             // loop through the required options
+             while (iter.hasNext())
+             {
++                if (!first) {
++                    buff.append(", ");
++                } else {
++                    first = false;
++                }
+                 buff.append(iter.next());
+             }
+ 
+             throw new MissingOptionException(buff.toString());
+         }
+     }
+\ No newline at end of file

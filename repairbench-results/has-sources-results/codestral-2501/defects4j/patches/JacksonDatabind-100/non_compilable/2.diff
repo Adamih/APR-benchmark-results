@@ -1,0 +1,38 @@
+diff --git a/tmp/39837bcc-dbe4-45c6-90fc-c5ff9f196e4d_buggy.java b/tmp/bdea7ca5-cf7b-4803-b0a0-400a4f65da08_fixed.java
+index fc8c302..93c5709 100644
+--- a/tmp/39837bcc-dbe4-45c6-90fc-c5ff9f196e4d_buggy.java
++++ b/tmp/bdea7ca5-cf7b-4803-b0a0-400a4f65da08_fixed.java
+@@ -1,23 +1,29 @@
+ @Override
+-    public byte[] getBinaryValue(Base64Variant b64variant)
+-        throws IOException, JsonParseException
+-    {
++public byte[] getBinaryValue(Base64Variant b64variant) throws IOException, JsonParseException {
+     // Multiple possibilities...
+     JsonNode n = currentNode();
+     if (n != null) {
++        if (n.isTextual()) {
++            String text = n.asText();
++            try {
++                return b64variant.decode(text);
++            } catch (IllegalArgumentException e) {
++                throw new JsonParseException(n, "Cannot access contents of TextNode as binary due to broken Base64 encoding: " + e.getMessage());
++            }
++        }
+         // [databind#2096]: although `binaryValue()` works for real binary node
+         // and embedded "POJO" node, coercion from TextNode may require variant, so:
+         byte[] data = n.binaryValue();
+         if (data != null) {
+             return data;
+         }
+         if (n.isPojo()) {
+             Object ob = ((POJONode) n).getPojo();
+             if (ob instanceof byte[]) {
+                 return (byte[]) ob;
+             }
+         }
+     }
+     // otherwise return null to mark we have no binary content
+     return null;
+ }
+\ No newline at end of file

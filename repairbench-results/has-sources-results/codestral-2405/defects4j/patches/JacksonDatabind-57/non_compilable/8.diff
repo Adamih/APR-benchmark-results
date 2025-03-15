@@ -1,0 +1,23 @@
+diff --git a/tmp/ca5cf272-2b6d-4b05-90f4-a7b5b125a81c_buggy.java b/tmp/62462855-022a-4e3f-885e-1aafae82d627_fixed.java
+index 08a41cf..7ec251c 100644
+--- a/tmp/ca5cf272-2b6d-4b05-90f4-a7b5b125a81c_buggy.java
++++ b/tmp/62462855-022a-4e3f-885e-1aafae82d627_fixed.java
+@@ -1,12 +1,15 @@
+ /**
+  * Overloaded version of {@link #readValue(InputStream)}.
+  */
+ public <T> MappingIterator<T> readValues(byte[] src, int offset, int length)
+     throws IOException, JsonProcessingException
+ {
+     if (_dataFormatReaders != null) {
+         return _detectBindAndReadValues(_dataFormatReaders.findFormat(src, offset, length), false);
+     }
+-        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src),
+-                true));
++    // Modification to handle invalid UTF-32 characters
++    InputStream stream = new ByteArrayInputStream(src, offset, length);
++    Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8); // Using standard charset UTF-8
++    reader = new UnicodeBomInputStream(reader, UnicodeBom.UTF_8); // Check for BOM and ignore if any
++    return _bindAndReadValues(_considerFilter(_parserFactory.createParser(reader), true));
+ }
+\ No newline at end of file

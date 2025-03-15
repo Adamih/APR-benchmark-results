@@ -1,0 +1,41 @@
+diff --git a/tmp/dd032b94-8cad-4e76-9d3d-94bab272f029_buggy.java b/tmp/9e5293ac-7db2-42f2-80dd-851f059fa2a0_fixed.java
+index 1530b34..a9e6dc1 100644
+--- a/tmp/dd032b94-8cad-4e76-9d3d-94bab272f029_buggy.java
++++ b/tmp/9e5293ac-7db2-42f2-80dd-851f059fa2a0_fixed.java
+@@ -1,23 +1,33 @@
+ /**
+  * Declares all of a function's arguments.
+  */
+ private void declareArguments(Node functionNode) {
+     Node astParameters = functionNode.getFirstChild().getNext();
+     Node body = astParameters.getNext();
+     FunctionType functionType = (FunctionType) functionNode.getJSType();
+     if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+             Node jsDocParameter = jsDocParameters.getFirstChild();
+             for (Node astParameter : astParameters.children()) {
+                 if (jsDocParameter != null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++                    JSType jsDocType = jsDocParameter.getJSType();
++                    JSType astType = astParameter.getJSType();
++                    
++                    // Check for type mismatch between JSDoc and AST parameter
++                    if (astType != null && !astType.isUnknownType() && 
++                        !jsDocType.isUnknownType() && !astType.canAssignTo(jsDocType)) {
++                        compiler.report(
++                            JSError.make(functionNode, MismatchType.WRONG_ARGUMENT_TYPE,
++                                astParameter.getString(), astType.toString(), jsDocType.toString()));
++                    }
++                    
++                    defineSlot(astParameter, functionNode, jsDocType, true);
+                     jsDocParameter = jsDocParameter.getNext();
+                 } else {
+                     defineSlot(astParameter, functionNode, null, true);
+                 }
+             }
+         }
+     }
+ } // end declareArguments
+\ No newline at end of file

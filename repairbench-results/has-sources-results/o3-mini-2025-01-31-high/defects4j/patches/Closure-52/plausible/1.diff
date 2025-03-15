@@ -1,0 +1,25 @@
+diff --git a/tmp/8f6f0bb6-cab0-436a-b611-f9bda941a0cc_buggy.java b/tmp/64593d75-4251-4a6d-9536-6db9099dd6cb_fixed.java
+index 4b7f469..8c14879 100644
+--- a/tmp/8f6f0bb6-cab0-436a-b611-f9bda941a0cc_buggy.java
++++ b/tmp/64593d75-4251-4a6d-9536-6db9099dd6cb_fixed.java
+@@ -1,10 +1,18 @@
+ static boolean isSimpleNumber(String s) {
+   int len = s.length();
++  if (len == 0) {
++    return false;
++  }
++  // A simple number must be a nonnegative integer written in decimal
++  // with no extra leading zeroes. Thus "0" is OK but "010" and "0x10" are not.
++  if (s.charAt(0) == '0' && len > 1) {
++    return false;
++  }
+   for (int index = 0; index < len; index++) {
+     char c = s.charAt(index);
+     if (c < '0' || c > '9') {
+       return false;
+     }
+   }
+-    return len > 0;
++  return true;
+ }
+\ No newline at end of file

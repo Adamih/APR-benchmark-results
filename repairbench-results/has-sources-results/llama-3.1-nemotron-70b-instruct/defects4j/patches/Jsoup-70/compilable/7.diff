@@ -1,0 +1,29 @@
+diff --git a/tmp/227ffccb-dd39-49ca-b2f8-67862191c657_buggy.java b/tmp/12050d5f-33c1-4e38-a703-c7825343120d_fixed.java
+index 6c87721..eb07fd6 100644
+--- a/tmp/227ffccb-dd39-49ca-b2f8-67862191c657_buggy.java
++++ b/tmp/12050d5f-33c1-4e38-a703-c7825343120d_fixed.java
+@@ -1,11 +1,19 @@
++/**
++ * Checks if whitespace should be preserved for the given Node, 
++ * looking up the DOM tree up to 5 levels for a preserving parent.
++ * 
++ * @param node the Node to check
++ * @return true if whitespace should be preserved, false otherwise
++ */
+ static boolean preserveWhitespace(Node node) {
+-        // looks only at this element and five levels up, to prevent recursion & needless stack searches
+-        if (node != null && node instanceof Element) {
++    // looks up to 5 levels, to prevent recursion & needless stack searches
++    for (int i = 0; i < 5 && node!= null; i++) {
++        if (node instanceof Element) {
+             Element el = (Element) node;
+             if (el.tag.preserveWhitespace())
+                 return true;
+-                else
+-                    return el.parent() != null && el.parent().tag.preserveWhitespace();
++        }
++        node = node.parent();
+     }
+     return false;
+ }
+\ No newline at end of file

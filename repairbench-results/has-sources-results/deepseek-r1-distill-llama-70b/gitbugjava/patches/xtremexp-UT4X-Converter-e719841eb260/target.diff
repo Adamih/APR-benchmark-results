@@ -1,0 +1,30 @@
+diff --git a/tmp/352c3fc4-c77c-4996-b66b-5c148947d398_buggy.java b/tmp/06864170-8748-4b15-ae07-dd5dce8ba31b_fixed.java
+index cafacc6..cdd08ac 100644
+--- a/tmp/352c3fc4-c77c-4996-b66b-5c148947d398_buggy.java
++++ b/tmp/06864170-8748-4b15-ae07-dd5dce8ba31b_fixed.java
+@@ -1,14 +1,24 @@
+ 	/**
+ 	 * FOR TESTING PURPOSE ONLY
+ 	 * This follows order of execution in T3DLevelConvertor :
+ 	 * Convert -> Scale -> toT3D()
+ 	 *
+ 	 * @param scaleFactor Scale factor
+ 	 * @return Converted actor as t3d string
+ 	 */
+ 	protected String convertScaleAndToT3D(double scaleFactor) {
+ 		this.convert();
+ 		this.scale(scaleFactor);
+ 
+-		return "Begin Map\nBegin Level\n" + toT3d() + "End Level\nEnd Map";
++		String convT3d = toT3d();
++
++		if (convT3d == null) {
++			convT3d = "";
++
++			for (T3DActor repActor : this.children) {
++				convT3d += repActor.toT3d();
++			}
++		}
++
++		return "Begin Map\nBegin Level\n" + convT3d + "End Level\nEnd Map";
+ 	}

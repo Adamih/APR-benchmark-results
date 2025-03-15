@@ -1,0 +1,19 @@
+diff --git a/tmp/58b62985-0474-49aa-bf30-a10ca68764d3_buggy.java b/tmp/e0635453-98ff-4f01-b8b3-095d3593ac12_fixed.java
+index fc49bcd..520cbc4 100644
+--- a/tmp/58b62985-0474-49aa-bf30-a10ca68764d3_buggy.java
++++ b/tmp/e0635453-98ff-4f01-b8b3-095d3593ac12_fixed.java
+@@ -1,4 +1,12 @@
+ @Override
+ public DefaultPrettyPrinter createInstance() {
+-        return new DefaultPrettyPrinter(this);
++    DefaultPrettyPrinter newInstance = new DefaultPrettyPrinter(this);
++    // Check if this method is being called from a subclass
++    if (!this.getClass().equals(DefaultPrettyPrinter.class)) {
++        // Check if the returned instance is of the same class as the subclass
++        if (!this.getClass().equals(newInstance.getClass())) {
++            throw new IllegalStateException("Subclass does not override createInstance() to return an instance of itself");
++        }
++    }
++    return newInstance;
+ }
+\ No newline at end of file

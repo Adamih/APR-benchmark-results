@@ -1,0 +1,66 @@
+diff --git a/tmp/8c9d3a2d-162c-4931-b3c2-23a41d538859_buggy.java b/tmp/930b0f25-f50e-444b-9057-1bca81c66b38_fixed.java
+index d87dd79..3d8cb12 100644
+--- a/tmp/8c9d3a2d-162c-4931-b3c2-23a41d538859_buggy.java
++++ b/tmp/930b0f25-f50e-444b-9057-1bca81c66b38_fixed.java
+@@ -1,47 +1,55 @@
+     @Override
+     protected Object decode(
+             ChannelHandlerContext ctx, Channel channel, ByteBuf buf) throws Exception {
+ 
+         int endIndex = -1;
+         for (int i = buf.writerIndex() - 1; i >= buf.readerIndex(); i--) {
+             if (buf.getByte(i) == ']') {
+                 endIndex = i + 1;
+                 break;
+             }
+         }
+ 
+-        if (endIndex > 0) {
++        if (endIndex > 0 && endIndex > buf.readerIndex()) {
+             ByteBuf frame = Unpooled.buffer();
+-            while (buf.readerIndex() < endIndex) {
+-                byte b1 = buf.readByte();
++            int readerIndex = buf.readerIndex();
++            while (readerIndex < endIndex) {
++                byte b1 = buf.getByte(readerIndex);
+                 if (b1 == '}') {
+-                    byte b2 = buf.readByte();
++                    byte b2 = buf.getByte(readerIndex + 1);
+                     switch (b2) {
+                         case 0x01:
+                             frame.writeByte('}');
++                            readerIndex += 2;
+                             break;
+                         case 0x02:
+                             frame.writeByte('[');
++                            readerIndex += 2;
+                             break;
+                         case 0x03:
+                             frame.writeByte(']');
++                            readerIndex += 2;
+                             break;
+                         case 0x04:
+                             frame.writeByte(',');
++                            readerIndex += 2;
+                             break;
+                         case 0x05:
+                             frame.writeByte('*');
++                            readerIndex += 2;
+                             break;
+                         default:
+                             throw new IllegalArgumentException(String.format(
+-                                    "unexpected byte at %d: 0x%02x", buf.readerIndex() - 1, b2));
++                                    "unexpected byte at %d: 0x%02x", readerIndex, b2));
+                     }
+                 } else {
+                     frame.writeByte(b1);
++                    readerIndex++;
+                 }
+             }
++            buf.readerIndex(readerIndex);
+             return frame;
+         }
+ 
+         return null;
+     }
+\ No newline at end of file

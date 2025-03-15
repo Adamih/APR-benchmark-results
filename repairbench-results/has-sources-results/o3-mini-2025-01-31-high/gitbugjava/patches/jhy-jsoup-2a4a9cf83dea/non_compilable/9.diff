@@ -1,0 +1,36 @@
+diff --git a/tmp/fbd7e613-b72e-4fb3-8c3a-0d639ca2554c_buggy.java b/tmp/490b280c-dee4-4b9c-b7db-4b4032f74419_fixed.java
+index c9c2b44..b30ff37 100644
+--- a/tmp/fbd7e613-b72e-4fb3-8c3a-0d639ca2554c_buggy.java
++++ b/tmp/490b280c-dee4-4b9c-b7db-4b4032f74419_fixed.java
+@@ -1,13 +1,25 @@
+ @Override
+ public boolean matches(Element root, Element element) {
+-            // evaluate from last to first
+-            for (int i = evaluators.size() -1; i >= 0; --i) {
+-                if (element == null)
++    // When using a selector on an element ("context"),
++    // the context element itself should not be considered.
++    if (element == root)
+         return false;
+-                Evaluator eval = evaluators.get(i);
+-                if (!eval.matches(root, element))
++    int size = evaluators.size();
++    // The last evaluator in the chain must directly match the candidate element.
++    if (!evaluators.get(size - 1).matches(root, element))
+         return false;
++    // For each remaining evaluator, work upward in the ancestry until a match is found.
++    for (int i = size - 2; i >= 0; i--) {
++        // Step one level up.
+         element = element.parent();
++        if (element == null || element == root)
++            return false;
++        // For descendant combinators, it’s allowed to skip levels:
++        while (!evaluators.get(i).matches(root, element)) {
++            element = element.parent();
++            if (element == null || element == root)
++                return false;
++        }
+     }
+     return true;
+ }
+\ No newline at end of file

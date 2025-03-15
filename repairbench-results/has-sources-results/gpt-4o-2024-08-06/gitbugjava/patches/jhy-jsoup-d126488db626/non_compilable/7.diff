@@ -1,0 +1,36 @@
+diff --git a/tmp/0ad0d748-5204-4514-82c6-fe268f86f189_buggy.java b/tmp/82873a9c-dbfa-45db-b15e-4967ae3284d9_fixed.java
+index 5bf31b1..ac49264 100644
+--- a/tmp/0ad0d748-5204-4514-82c6-fe268f86f189_buggy.java
++++ b/tmp/82873a9c-dbfa-45db-b15e-4967ae3284d9_fixed.java
+@@ -1,17 +1,25 @@
+     private String consumeSubQuery() {
+         StringBuilder sq = StringUtil.borrowBuilder();
++        boolean foundSubQuery = false;
+         while (!tq.isEmpty()) {
+-            if (tq.matches("("))
++            if (tq.matches("(")) {
+                 sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+-            else if (tq.matches("["))
++                foundSubQuery = true;
++            }
++            else if (tq.matches("[")) {
+                 sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++                foundSubQuery = true;
++            }
++            else if (tq.matchesAny(Combinators)) {
++                if (sq.length() > 0 || foundSubQuery)
+                     break;
+                 else
+                     tq.consume();
+-            else
++            }
++            else {
+                 sq.append(tq.consume());
++                foundSubQuery = true;
++            }
+         }
+         return StringUtil.releaseBuilder(sq);
+     }
+\ No newline at end of file

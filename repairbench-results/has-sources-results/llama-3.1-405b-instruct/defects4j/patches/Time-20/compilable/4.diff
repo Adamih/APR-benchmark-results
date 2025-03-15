@@ -1,0 +1,29 @@
+diff --git a/tmp/636a8b68-7843-485b-8a47-246e4b3cf21e_buggy.java b/tmp/194b2406-5eef-4e50-8165-28fe2512388b_fixed.java
+index ae6c2b1..cf67f0d 100644
+--- a/tmp/636a8b68-7843-485b-8a47-246e4b3cf21e_buggy.java
++++ b/tmp/194b2406-5eef-4e50-8165-28fe2512388b_fixed.java
+@@ -1,10 +1,23 @@
+ public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+     String str = text.substring(position);
+     for (String id : ALL_IDS) {
+         if (str.startsWith(id)) {
+             bucket.setZone(DateTimeZone.forID(id));
+             return position + id.length();
+         }
+     }
++    // If no exact match found, try to find the longest matching prefix
++    int longestMatch = 0;
++    String longestMatchId = null;
++    for (String id : ALL_IDS) {
++        if (str.startsWith(id) && id.length() > longestMatch) {
++            longestMatch = id.length();
++            longestMatchId = id;
++        }
++    }
++    if (longestMatchId!= null) {
++        bucket.setZone(DateTimeZone.forID(longestMatchId));
++        return position + longestMatch;
++    }
+     return ~position;
+ }
+\ No newline at end of file

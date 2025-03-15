@@ -1,0 +1,30 @@
+diff --git a/tmp/7e5933d3-195e-40d7-be40-95921a356c2a_buggy.java b/tmp/c91779d1-1bcc-4547-aea4-383ae672c2f3_fixed.java
+index 19fe1b4..6430eb4 100644
+--- a/tmp/7e5933d3-195e-40d7-be40-95921a356c2a_buggy.java
++++ b/tmp/c91779d1-1bcc-4547-aea4-383ae672c2f3_fixed.java
+@@ -1,17 +1,23 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+           !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+       for (int i = 1; i < length; i++) {
+         if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++            !Character.isJavaIdentifierPart(s.charAt(i)) ||
++            (s.charAt(i) >= '\u2000' && s.charAt(i) <= '\u206F') || // General Punctuation
++            (s.charAt(i) >= '\u2070' && s.charAt(i) <= '\u209F') || // Superscripts and Subscripts
++            (s.charAt(i) >= '\u20A0' && s.charAt(i) <= '\u20CF') || // Currency Symbols
++            (s.charAt(i) >= '\u2100' && s.charAt(i) <= '\u214F') || // Letterlike Symbols
++            (s.charAt(i) >= '\u2190' && s.charAt(i) <= '\u21FF')    // Arrows
++        ) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }
+\ No newline at end of file

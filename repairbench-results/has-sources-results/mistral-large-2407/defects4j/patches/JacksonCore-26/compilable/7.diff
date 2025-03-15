@@ -1,0 +1,33 @@
+diff --git a/tmp/29a9142f-8a5c-47a3-8762-a4b12c3d37b5_buggy.java b/tmp/795f1d64-5d3a-440d-9969-ba879da1017f_fixed.java
+index 0722547..c359fa4 100644
+--- a/tmp/29a9142f-8a5c-47a3-8762-a4b12c3d37b5_buggy.java
++++ b/tmp/795f1d64-5d3a-440d-9969-ba879da1017f_fixed.java
+@@ -1,26 +1,26 @@
+     @Override
+     public void feedInput(byte[] buf, int start, int end) throws IOException
+     {
+         // Must not have remaining input
+         if (_inputPtr < _inputEnd) {
+             _reportError("Still have %d undecoded bytes, should not call 'feedInput'", _inputEnd - _inputPtr);
+         }
+         if (end < start) {
+             _reportError("Input end (%d) may not be before start (%d)", end, start);
+         }
+         // and shouldn't have been marked as end-of-input
+         if (_endOfInput) {
+             _reportError("Already closed, can not feed more input");
+         }
+         // Time to update pointers first
+         _currInputProcessed += _origBufferLen;
+ 
+         // Also need to adjust row start, to work as if it extended into the past wrt new buffer
+-        _currInputRowStart = start - (_inputEnd - _currInputRowStart);
++        _currInputRowStart = _currInputRowStart + _origBufferLen - _inputEnd;
+ 
+         // And then update buffer settings
+         _inputBuffer = buf;
+         _inputPtr = start;
+         _inputEnd = end;
+         _origBufferLen = end - start;
+     }
+\ No newline at end of file

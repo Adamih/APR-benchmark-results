@@ -1,0 +1,21 @@
+diff --git a/tmp/b681fb31-7a3b-402a-b5b0-5bcfba4955c0_buggy.java b/tmp/0270802d-c40a-41fd-88b9-dbc3b103ad19_fixed.java
+index 1c92640..4fe457b 100644
+--- a/tmp/b681fb31-7a3b-402a-b5b0-5bcfba4955c0_buggy.java
++++ b/tmp/0270802d-c40a-41fd-88b9-dbc3b103ad19_fixed.java
+@@ -1,7 +1,14 @@
+     /**
+      * Set the name of the entry.
++     * This method ensures that backslashes in the name are replaced with forward slashes 
++     * to maintain consistency and handle cross-platform ZIP encoding issues.
++     * 
+      * @param name the name to use
+      */
+     protected void setName(String name) {
+-        this.name = name;
++        if (name != null) {
++            this.name = name.replace('\\', '/');
++        } else {
++            this.name = null;
++        }
+     }
+\ No newline at end of file

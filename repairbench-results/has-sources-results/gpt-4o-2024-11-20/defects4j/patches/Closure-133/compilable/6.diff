@@ -1,0 +1,20 @@
+diff --git a/tmp/2615515b-9621-42ee-bbe6-75bbc41e5eb1_buggy.java b/tmp/f5eb1336-df49-4604-b0a6-e53f00c4b69c_fixed.java
+index 42d4174..e9f8bb4 100644
+--- a/tmp/2615515b-9621-42ee-bbe6-75bbc41e5eb1_buggy.java
++++ b/tmp/f5eb1336-df49-4604-b0a6-e53f00c4b69c_fixed.java
+@@ -1,7 +1,13 @@
+   /**
+-   * Returns the remainder of the line.
++   * Returns the remainder of the line with leading "*" characters removed.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    if (result != null) {
++      result = result.trim();
++      if (result.startsWith("*")) {
++        result = result.substring(1).trim();
++      }
++    }
+     return result;
+   }
+\ No newline at end of file

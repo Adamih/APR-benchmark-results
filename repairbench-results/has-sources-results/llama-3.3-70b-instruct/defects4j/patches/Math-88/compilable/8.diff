@@ -1,0 +1,43 @@
+diff --git a/tmp/0e017342-cce4-4c91-a34d-db6565ebf7fe_buggy.java b/tmp/d95ef5a7-259c-4e6b-bca9-33874776a588_fixed.java
+index 544303b..a312640 100644
+--- a/tmp/0e017342-cce4-4c91-a34d-db6565ebf7fe_buggy.java
++++ b/tmp/d95ef5a7-259c-4e6b-bca9-33874776a588_fixed.java
+@@ -1,29 +1,24 @@
+ /**
+  * Get the current solution.
+  * <p>
+  * {@link #solve} should be called first for this to be the optimal solution.
+  * </p>
+  * @return current solution
+  */
+ protected RealPointValuePair getSolution() {
+     double[] coefficients = new double[getOriginalNumDecisionVariables()];
+-        Integer basicRow =
+-            getBasicRow(getNumObjectiveFunctions() + getOriginalNumDecisionVariables());
+-        double mostNegative = basicRow == null ? 0 : getEntry(basicRow, getRhsOffset());
++    double mostNegative = Double.NaN;
+     for (int i = 0; i < coefficients.length; i++) {
+-            basicRow = getBasicRow(getNumObjectiveFunctions() + i);
+-                // if multiple variables can take a given value 
+-                // then we choose the first and set the rest equal to 0
+-                coefficients[i] =
+-                    (basicRow == null ? 0 : getEntry(basicRow, getRhsOffset())) -
+-                    (restrictToNonNegative ? 0 : mostNegative);
+-            if (basicRow != null) {
+-                for (int j = getNumObjectiveFunctions(); j < getNumObjectiveFunctions() + i; j++) {
+-                    if (tableau.getEntry(basicRow, j) == 1) {
+-                         coefficients[i] = 0;
++        Integer basicRow = getBasicRow(getNumObjectiveFunctions() + i);
++        coefficients[i] = basicRow == null? 0 : getEntry(basicRow, getRhsOffset());
++        if (Double.isNaN(mostNegative) || coefficients[i] < mostNegative) {
++            mostNegative = coefficients[i];
+         }
+     }
++    if (!restrictToNonNegative) {
++        for (int i = 0; i < coefficients.length; i++) {
++            coefficients[i] -= mostNegative;
+         }
+     }
+     return new RealPointValuePair(coefficients, f.getValue(coefficients));
+ }
+\ No newline at end of file

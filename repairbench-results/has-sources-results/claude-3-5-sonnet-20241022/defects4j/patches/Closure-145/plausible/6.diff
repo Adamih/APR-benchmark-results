@@ -1,0 +1,29 @@
+diff --git a/tmp/bf38b23b-6282-4931-a55a-8572681674f9_buggy.java b/tmp/0e384947-e8cc-4ffb-bb98-d8c1c18f6249_fixed.java
+index 57f69c5..4c7ee41 100644
+--- a/tmp/bf38b23b-6282-4931-a55a-8572681674f9_buggy.java
++++ b/tmp/0e384947-e8cc-4ffb-bb98-d8c1c18f6249_fixed.java
+@@ -1,12 +1,17 @@
+ /**
+  * @return Whether the Node is a DO or FUNCTION (with or without
+  * labels).
+  */
+ private boolean isOneExactlyFunctionOrDo(Node n) {
+-        // For labels with block children, we need to ensure that a
+-        // labeled FUNCTION or DO isn't generated when extraneous BLOCKs 
+-        // are skipped. 
+-          // Either a empty statement or an block with more than one child,
+-          // way it isn't a FUNCTION or DO.
+-      return (n.getType() == Token.FUNCTION || n.getType() == Token.DO);
++    int type = n.getType();
++    if (type == Token.FUNCTION || type == Token.DO) {
++        return true;
++    }
++    // Handle labeled FUNCTION or DO
++    if (type == Token.LABEL) {
++        Node labelledNode = n.getFirstChild().getNext();
++        return (labelledNode.getType() == Token.FUNCTION || 
++                labelledNode.getType() == Token.DO);
++    }
++    return false;
+ }
+\ No newline at end of file

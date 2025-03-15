@@ -1,0 +1,44 @@
+diff --git a/tmp/9aa17b46-0444-4fc7-a8e2-fd35d72eb77d_buggy.java b/tmp/bf395bb8-7c40-492e-972a-6c751d248757_fixed.java
+index b2d53db..b0ea5ca 100644
+--- a/tmp/9aa17b46-0444-4fc7-a8e2-fd35d72eb77d_buggy.java
++++ b/tmp/bf395bb8-7c40-492e-972a-6c751d248757_fixed.java
+@@ -1,34 +1,37 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+         t.dataBuffer.append(name);
+-                r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
+             default:
+                 t.dataBuffer.append(c);
++                if (t.tagPending.name.equals("script")) {
++                    t.transition(Rawtext);
++                } else {
+                     anythingElse(t, r);
++                }
+                 break;
+         }
+     } else {
+         anythingElse(t, r);
+     }
+ }
+\ No newline at end of file

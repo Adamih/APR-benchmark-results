@@ -1,0 +1,48 @@
+diff --git a/tmp/2fae78ea-8042-4b5c-8469-a8a41de7c0ed_buggy.java b/tmp/a0575105-9cfe-49a8-a0cf-b6de329f9bcb_fixed.java
+index b98f0a7..d045d93 100644
+--- a/tmp/2fae78ea-8042-4b5c-8469-a8a41de7c0ed_buggy.java
++++ b/tmp/a0575105-9cfe-49a8-a0cf-b6de329f9bcb_fixed.java
+@@ -1,29 +1,36 @@
+ private FlowScope traverseNew(Node n, FlowScope scope) {
+-
+   Node constructor = n.getFirstChild();
+   scope = traverse(constructor, scope);
+   JSType constructorType = constructor.getJSType();
+   JSType type = null;
++  FunctionType ct = null;
+   if (constructorType != null) {
+     constructorType = constructorType.restrictByNotNullOrUndefined();
+     if (constructorType.isUnknownType()) {
+       type = getNativeType(UNKNOWN_TYPE);
+     } else {
+-        FunctionType ct = constructorType.toMaybeFunctionType();
++      ct = constructorType.toMaybeFunctionType();
+       if (ct == null && constructorType instanceof FunctionType) {
+-          // If constructorType is a NoObjectType, then toMaybeFunctionType will
+-          // return null. But NoObjectType implements the FunctionType
+-          // interface, precisely because it can validly construct objects.
+         ct = (FunctionType) constructorType;
+       }
+       if (ct != null && ct.isConstructor()) {
+         type = ct.getInstanceType();
+       }
+     }
+   }
+   n.setJSType(type);
+-    for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
++  int argIndex = 0;
++  // Traverse arguments and, if a formal parameter type is available,
++  // use it to do backward inference on the argument.
++  for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext(), argIndex++) {
+     scope = traverse(arg, scope);
++    if (ct != null && ct.isConstructor() && argIndex < ct.getParameterCount()) {
++      JSType formalArgType = ct.getParameterType(argIndex);
++      if (formalArgType != null) {
++        // Backward-infer this argument’s type from the formal parameter.
++        arg.setJSType(formalArgType);
++      }
++    }
+   }
+   return scope;
+ }
+\ No newline at end of file

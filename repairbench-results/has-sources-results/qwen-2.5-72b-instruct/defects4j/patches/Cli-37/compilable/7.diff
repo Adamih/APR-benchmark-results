@@ -1,0 +1,38 @@
+diff --git a/tmp/e67146d1-b4ab-47fb-83de-8b43be19b3a3_buggy.java b/tmp/4d4dd3a8-59cd-4b37-81d0-ccd6bc753b7e_fixed.java
+index a7e6997..d0cbff8 100644
+--- a/tmp/e67146d1-b4ab-47fb-83de-8b43be19b3a3_buggy.java
++++ b/tmp/4d4dd3a8-59cd-4b37-81d0-ccd6bc753b7e_fixed.java
+@@ -1,12 +1,29 @@
+     /**
+      * Tells if the token looks like a short option.
+      * 
+      * @param token
+      */
+     private boolean isShortOption(String token)
+     {
+         // short options (-S, -SV, -S=V, -SV1=V2, -S1S2)
+-        return token.startsWith("-") && token.length() >= 2 && options.hasShortOption(token.substring(1, 2));
+-
+-        // remove leading "-" and "=value"
++        if (token.startsWith("-") && token.length() >= 2) {
++            String firstChar = token.substring(1, 2);
++            if (options.hasShortOption(firstChar)) {
++                // Check if the token is a single short option or a combination of short options
++                if (token.length() == 2 || token.charAt(2) == '=') {
++                    return true;
++                }
++                // Check if the remaining part is a valid combination of short options
++                for (int i = 2; i < token.length(); i++) {
++                    if (token.charAt(i) == '=') {
++                        break;
++                    }
++                    if (!options.hasShortOption(String.valueOf(token.charAt(i)))) {
++                        return false;
++                    }
++                }
++                return true;
++            }
++        }
++        return false;
+     }
+\ No newline at end of file

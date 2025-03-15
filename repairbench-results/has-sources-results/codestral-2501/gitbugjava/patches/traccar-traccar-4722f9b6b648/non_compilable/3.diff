@@ -1,0 +1,37 @@
+diff --git a/tmp/e7a48f10-097d-49ef-8de3-c550b8a38858_buggy.java b/tmp/266943b1-c37a-4e2e-9826-bd36d3d1b58b_fixed.java
+index c84c989..eb64ea7 100644
+--- a/tmp/e7a48f10-097d-49ef-8de3-c550b8a38858_buggy.java
++++ b/tmp/266943b1-c37a-4e2e-9826-bd36d3d1b58b_fixed.java
+@@ -1,27 +1,30 @@
+ private Position decodeIridiumPosition(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
+ 
+     buf.readUnsignedShortLE(); // length
+ 
+     buf.skipBytes(3); // identification header
+     buf.readUnsignedIntLE(); // index
+ 
+     DeviceSession deviceSession = getDeviceSession(
+             channel, remoteAddress, buf.readSlice(15).toString(StandardCharsets.US_ASCII));
+     if (deviceSession == null) {
+         return null;
+     }
+ 
+     Position position = new Position(getProtocolName());
+     position.setDeviceId(deviceSession.getDeviceId());
+ 
+     buf.readUnsignedByte(); // session status
+     buf.skipBytes(4); // reserved
+-        buf.readUnsignedIntLE(); // date and time
++    long timestamp = buf.readUnsignedIntLE(); // date and time
+ 
+     buf.skipBytes(23); // coordinates block
+ 
+     buf.skipBytes(3); // data tag header
+     decodeMinimalDataSet(position, buf);
+ 
++    // Set the timestamp to the position
++    position.setTime(new Date(timestamp * 1000L));
++
+     return position;
+ }
+\ No newline at end of file

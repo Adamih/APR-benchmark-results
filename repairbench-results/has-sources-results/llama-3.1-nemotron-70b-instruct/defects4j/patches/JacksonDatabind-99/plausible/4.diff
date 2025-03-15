@@ -1,0 +1,19 @@
+diff --git a/tmp/c24b9f05-6344-47c2-9bf5-2e4a05142c99_buggy.java b/tmp/06ece057-88ab-4cd4-838d-54558a627e44_fixed.java
+index ee836e4..5569471 100644
+--- a/tmp/c24b9f05-6344-47c2-9bf5-2e4a05142c99_buggy.java
++++ b/tmp/06ece057-88ab-4cd4-838d-54558a627e44_fixed.java
+@@ -1,9 +1,12 @@
+ @Override
+ protected String buildCanonicalName()
+ {
+     StringBuilder sb = new StringBuilder();
+     sb.append(_class.getName());
++    if (_referencedType!= null) { // add null check for safety
+         sb.append('<');
+-        sb.append(_referencedType.toCanonical());
++        sb.append(_referencedType.toCanonical().replace("[]", ">")); // replace [] with > for correct canonical name
++        sb.append('>'); // append closing angle bracket
++    }
+     return sb.toString();
+ }
+\ No newline at end of file

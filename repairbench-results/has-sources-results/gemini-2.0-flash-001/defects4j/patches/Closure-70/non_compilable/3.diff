@@ -1,0 +1,34 @@
+diff --git a/tmp/d4bfbfd1-dd76-40fd-a1ce-79c56c24e132_buggy.java b/tmp/28f940d6-a55b-43b0-9126-503f8f0d9241_fixed.java
+index 1530b34..584d342 100644
+--- a/tmp/d4bfbfd1-dd76-40fd-a1ce-79c56c24e132_buggy.java
++++ b/tmp/28f940d6-a55b-43b0-9126-503f8f0d9241_fixed.java
+@@ -1,23 +1,25 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
++            JSType parameterType = null;
+             if (jsDocParameter != null) {
++              parameterType = jsDocParameter.getJSType();
++            }
+             defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++                parameterType, true);
++            if (jsDocParameter != null) {
+               jsDocParameter = jsDocParameter.getNext();
+-            } else {
+-              defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+     } // end declareArguments
+\ No newline at end of file

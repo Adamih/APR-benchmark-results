@@ -1,0 +1,31 @@
+diff --git a/tmp/aa20f1c8-dc78-4c8e-91e4-36f66fddef94_buggy.java b/tmp/5bd0f0f7-5e20-47cc-af96-addac44b83a6_fixed.java
+index a37dc7a..fbb9e58 100644
+--- a/tmp/aa20f1c8-dc78-4c8e-91e4-36f66fddef94_buggy.java
++++ b/tmp/5bd0f0f7-5e20-47cc-af96-addac44b83a6_fixed.java
+@@ -1,10 +1,22 @@
+ protected void addChildren(int index, Node... children) {
+     Validate.noNullElements(children);
+     ensureChildNodes();
++    // Save each child’s original sibling index if it is already in this parent.
++    int[] origIndexes = new int[children.length];
++    for (int i = 0; i < children.length; i++) {
++        Node child = children[i];
++        origIndexes[i] = child.parent() == this ? child.siblingIndex() : -1;
++    }
++    // Iterate in reverse so that the children keep their relative order.
+     for (int i = children.length - 1; i >= 0; i--) {
+-            Node in = children[i];
+-            reparentChild(in);
+-            childNodes.add(index, in);
++        Node child = children[i];
++        int origIndex = origIndexes[i];
++        reparentChild(child);
++        // If the child was already in this parent and located before the target insertion point,
++        // then the removal has shifted indices so adjust the index accordingly.
++        if (origIndex != -1 && origIndex < index)
++            index--;
++        childNodes.add(index, child);
+     }
+     reindexChildren(index);
+ }
+\ No newline at end of file

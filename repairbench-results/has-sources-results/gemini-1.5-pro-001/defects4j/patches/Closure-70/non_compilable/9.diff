@@ -1,0 +1,35 @@
+diff --git a/tmp/106b3c91-e05f-4198-91e2-1f06f2bde61b_buggy.java b/tmp/224a5ecb-fb02-4f24-98a7-8c8623fe4bd1_fixed.java
+index 1530b34..97ee239 100644
+--- a/tmp/106b3c91-e05f-4198-91e2-1f06f2bde61b_buggy.java
++++ b/tmp/224a5ecb-fb02-4f24-98a7-8c8623fe4bd1_fixed.java
+@@ -1,23 +1,29 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
+               defineSlot(astParameter, functionNode,
+                   jsDocParameter.getJSType(), true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
++              // The JSDoc declaration may have fewer parameters than the real declaration.
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
++        } else {
++          // The function has no parameters.
++          for (Node astParameter : astParameters.children()) {
++            defineSlot(astParameter, functionNode, null, true);
++          }
+         }
+       }
+     } // end declareArguments
+\ No newline at end of file

@@ -1,0 +1,39 @@
+diff --git a/tmp/9058cea9-9d53-4e5f-bfc1-f8fa760b8395_buggy.java b/tmp/04d9440f-d136-4aa9-8b0d-33013edba840_fixed.java
+index e1fc51f..4d380b6 100644
+--- a/tmp/9058cea9-9d53-4e5f-bfc1-f8fa760b8395_buggy.java
++++ b/tmp/04d9440f-d136-4aa9-8b0d-33013edba840_fixed.java
+@@ -1,9 +1,26 @@
+-    public boolean hasSameMethod(Invocation candidate) {        
+-        //not using method.equals() for 1 good reason:
+-        //sometimes java generates forwarding methods when generics are in play see JavaGenericsForwardingMethodsTest
+-        Method m1 = invocation.getMethod();
+-        Method m2 = candidate.getMethod();
+-        
+-        	/* Avoid unnecessary cloning */
+-        return m1.equals(m2);
++
++interface Iterable<T> {
++
++    Iterator<T> iterator();
++
++}
++
++class StringIterable implements Iterable<String> {
++
++    public Iterator<String> iterator() {
++
++        // implementation
++
++    }
++
++}
++
++class ObjectIterable extends StringIterable implements Iterable<Object> {
++
++    public Iterator<Object> iterator() {
++
++        // implementation
++
++    }
++
+ }

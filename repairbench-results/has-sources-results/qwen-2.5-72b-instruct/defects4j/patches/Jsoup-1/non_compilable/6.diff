@@ -1,0 +1,35 @@
+diff --git a/tmp/9331f8d4-20bb-4e43-8b15-66f4241f0358_buggy.java b/tmp/4a786cb7-bf4f-48b6-bdaa-edbd2f09ed4b_fixed.java
+index 00914da..83b51b6 100644
+--- a/tmp/9331f8d4-20bb-4e43-8b15-66f4241f0358_buggy.java
++++ b/tmp/4a786cb7-bf4f-48b6-bdaa-edbd2f09ed4b_fixed.java
+@@ -1,17 +1,25 @@
+-    // does not recurse.
+ private void normalise(Element element) {
+     List<Node> toMove = new ArrayList<Node>();
+     for (Node node : element.childNodes) {
+         if (node instanceof TextNode) {
+             TextNode tn = (TextNode) node;
+-                if (!tn.isBlank())
++            if (!tn.isBlank()) {
+                 toMove.add(tn);
+             }
+         }
++    }
+ 
+     for (Node node : toMove) {
+         element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++        int index = element.childNodes.indexOf(node);
++        if (index == -1) {
++            // If the node was removed, append it to the start of the body
++            body().insertChild(0, new TextNode(" ", ""));
++            body().insertChild(1, node);
++        } else {
++            // Insert the node back at the correct position
++            element.insertBefore(new TextNode(" ", ""), element.childNode(index));
++            element.insertBefore(node, element.childNode(index));
++        }
+     }
+ }
+\ No newline at end of file

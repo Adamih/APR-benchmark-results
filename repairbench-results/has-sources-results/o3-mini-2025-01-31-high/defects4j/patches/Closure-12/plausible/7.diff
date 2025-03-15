@@ -1,0 +1,16 @@
+diff --git a/tmp/2d557487-edd9-43ff-b15d-7d9cc3910a75_buggy.java b/tmp/9b77fa75-bfa0-4a2b-8d20-f5c4882011c2_fixed.java
+index 22640dd..e06b1e2 100644
+--- a/tmp/2d557487-edd9-43ff-b15d-7d9cc3910a75_buggy.java
++++ b/tmp/9b77fa75-bfa0-4a2b-8d20-f5c4882011c2_fixed.java
+@@ -1,3 +1,10 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++  // Walk up the AST from the given node. If we find an enclosing try
++  // statement that has a catch or finally block, then there’s an exception handler.
++  for (Node current = cfgNode; current != null; current = current.getParent()) {
++    if (current.getType() == Token.TRY && current.getChildCount() > 1) {
++      return true;
++    }
++  }
+   return false;
+ }
+\ No newline at end of file

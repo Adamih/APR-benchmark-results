@@ -1,0 +1,29 @@
+diff --git a/tmp/e5dc5314-0211-4e82-bb10-b25ac4677dc8_buggy.java b/tmp/23b9528a-d51a-4974-aa84-188700b34e54_fixed.java
+index 072c672..424ad9e 100644
+--- a/tmp/e5dc5314-0211-4e82-bb10-b25ac4677dc8_buggy.java
++++ b/tmp/23b9528a-d51a-4974-aa84-188700b34e54_fixed.java
+@@ -1,20 +1,21 @@
+ @Override
+ public int parseArguments(Parameters params) throws CmdLineException {
+   String param = params.getParameter(0);
+ 
+   if (param == null) {
+     setter.addValue(true);
+     return 0;
+   } else {
+     String lowerParam = param.toLowerCase();
+     if (TRUES.contains(lowerParam)) {
+       setter.addValue(true);
+     } else if (FALSES.contains(lowerParam)) {
+       setter.addValue(false);
+     } else {
+-            setter.addValue(true);
+-            return 0;
++      // If the parameter is not recognized as true or false, it should not default to true.
++      // Instead, it should throw an exception or handle the unrecognized parameter.
++      throw new CmdLineException("Unrecognized parameter: " + param);
+     }
+     return 1;
+   }
+ }
+\ No newline at end of file

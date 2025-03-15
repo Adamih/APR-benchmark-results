@@ -1,0 +1,15 @@
+diff --git a/tmp/c3aa1554-78c5-4a27-bf7f-57f4fce20af2_buggy.java b/tmp/ae76caa6-f4e3-44ef-9f7c-4d74320a74c8_fixed.java
+index 084a224..6fdaffa 100644
+--- a/tmp/c3aa1554-78c5-4a27-bf7f-57f4fce20af2_buggy.java
++++ b/tmp/ae76caa6-f4e3-44ef-9f7c-4d74320a74c8_fixed.java
+@@ -1,7 +1,7 @@
+ private static ZipLong unixTimeToZipLong(long l) {
+-        final long TWO_TO_32 = 0x100000000L;
+-        if (l >= TWO_TO_32) {
++    final long MAX_TIME_SECONDS = Long.MAX_VALUE - (Long.MAX_VALUE % (1L << 32));
++    if (l > MAX_TIME_SECONDS) {
+         throw new IllegalArgumentException("X5455 timestamps must fit in a signed 32 bit integer: " + l);
+     }
+     return new ZipLong(l);
+ }
+\ No newline at end of file

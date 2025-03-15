@@ -1,0 +1,36 @@
+diff --git a/tmp/82b752f3-454d-4382-a30c-66dc03ba7c33_buggy.java b/tmp/5ef4dfda-cdfe-450a-9cdf-11a182064a88_fixed.java
+index 1ea204a..19722f1 100644
+--- a/tmp/82b752f3-454d-4382-a30c-66dc03ba7c33_buggy.java
++++ b/tmp/5ef4dfda-cdfe-450a-9cdf-11a182064a88_fixed.java
+@@ -1,17 +1,26 @@
+-  private static String extractClassNameIfGoog(Node node, Node parent,
+-      String functionName){
++private static String extractClassNameIfGoog(Node node, Node parent, String functionName) {
+     String className = null;
+     if (NodeUtil.isExprCall(parent)) {
+       Node callee = node.getFirstChild();
+       if (callee!= null && callee.getType() == Token.GETPROP) {
+         String qualifiedName = callee.getQualifiedName();
+         if (functionName.equals(qualifiedName)) {
+-          Node target = callee.getNext();
+-          if (target != null) {
+-            className = target.getString();
++          Node secondChild = node.getSecondChild();
++          if (secondChild!= null) {
++            className = getNodeValueAsString(secondChild).replace("'", "");
+           }
+         }
+       }
+     }
+     return className;
+ }
++
++private static String getNodeValueAsString(Node node) {
++    switch (node.getType()) {
++      case Token.STRING:
++        return node.getString();
++      default:
++        break;
++    }
++    throw new RuntimeException("Unhandled child type: " + Token.name(node.getType()));
++}

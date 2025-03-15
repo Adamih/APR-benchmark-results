@@ -1,0 +1,40 @@
+diff --git a/tmp/e2b91ac0-7301-4993-923b-76b916e5ab3a_buggy.java b/tmp/b7e9fbc6-2f6d-418f-a880-ebd989864ec8_fixed.java
+index 544303b..91a5200 100644
+--- a/tmp/e2b91ac0-7301-4993-923b-76b916e5ab3a_buggy.java
++++ b/tmp/b7e9fbc6-2f6d-418f-a880-ebd989864ec8_fixed.java
+@@ -1,29 +1,30 @@
+     /**
+      * Get the current solution.
+      * <p>
+      * {@link #solve} should be called first for this to be the optimal solution.
+      * </p>
+      * @return current solution
+      */
+     protected RealPointValuePair getSolution() {
+         double[] coefficients = new double[getOriginalNumDecisionVariables()];
+         Integer basicRow =
+             getBasicRow(getNumObjectiveFunctions() + getOriginalNumDecisionVariables());
+         double mostNegative = basicRow == null ? 0 : getEntry(basicRow, getRhsOffset());
+         for (int i = 0; i < coefficients.length; i++) {
+             basicRow = getBasicRow(getNumObjectiveFunctions() + i);
+-                // if multiple variables can take a given value 
+-                // then we choose the first and set the rest equal to 0
+             coefficients[i] =
+                 (basicRow == null ? 0 : getEntry(basicRow, getRhsOffset())) -
+                 (restrictToNonNegative ? 0 : mostNegative);
+             if (basicRow != null) {
+-                for (int j = getNumObjectiveFunctions(); j < getNumObjectiveFunctions() + i; j++) {
+-                    if (tableau.getEntry(basicRow, j) == 1) {
++                // if multiple variables can take a given value 
++                // then we choose the first and set the rest equal to 0
++                for (int j = 0; j < getNumObjectiveFunctions() + i; j++) {
++                    if (tableau.getEntry(basicRow, j) != 0) {
+                         coefficients[i] = 0;
++                        break;
+                     }
+                 }
+             }
+         }
+         return new RealPointValuePair(coefficients, f.getValue(coefficients));
+     }
+\ No newline at end of file

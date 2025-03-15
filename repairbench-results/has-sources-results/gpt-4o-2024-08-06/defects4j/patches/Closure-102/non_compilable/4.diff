@@ -1,0 +1,25 @@
+diff --git a/tmp/e8687321-3f29-44a1-9b9e-32bf4a4a3dac_buggy.java b/tmp/be5b03f4-a150-4ed8-b822-69c73f850473_fixed.java
+index f47d784..d04140c 100644
+--- a/tmp/e8687321-3f29-44a1-9b9e-32bf4a4a3dac_buggy.java
++++ b/tmp/be5b03f4-a150-4ed8-b822-69c73f850473_fixed.java
+@@ -1,12 +1,19 @@
+   @Override
+   public void process(Node externs, Node root) {
+     NodeTraversal.traverse(compiler, root, this);
+     if (MAKE_LOCAL_NAMES_UNIQUE) {
+       MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+       NodeTraversal t = new NodeTraversal(compiler, renamer);
+       t.traverseRoots(externs, root);
+     }
+     removeDuplicateDeclarations(root);
+     new PropogateConstantAnnotations(compiler, assertOnChange)
+         .process(externs, root);
++    
++    // Add additional cleanup step to make sure local 'arguments' variables are renamed
++    if (MAKE_LOCAL_NAMES_UNIQUE) {
++      RenameArguments renameArguments = new RenameArguments();
++      NodeTraversal tArgs = new NodeTraversal(compiler, renameArguments);
++      tArgs.traverseRoots(externs, root);
++    }
+   }
+\ No newline at end of file

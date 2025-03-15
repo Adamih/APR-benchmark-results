@@ -1,0 +1,16 @@
+diff --git a/tmp/610ac3e2-6c73-40b8-8f13-16b8dc764b33_buggy.java b/tmp/71508b44-911b-4d91-a918-fd28ad381de9_fixed.java
+index 5eedc11..baa80fe 100644
+--- a/tmp/610ac3e2-6c73-40b8-8f13-16b8dc764b33_buggy.java
++++ b/tmp/71508b44-911b-4d91-a918-fd28ad381de9_fixed.java
+@@ -1,6 +1,8 @@
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+     tb.insert(startTag);
+     tb.tokeniser.transition(TokeniserState.Rawtext);
+-        tb.markInsertionMode();
+-        tb.transition(Text);
++    // The issue was with the markInsertionMode() and transition(Text) calls.
++    // The transition(Text) method causes the tokeniser to start parsing text, but it shouldn't here because 'style' and 'noframes' are self-closing tags.
++    // So, we should to insert an EndTag instead and let the tree builder handle it appropriately.
++    tb.insert(new Token.EndTag(startTag.tagName()));
+ }
+\ No newline at end of file

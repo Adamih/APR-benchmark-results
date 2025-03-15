@@ -1,0 +1,45 @@
+diff --git a/tmp/90a375a3-496b-4d57-80f6-355b25fe1c63_buggy.java b/tmp/e73febb8-ac70-484a-8919-0ebc7eed8633_fixed.java
+index 10616db..f66fd57 100644
+--- a/tmp/90a375a3-496b-4d57-80f6-355b25fe1c63_buggy.java
++++ b/tmp/e73febb8-ac70-484a-8919-0ebc7eed8633_fixed.java
+@@ -1,19 +1,37 @@
+ //-----------------------------------------------------------------------
+ public int[] add(ReadablePartial partial, int fieldIndex, int[] values, int valueToAdd) {
+     // overridden as superclass algorithm can't handle
+     // 2004-02-29 + 48 months -> 2008-02-29 type dates
+     if (valueToAdd == 0) {
+         return values;
+     }
++    
+     // month is largest field and being added to, such as month-day
+     if (DateTimeUtils.isContiguous(partial)) {
+         long instant = 0L;
+         for (int i = 0, isize = partial.size(); i < isize; i++) {
+             instant = partial.getFieldType(i).getField(iChronology).set(instant, values[i]);
+         }
+-            instant = add(instant, valueToAdd);
+-            return iChronology.get(partial, instant);
++        
++        // Create a full date (year-month-day) to handle the addition properly
++        DateTime dt = new DateTime(instant, iChronology);
++        
++        // Determine which field we're adding to
++        DateTimeField field = partial.getFieldType(fieldIndex).getField(iChronology);
++        
++        // Add the value
++        instant = field.add(dt.getMillis(), valueToAdd);
++        
++        // Reconstruct the MonthDay, adjusting for end of month if necessary
++        dt = new DateTime(instant, iChronology);
++        MonthDay result = new MonthDay(dt.getMonthOfYear(), dt.getDayOfMonth(), iChronology);
++        
++        // Update the values array
++        values[fieldIndex] = result.getMonthOfYear();
++        values[fieldIndex + 1] = result.getDayOfMonth();
++        
++        return values;
+     } else {
+         return super.add(partial, fieldIndex, values, valueToAdd);
+     }
+ }
+\ No newline at end of file

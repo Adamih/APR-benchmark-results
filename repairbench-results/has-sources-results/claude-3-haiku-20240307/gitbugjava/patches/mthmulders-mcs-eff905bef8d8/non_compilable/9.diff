@@ -1,0 +1,19 @@
+diff --git a/tmp/89eaf677-6e2d-4281-a273-6516016c1d40_buggy.java b/tmp/9ca3675b-6282-4c67-b145-4941b98ed702_fixed.java
+index 1186509..2485a8a 100644
+--- a/tmp/89eaf677-6e2d-4281-a273-6516016c1d40_buggy.java
++++ b/tmp/9ca3675b-6282-4c67-b145-4941b98ed702_fixed.java
+@@ -1,7 +1,12 @@
+ private void printRow(final Help.TextTable table, final SearchResponse.Response.Doc doc) {
+     var lastUpdated = DATE_TIME_FORMATTER.format(
+             Instant.ofEpochMilli(doc.timestamp()).atZone(ZoneId.systemDefault())
+     );
+ 
+-        table.addRowValues(doc.id(), lastUpdated);
++    table.addRowValues(
++            doc.groupId(),
++            doc.artifactId(),
++            doc.version(),
++            lastUpdated
++    );
+ }
+\ No newline at end of file

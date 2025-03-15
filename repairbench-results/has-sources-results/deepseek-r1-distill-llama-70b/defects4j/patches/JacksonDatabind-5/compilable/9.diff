@@ -1,0 +1,38 @@
+diff --git a/tmp/a51c8279-de64-4f79-84c6-363b38868e49_buggy.java b/tmp/3571d1c7-b706-4a6e-a22a-3c379160522c_fixed.java
+index b2db1d6..19dfa0f 100644
+--- a/tmp/a51c8279-de64-4f79-84c6-363b38868e49_buggy.java
++++ b/tmp/3571d1c7-b706-4a6e-a22a-3c379160522c_fixed.java
+@@ -1,29 +1,30 @@
+ protected void _addMethodMixIns(Class<?> targetClass, AnnotatedMethodMap methods,
+         Class<?> mixInCls, AnnotatedMethodMap mixIns)
+ {
+     List<Class<?>> parents = new ArrayList<Class<?>>();
+     parents.add(mixInCls);
+     ClassUtil.findSuperTypes(mixInCls, targetClass, parents);
+     for (Class<?> mixin : parents) {
+         for (Method m : mixin.getDeclaredMethods()) {
+             if (!_isIncludableMemberMethod(m)) {
+                 continue;
+             }
+             AnnotatedMethod am = methods.find(m);
+             /* Do we already have a method to augment (from sub-class
+              * that will mask this mixIn)? If so, add if visible
+              * without masking (no such annotation)
+              */
+             if (am != null) {
+                 _addMixUnders(m, am);
+                 /* Otherwise will have precedence, but must wait
+                  * until we find the real method (mixIn methods are
+                  * just placeholder, can't be called)
+                  */
+             } else {
+-                    // Well, or, as per [Issue#515], multi-level merge within mixins...
+-                        mixIns.add(_constructMethod(m));
++                // Change: Add the method to the methods instead of mixIns
++                AnnotatedMethod constructed = _constructMethod(m);
++                methods.add(constructed);
+             }
+         }
+     }
+ }
+\ No newline at end of file

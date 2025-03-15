@@ -1,0 +1,31 @@
+diff --git a/tmp/06994cb7-9237-467f-a88b-1b93410c4efd_buggy.java b/tmp/4152e046-bf5c-4c87-9c6e-38f0c1a174d0_fixed.java
+index 00914da..f83bbd4 100644
+--- a/tmp/06994cb7-9237-467f-a88b-1b93410c4efd_buggy.java
++++ b/tmp/4152e046-bf5c-4c87-9c6e-38f0c1a174d0_fixed.java
+@@ -1,17 +1,22 @@
+-    // does not recurse.
++/**
++ * Normalises the given element by moving non-blank TextNodes to the beginning of the body.
++ * This is necessary when parsing HTML snippets that contain text outside of the body.
++ */
+ private void normalise(Element element) {
+     List<Node> toMove = new ArrayList<Node>();
+     for (Node node: element.childNodes) {
+         if (node instanceof TextNode) {
+             TextNode tn = (TextNode) node;
+             if (!tn.isBlank())
+                 toMove.add(tn);
+         }
+     }
+ 
++    // Fix: append moved nodes to the beginning of the body, not the end
+     for (Node node: toMove) {
+         element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++        body().prependChild(node); // Use prependChild instead of appendChild
++        // Remove the unnecessary space append
++        // body().appendChild(new TextNode(" ", ""));
+     }
+ }
+\ No newline at end of file

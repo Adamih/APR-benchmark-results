@@ -1,0 +1,30 @@
+diff --git a/tmp/bd3c9572-0ca6-427e-9071-bc4380393050_buggy.java b/tmp/7be8d236-9387-40c3-ac1d-3f0430f93c3f_fixed.java
+index c3c1a6f..d745bd4 100644
+--- a/tmp/bd3c9572-0ca6-427e-9071-bc4380393050_buggy.java
++++ b/tmp/7be8d236-9387-40c3-ac1d-3f0430f93c3f_fixed.java
+@@ -1,22 +1,25 @@
+     private final static int _parseIndex(String str) {
+         final int len = str.length();
+         // [core#133]: beware of super long indexes; assume we never
+         // have arrays over 2 billion entries so ints are fine.
+         if (len == 0 || len > 10) {
+             return -1;
+         }
+         // [core#176]: no leading zeroes allowed
++        if (len > 1 && str.charAt(0) == '0') {
++            return -1;
++        }
+         for (int i = 0; i < len; ++i) {
+             char c = str.charAt(i);
+             if (c > '9' || c < '0') {
+                 return -1;
+             }
+         }
+         if (len == 10) {
+             long l = NumberInput.parseLong(str);
+             if (l > Integer.MAX_VALUE) {
+                 return -1;
+             }
+         }
+         return NumberInput.parseInt(str);
+     }

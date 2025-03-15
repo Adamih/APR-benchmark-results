@@ -1,0 +1,97 @@
+diff --git a/tmp/753dd2c3-ea38-4de4-b217-451feeaefe74_buggy.java b/tmp/da53409c-5e30-4641-aa08-48667d4e5acd_fixed.java
+index f506479..8672b29 100644
+--- a/tmp/753dd2c3-ea38-4de4-b217-451feeaefe74_buggy.java
++++ b/tmp/da53409c-5e30-4641-aa08-48667d4e5acd_fixed.java
+@@ -1,64 +1,89 @@
+ void consume(final RepeatingArgGroup groupArg, final Deque<NameValuePair> arguments)
+ {
+     final Map<DslArg, List<String>> valuesByArg = new HashMap<>();
+     final SimpleArgumentProcessor processor = new SimpleArgumentProcessor(valuesByArg, "Did not supply a value for %s in group " + groupArg.getName());
+ 
++    // Process identity argument separately to allow for repeating groups
+     processor.consume(groupArg.getIdentity(), arguments);
+ 
+     final Map<String, SimpleDslArg> argsByName = new HashMap<>();
+     argsByName.put(groupArg.getIdentity().getName(), groupArg.getIdentity());
+     for (SimpleDslArg dslArg : groupArg.getOtherArgs())
+     {
+         if (argsByName.put(dslArg.getName().toLowerCase(), dslArg)!= null)
+         {
+             throw new IllegalArgumentException("Duplicate parameter '" + dslArg.getName() + "' in group " + groupArg.getName());
+         }
+     }
+ 
++    // Continue processing until we encounter an argument that doesn't belong to the group
+     while (!arguments.isEmpty())
+     {
+         final NameValuePair argument = arguments.peekFirst();
+         if (argument == NameValuePair.NULL)
+         {
+             arguments.pollFirst();
+             continue;
+         }
+ 
+         if (argument.name == null)
+         {
+-                    throw new IllegalArgumentException("Unexpected ambiguous argument " + argument.originalValue);
++            // If we encounter an ambiguous argument, stop processing the group
++            break;
+         }
+ 
+         final DslArg arg = argsByName.get(argument.name.toLowerCase());
+         if (arg == null)
+         {
++            // If the argument doesn't belong to the group, stop processing
+             break;
+         }
+ 
+         final List<String> argValues = valuesByArg.computeIfAbsent(arg, k -> new ArrayList<>());
+         if (!argValues.isEmpty() &&!arg.isAllowMultipleValues())
+         {
++            // If the argument doesn't allow multiple values, stop processing it
+             break;
+         }
+ 
+         checkValidValue(arg, argument.value);
+         argValues.add(argument.value);
+         arguments.pollFirst();
++
++        // If the argument is the group identity, process the other args again
++        if (arg == groupArg.getIdentity())
++        {
++            for (SimpleDslArg dslArg : groupArg.getOtherArgs())
++            {
++                while (!arguments.isEmpty() && argsByName.get(arguments.peekFirst().name.toLowerCase()) == dslArg)
++                {
++                    final NameValuePair nextArgument = arguments.pollFirst();
++                    final List<String> nextArgValues = valuesByArg.computeIfAbsent(dslArg, k -> new ArrayList<>());
++                    if (!nextArgValues.isEmpty() &&!dslArg.isAllowMultipleValues())
++                    {
++                        break;
++                    }
++
++                    checkValidValue(dslArg, nextArgument.value);
++                    nextArgValues.add(nextArgument.value);
++                }
++            }
++        }
+     }
+ 
+-            // TODO: this whole thing here is a bit hacky!
++    // Map values by name for easier consumption
+     final Map<String, List<String>> valuesByName = new HashMap<>();
+     for (final SimpleDslArg simpleDslArg : argsByName.values())
+     {
+         final SimpleDslParam param = processor.collect(simpleDslArg);
+         if (param.hasValue())
+         {
+             valuesByName.put(param.getName().toLowerCase(), param.getValuesAsList());
+         }
+     }
+ 
+     final DslArg[] dslArgs = new DslArg[groupArg.getOtherArgs().length + 1];
+     dslArgs[0] = groupArg.getIdentity();
+     System.arraycopy(groupArg.getOtherArgs(), 0, dslArgs, 1, groupArg.getOtherArgs().length);
+     groupsByArg.computeIfAbsent(groupArg, k -> new ArrayList<>()).add(new RepeatingParamValues(dslArgs, valuesByName));
+ }
+\ No newline at end of file

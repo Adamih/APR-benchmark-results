@@ -1,0 +1,37 @@
+diff --git a/tmp/9f301437-d227-4a8c-966e-725166395780_buggy.java b/tmp/b4bfc1f6-1c9e-41c9-8ff4-c9d445fa8473_fixed.java
+index c84c989..937b9a3 100644
+--- a/tmp/9f301437-d227-4a8c-966e-725166395780_buggy.java
++++ b/tmp/b4bfc1f6-1c9e-41c9-8ff4-c9d445fa8473_fixed.java
+@@ -1,27 +1,30 @@
+     private Position decodeIridiumPosition(Channel channel, SocketAddress remoteAddress, ByteBuf buf) {
+ 
+         buf.readUnsignedShortLE(); // length
+ 
+         buf.skipBytes(3); // identification header
+         buf.readUnsignedIntLE(); // index
+ 
+         DeviceSession deviceSession = getDeviceSession(
+                 channel, remoteAddress, buf.readSlice(15).toString(StandardCharsets.US_ASCII));
+         if (deviceSession == null) {
+             return null;
+         }
+ 
+         Position position = new Position(getProtocolName());
+         position.setDeviceId(deviceSession.getDeviceId());
+ 
+         buf.readUnsignedByte(); // session status
+         buf.skipBytes(4); // reserved
+-        buf.readUnsignedIntLE(); // date and time
++
++        long timestampField = buf.readUnsignedIntLE(); // date and time as seconds since 2000-01-01
++        long baseTime = 946684800000L; // Base time: 2000-01-01 00:00:00 UTC in milliseconds
++        position.setTime(baseTime + timestampField * 1000);
+ 
+         buf.skipBytes(23); // coordinates block
+ 
+         buf.skipBytes(3); // data tag header
+         decodeMinimalDataSet(position, buf);
+ 
+         return position;
+     }
+\ No newline at end of file

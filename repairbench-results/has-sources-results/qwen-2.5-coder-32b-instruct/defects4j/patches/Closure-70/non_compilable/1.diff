@@ -1,0 +1,39 @@
+diff --git a/tmp/c66391c6-76bb-427e-a82b-1ae57dc523b8_buggy.java b/tmp/3eeb12e4-574c-4df5-9644-132480817c5a_fixed.java
+index 1530b34..7ea7316 100644
+--- a/tmp/c66391c6-76bb-427e-a82b-1ae57dc523b8_buggy.java
++++ b/tmp/3eeb12e4-574c-4df5-9644-132480817c5a_fixed.java
+@@ -1,23 +1,30 @@
+ /**
+  * Declares all of a function's arguments.
+  */
+ private void declareArguments(Node functionNode) {
+   Node astParameters = functionNode.getFirstChild().getNext();
+   Node body = astParameters.getNext();
+   FunctionType functionType = (FunctionType) functionNode.getJSType();
+   if (functionType != null) {
+     Node jsDocParameters = functionType.getParametersNode();
+     if (jsDocParameters != null) {
+       Node jsDocParameter = jsDocParameters.getFirstChild();
+       for (Node astParameter : astParameters.children()) {
++        JSType requiredType = null;
+         if (jsDocParameter != null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++          requiredType = jsDocParameter.getJSType();
+           jsDocParameter = jsDocParameter.getNext();
++        }
++        JSType actualType = astParameter.getJSType();
++        if (requiredType != null && !actualType.isUnknownType() && !actualType.isEquivalentTo(requiredType)) {
++          compiler.report(JSError.make(astParameter, TypeValidator.TYPE_MISMATCH_WARNING, actualType.toString(), requiredType.toString()));
++        }
++        defineSlot(astParameter, functionNode, requiredType, true);
++      }
+     } else {
++      for (Node astParameter : astParameters.children()) {
+         defineSlot(astParameter, functionNode, null, true);
+       }
+     }
+   }
+-      }
+ } // end declareArguments
+\ No newline at end of file

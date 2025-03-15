@@ -1,0 +1,29 @@
+diff --git a/tmp/7a0608c9-f771-461d-bf84-7057e513260e_buggy.java b/tmp/61438c90-3a39-44dd-8abe-97e832cffc4e_fixed.java
+index c9c2b44..76c897f 100644
+--- a/tmp/7a0608c9-f771-461d-bf84-7057e513260e_buggy.java
++++ b/tmp/61438c90-3a39-44dd-8abe-97e832cffc4e_fixed.java
+@@ -1,13 +1,18 @@
+ @Override
+ public boolean matches(Element root, Element element) {
+-            // evaluate from last to first
+-            for (int i = evaluators.size() -1; i >= 0; --i) {
+-                if (element == null)
++    int size = evaluators.size();
++    if (size == 0)
+         return false;
+-                Evaluator eval = evaluators.get(i);
+-                if (!eval.matches(root, element))
++    // First, the candidate element must match the right-most evaluator.
++    if (!evaluators.get(size - 1).matches(root, element))
+         return false;
++    // Then, for each remaining evaluator, climb one level up before testing.
++    for (int i = size - 2; i >= 0; i--) {
+         element = element.parent();
++        if (element == null)
++            return false;
++        if (!evaluators.get(i).matches(root, element))
++            return false;
+     }
+     return true;
+ }
+\ No newline at end of file

@@ -1,0 +1,46 @@
+diff --git a/tmp/7b556b44-4fea-4f86-91d9-89f8a60cb75b_buggy.java b/tmp/e9cd1dd3-7789-4d0f-a180-4d38b370ce31_fixed.java
+index 373b1e8..741643b 100644
+--- a/tmp/7b556b44-4fea-4f86-91d9-89f8a60cb75b_buggy.java
++++ b/tmp/e9cd1dd3-7789-4d0f-a180-4d38b370ce31_fixed.java
+@@ -1,37 +1,37 @@
+ private static boolean looksLikeUtf8(byte[] input) {
+     int i = 0;
+     // BOM:
+     if (input.length >= 3 && (input[0] & 0xFF) == 0xEF
+-                && (input[1] & 0xFF) == 0xBB & (input[2] & 0xFF) == 0xBF) {
++        && (input[1] & 0xFF) == 0xBB && (input[2] & 0xFF) == 0xBF) {
+         i = 3;
+     }
+ 
+     int end;
+     for (int j = input.length; i < j; ++i) {
+         int o = input[i];
+         if ((o & 0x80) == 0) {
+             continue; // ASCII
+         }
+ 
+         // UTF-8 leading:
+         if ((o & 0xE0) == 0xC0) {
+             end = i + 1;
+         } else if ((o & 0xF0) == 0xE0) {
+             end = i + 2;
+         } else if ((o & 0xF8) == 0xF0) {
+             end = i + 3;
+         } else {
+             return false;
+         }
+ 
+-
+-                while (i < end) {
++        // Skip the current byte, it was already checked
++        while (i + 1 < end && i + 1 < input.length) {
+             i++;
+             o = input[i];
+             if ((o & 0xC0)!= 0x80) {
+                 return false;
+             }
+         }
+     }
+     return true;
+ }
+\ No newline at end of file

@@ -1,0 +1,22 @@
+diff --git a/tmp/47fce5ea-98fd-4e39-98e2-86fe4014fb1f_buggy.java b/tmp/a3e4caf5-3d3f-43fe-af33-51f9a36dc7f9_fixed.java
+index 4aff4e4..2ad4c6e 100644
+--- a/tmp/47fce5ea-98fd-4e39-98e2-86fe4014fb1f_buggy.java
++++ b/tmp/a3e4caf5-3d3f-43fe-af33-51f9a36dc7f9_fixed.java
+@@ -1,15 +1,15 @@
+ private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+     // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+     // rels without a baseuri get removed
+     String value = el.absUrl(attr.getKey());
+     if (!preserveRelativeLinks)
+         attr.setValue(value);
+ 
+     for (Protocol protocol : protocols) {
+-            String prot = protocol.toString() + ":";
++        String prot = protocol.toString().toLowerCase() + ":";  // Fixed case sensitivity issue
+         if (value.toLowerCase().startsWith(prot)) {
+             return true;
+         }
+     }
+     return false;
+ }
+\ No newline at end of file

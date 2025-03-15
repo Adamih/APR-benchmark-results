@@ -1,0 +1,13 @@
+diff --git a/tmp/5fbe95a6-937f-4cac-8174-ef3da2cfbf9e_buggy.java b/tmp/a52737c3-122a-4253-a0c2-80b4273a39ec_fixed.java
+index fc49bcd..5c26acc 100644
+--- a/tmp/5fbe95a6-937f-4cac-8174-ef3da2cfbf9e_buggy.java
++++ b/tmp/a52737c3-122a-4253-a0c2-80b4273a39ec_fixed.java
+@@ -1,4 +1,8 @@
+     @Override
+     public DefaultPrettyPrinter createInstance() {
++        if (getClass() != DefaultPrettyPrinter.class) { // since 2.10
++            throw new IllegalStateException("Failed `createInstance()`: "+getClass().getName()
++                    +" does not override method; it has to");
++        }
+         return new DefaultPrettyPrinter(this);
+     }

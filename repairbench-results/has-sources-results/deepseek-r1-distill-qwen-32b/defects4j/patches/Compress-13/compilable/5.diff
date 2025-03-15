@@ -1,0 +1,20 @@
+diff --git a/tmp/6666b9ef-8545-472f-bf12-8a7799ca9e7f_buggy.java b/tmp/ebde7486-1c00-4cc4-8ad8-fc620f3ae037_fixed.java
+index 1c92640..bf73b87 100644
+--- a/tmp/6666b9ef-8545-472f-bf12-8a7799ca9e7f_buggy.java
++++ b/tmp/ebde7486-1c00-4cc4-8ad8-fc620f3ae037_fixed.java
+@@ -1,7 +1,9 @@
+-    /**
+-     * Set the name of the entry.
+-     * @param name the name to use
+-     */
+ protected void setName(String name) {
+-        this.name = name;
++    char[] nameArray = name.toCharArray();
++    for (int i = 0; i < nameArray.length; i++) {
++        if (nameArray[i] == '\\') {
++            nameArray[i] = '/';
++        }
++    }
++    this.name = new String(nameArray);
+ }
+\ No newline at end of file

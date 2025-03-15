@@ -1,0 +1,21 @@
+diff --git a/tmp/7b445c26-3619-4e44-8296-0d82d8717302_buggy.java b/tmp/dd0701e2-7aa1-4d9a-8778-f41b5b0e6af1_fixed.java
+index 42d4174..c8c1894 100644
+--- a/tmp/7b445c26-3619-4e44-8296-0d82d8717302_buggy.java
++++ b/tmp/dd0701e2-7aa1-4d9a-8778-f41b5b0e6af1_fixed.java
+@@ -1,7 +1,14 @@
+   /**
+-   * Returns the remainder of the line.
++   * Returns the remainder of the line, ensuring it trims any leading '*' characters 
++   * that are common in JSDoc-style comments.
+    */
+   private String getRemainingJSDocLine() {
+     String result = stream.getRemainingJSDocLine();
++    if (result != null) {
++      result = result.trim();
++      if (result.startsWith("*")) {
++        result = result.substring(1).trim();
++      }
++    }
+     return result;
+   }
+\ No newline at end of file

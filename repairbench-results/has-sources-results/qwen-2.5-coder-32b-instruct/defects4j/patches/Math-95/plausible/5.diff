@@ -1,0 +1,27 @@
+diff --git a/tmp/aae3d595-68f3-400d-b736-79bf3cda9ddd_buggy.java b/tmp/85de954d-3998-463c-a261-f619d6c322ff_fixed.java
+index 25c13b3..74df6cf 100644
+--- a/tmp/aae3d595-68f3-400d-b736-79bf3cda9ddd_buggy.java
++++ b/tmp/85de954d-3998-463c-a261-f619d6c322ff_fixed.java
+@@ -1,15 +1,12 @@
+-    /**
+-     * Access the initial domain value, based on <code>p</code>, used to
+-     * bracket a CDF root.  This method is used by
+-     * {@link #inverseCumulativeProbability(double)} to find critical values.
+-     * 
+-     * @param p the desired probability for the critical value
+-     * @return initial domain value
+-     */
+ protected double getInitialDomain(double p) {
+     double ret;
+     double d = getDenominatorDegreesOfFreedom();
+-            // use mean
++    if (d <= 2.0) {
++        // For small degrees of freedom, a more reasonable starting point might be 1.0
++        ret = 1.0;
++    } else {
++        // Use a more appropriate initial guess for larger degrees of freedom
+         ret = d / (d - 2.0);
++    }
+     return ret;
+ }
+\ No newline at end of file

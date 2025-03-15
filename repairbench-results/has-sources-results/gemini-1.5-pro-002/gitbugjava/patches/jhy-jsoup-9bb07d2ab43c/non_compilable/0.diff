@@ -1,0 +1,25 @@
+diff --git a/tmp/09b6a556-cb6d-4a4e-92d3-93c069057467_buggy.java b/tmp/ce9f1044-e2bb-4b1b-b2ef-d784345e46fd_fixed.java
+index dcc36a4..fb0251a 100644
+--- a/tmp/09b6a556-cb6d-4a4e-92d3-93c069057467_buggy.java
++++ b/tmp/ce9f1044-e2bb-4b1b-b2ef-d784345e46fd_fixed.java
+@@ -1,12 +1,18 @@
+     protected void replaceChild(Node out, Node in) {
+         Validate.isTrue(out.parentNode == this);
+         Validate.notNull(in);
+-        if (in.parentNode != null)
++        if (in.parentNode != null) {
+             in.parentNode.removeChild(in);
++        }
+ 
+         final int index = out.siblingIndex;
+-        ensureChildNodes().set(index, in);
++        List<Node> children = ensureChildNodes();
++        if (in == out) {
++            // was in = children.get(index), now we don't need to because we already know
++            return; // no change if replacing self
++        }
++        children.set(index, in);
+         in.parentNode = this;
+         in.setSiblingIndex(index);
+         out.parentNode = null;
+     }

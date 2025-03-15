@@ -1,0 +1,50 @@
+diff --git a/tmp/3c44b4da-b052-462c-96a4-4dc083e10f3c_buggy.java b/tmp/5871c634-cd90-4d9a-b3c3-10835b2e1457_fixed.java
+index b2d53db..04f5e72 100644
+--- a/tmp/3c44b4da-b052-462c-96a4-4dc083e10f3c_buggy.java
++++ b/tmp/5871c634-cd90-4d9a-b3c3-10835b2e1457_fixed.java
+@@ -1,34 +1,44 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+         t.dataBuffer.append(name);
+         r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
+             default:
++                if (t.currentState() == InScript || t.currentState() == InScriptComment) {
++                    t.dataBuffer.append(c);
++                    return;
++                } else {
+                     t.dataBuffer.append(c);
+                     anythingElse(t, r);
+                     break;
+                 }
++        }
++    } else {
++        if (t.currentState() == InScript || t.currentState() == InScriptComment) {
++            t.dataBuffer.append(r.consumeTo('<'));
++            return;
+         } else {
+             anythingElse(t, r);
+         }
+     }
++}
+\ No newline at end of file

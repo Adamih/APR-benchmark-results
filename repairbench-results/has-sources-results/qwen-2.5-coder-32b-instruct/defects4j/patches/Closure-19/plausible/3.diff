@@ -1,0 +1,36 @@
+diff --git a/tmp/3750a6d1-c54f-4790-88e2-161f59d2287c_buggy.java b/tmp/ce8239ae-aaaf-4664-8b09-2fe4c3d0e288_fixed.java
+index fa42cd9..97f2b22 100644
+--- a/tmp/3750a6d1-c54f-4790-88e2-161f59d2287c_buggy.java
++++ b/tmp/ce8239ae-aaaf-4664-8b09-2fe4c3d0e288_fixed.java
+@@ -1,27 +1,30 @@
+   /**
+    * Declares a refined type in {@code scope} for the name represented by
+    * {@code node}. It must be possible to refine the type of the given node in
+    * the given scope, as determined by {@link #getTypeIfRefinable}.
+    */
+   protected void declareNameInScope(FlowScope scope, Node node, JSType type) {
+     switch (node.getType()) {
+       case Token.NAME:
+         scope.inferSlotType(node.getString(), type);
+         break;
+ 
+       case Token.GETPROP:
+         String qualifiedName = node.getQualifiedName();
+         Preconditions.checkNotNull(qualifiedName);
+ 
+         JSType origType = node.getJSType();
+         origType = origType == null ? getNativeType(UNKNOWN_TYPE) : origType;
+         scope.inferQualifiedSlot(node, qualifiedName, origType, type);
+         break;
+ 
++      case Token.THIS:
+         // "this" references aren't currently modeled in the CFG.
++        // We simply return here to avoid throwing an exception.
++        return;
+ 
+       default:
+         throw new IllegalArgumentException("Node cannot be refined. \n" +
+             node.toStringTree());
+     }
+   }
+\ No newline at end of file

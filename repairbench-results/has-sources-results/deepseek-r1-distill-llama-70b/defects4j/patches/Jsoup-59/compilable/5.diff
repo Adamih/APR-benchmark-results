@@ -1,0 +1,49 @@
+diff --git a/tmp/952f1df3-be54-44f2-a80e-5032576c77cb_buggy.java b/tmp/c6554786-7b6a-48e4-ada1-063c9071c8e5_fixed.java
+index 7de6748..1ac5ae4 100644
+--- a/tmp/952f1df3-be54-44f2-a80e-5032576c77cb_buggy.java
++++ b/tmp/c6554786-7b6a-48e4-ada1-063c9071c8e5_fixed.java
+@@ -1,23 +1,37 @@
+ final void newAttribute() {
+     if (attributes == null)
+         attributes = new Attributes();
+ 
+     if (pendingAttributeName != null) {
+-                // the tokeniser has skipped whitespace control chars, but trimming could collapse to empty for other control codes, so verify here
+         pendingAttributeName = pendingAttributeName.trim();
++        if (pendingAttributeName.isEmpty()) {
++            pendingAttributeName = null;
++            resetPendingAttributeValue();
++            return;
++        }
+         Attribute attribute;
+-                    if (hasPendingAttributeValue)
+-                        attribute = new Attribute(pendingAttributeName,
+-                            pendingAttributeValue.length() > 0 ? pendingAttributeValue.toString() : pendingAttributeValueS);
+-                    else if (hasEmptyAttributeValue)
++        if (hasPendingAttributeValue) {
++            attribute = new Attribute(
++                pendingAttributeName,
++                pendingAttributeValue.length() > 0 ? pendingAttributeValue.toString() : pendingAttributeValueS
++            );
++        } else if (hasEmptyAttributeValue) {
+             attribute = new Attribute(pendingAttributeName, "");
+-                    else
++        } else {
+             attribute = new BooleanAttribute(pendingAttributeName);
++        }
+         attributes.put(attribute);
+     }
+     pendingAttributeName = null;
+     hasEmptyAttributeValue = false;
+     hasPendingAttributeValue = false;
++    resetPendingAttributeValue();
++}
++
++// Added helper method to centralize reset logic
++void resetPendingAttributeValue() {
+     reset(pendingAttributeValue);
+     pendingAttributeValueS = null;
++    hasPendingAttributeValue = false;
++    hasEmptyAttributeValue = false;
+ }
+\ No newline at end of file

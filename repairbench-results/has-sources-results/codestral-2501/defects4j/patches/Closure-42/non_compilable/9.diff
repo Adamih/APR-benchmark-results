@@ -1,0 +1,28 @@
+diff --git a/tmp/c5b161bc-63b4-4de7-a1d8-c023d91ee7b3_buggy.java b/tmp/5b01b8cf-7e7c-4ba2-ad31-99059aeeff64_fixed.java
+index 4d0be80..78009eb 100644
+--- a/tmp/c5b161bc-63b4-4de7-a1d8-c023d91ee7b3_buggy.java
++++ b/tmp/5b01b8cf-7e7c-4ba2-ad31-99059aeeff64_fixed.java
+@@ -1,10 +1,21 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
++    // For the given loopNode, we need to handle the 'for each' construct.
++    // The existing code does not handle this correctly. We need to check if the loop is a 'for each' loop and handle it accordingly.
+ 
+-        // Return the bare minimum to put the AST in a valid state.
++    if (loopNode.isForEach()) {
++        // Handle 'for each' loop
++        return newNode(
++            Token.FOR_EACH,
++            transform(loopNode.getIterator()),
++            transform(loopNode.getIteratedObject()),
++            transformBlock(loopNode.getBody()));
++    } else {
++        // Handle standard 'for in' loop
+         return newNode(
+             Token.FOR,
+             transform(loopNode.getIterator()),
+             transform(loopNode.getIteratedObject()),
+             transformBlock(loopNode.getBody()));
+     }
++}
+\ No newline at end of file

@@ -1,0 +1,21 @@
+diff --git a/tmp/b4767662-960d-4b46-acf1-9cce36f554ae_buggy.java b/tmp/e26ad452-74ce-44a1-ade4-1d85ad9f46e9_fixed.java
+index fc49bcd..9620e21 100644
+--- a/tmp/b4767662-960d-4b46-acf1-9cce36f554ae_buggy.java
++++ b/tmp/e26ad452-74ce-44a1-ade4-1d85ad9f46e9_fixed.java
+@@ -1,4 +1,12 @@
+-    @Override
+-    public DefaultPrettyPrinter createInstance() {
+-        return new DefaultPrettyPrinter(this);
++public void testInvalidSubClass() throws Exception
++{
++    DefaultPrettyPrinter pp = new MyPrettyPrinter();
++    try {
++        pp.createInstance();
++        fail("Did not throw an UnsupportedOperationException");
++    } catch (UnsupportedOperationException e) {
++        // expected
++    } catch (Exception e) {
++        fail("Threw an unexpected exception: " + e.getClass().getName());
++    }
+ }
+\ No newline at end of file

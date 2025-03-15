@@ -1,0 +1,32 @@
+diff --git a/tmp/7775ea8f-4fd3-4ff9-8eb5-20cc2b5e2390_buggy.java b/tmp/cf2391f8-34ef-4cf1-b817-0066747d49d4_fixed.java
+index 4e8b037..17ca723 100644
+--- a/tmp/7775ea8f-4fd3-4ff9-8eb5-20cc2b5e2390_buggy.java
++++ b/tmp/cf2391f8-34ef-4cf1-b817-0066747d49d4_fixed.java
+@@ -1,20 +1,23 @@
+ public List getValues(final Option option,
+                       List defaultValues) {
+     // initialize the return list
+     List valueList = (List) values.get(option);
+ 
+     // grab the correct default values
+     if ((valueList == null) || valueList.isEmpty()) {
+         valueList = defaultValues;
+     }
+ 
+     // augment the list with the default values
+     if ((valueList == null) || valueList.isEmpty()) {
+         valueList = (List) this.defaultValues.get(option);
+     }
+-                // if there are more default values as specified, add them to
+-                // the list.
+-                    // copy the list first
++
++    // if there are more default values as specified, add them to the list.
++    if (valueList != null && this.defaultValues.containsKey(option)) {
++        List additionalDefaults = (List) this.defaultValues.get(option);
++        valueList.addAll(additionalDefaults.subList(valueList.size(), additionalDefaults.size()));
++    }
+ 
+     return valueList == null ? Collections.EMPTY_LIST : valueList;
+ }
+\ No newline at end of file

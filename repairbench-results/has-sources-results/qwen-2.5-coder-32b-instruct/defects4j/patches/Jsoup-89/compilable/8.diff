@@ -1,0 +1,21 @@
+diff --git a/tmp/e28f86a7-879d-476f-9182-29792e2b3935_buggy.java b/tmp/5ca83b9f-e81d-4f64-83cc-5627962dc599_fixed.java
+index 25217b6..7f59e8c 100644
+--- a/tmp/e28f86a7-879d-476f-9182-29792e2b3935_buggy.java
++++ b/tmp/5ca83b9f-e81d-4f64-83cc-5627962dc599_fixed.java
+@@ -1,14 +1,14 @@
+ /**
+  Set the attribute value.
+  @param val the new attribute value; must not be null
+  */
+ public String setValue(String val) {
+-        String oldVal = parent.get(this.key);
++    String oldVal = (parent != null) ? parent.get(this.key) : this.val;
+     if (parent != null) {
+         int i = parent.indexOfKey(this.key);
+         if (i != Attributes.NotFound)
+             parent.vals[i] = val;
+     }
+     this.val = val;
+     return Attributes.checkNotNull(oldVal);
+ }
+\ No newline at end of file

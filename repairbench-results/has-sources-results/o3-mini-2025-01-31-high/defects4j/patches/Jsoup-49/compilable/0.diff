@@ -1,0 +1,28 @@
+diff --git a/tmp/128a15f3-c714-45f8-9c60-f7295d33b09a_buggy.java b/tmp/0c9e9636-6917-4dd5-86c5-a74b1de8a525_fixed.java
+index a37dc7a..4364c0a 100644
+--- a/tmp/128a15f3-c714-45f8-9c60-f7295d33b09a_buggy.java
++++ b/tmp/0c9e9636-6917-4dd5-86c5-a74b1de8a525_fixed.java
+@@ -1,10 +1,22 @@
+ protected void addChildren(int index, Node... children) {
+     Validate.noNullElements(children);
+     ensureChildNodes();
++
++    // When moving nodes that already belong to this parent,
++    // adjust the insertion index to account for their removal.
++    for (Node child : children) {
++        if (child.parentNode == this) {
++            int pos = child.siblingIndex();
++            if (pos < index)
++                index--;
++        }
++    }
++
++    // Insert in reverse order so that the nodes appear in the same order as in the children array.
+     for (int i = children.length - 1; i >= 0; i--) {
+         Node in = children[i];
+         reparentChild(in);
+         childNodes.add(index, in);
+     }
+     reindexChildren(index);
+ }
+\ No newline at end of file

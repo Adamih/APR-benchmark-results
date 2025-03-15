@@ -1,0 +1,20 @@
+diff --git a/tmp/2343789f-c643-47db-a0c6-a76656dcddb7_buggy.java b/tmp/ebff0e76-d2f0-46cf-8bb0-a7fe0bcb1933_fixed.java
+index 5eedc11..218a5c0 100644
+--- a/tmp/2343789f-c643-47db-a0c6-a76656dcddb7_buggy.java
++++ b/tmp/ebff0e76-d2f0-46cf-8bb0-a7fe0bcb1933_fixed.java
+@@ -1,6 +1,14 @@
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+     tb.insert(startTag);
++    if (startTag.isSelfClosing()) {
++        // Since this tag is known to be empty (e.g. <style /> or <noframes />),
++        // we don’t want to switch into raw text mode. Instead, we return to the normal
++        // data state and pop the element off the stack immediately.
++        tb.tokeniser.transition(TokeniserState.Data);
++        tb.pop();
++    } else {
+         tb.tokeniser.transition(TokeniserState.Rawtext);
+         tb.markInsertionMode();
+         tb.transition(Text);
+     }
++}
+\ No newline at end of file

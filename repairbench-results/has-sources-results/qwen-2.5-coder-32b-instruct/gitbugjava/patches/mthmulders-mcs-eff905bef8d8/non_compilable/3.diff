@@ -1,0 +1,16 @@
+diff --git a/tmp/9746037d-891d-4c57-8f4d-1b38a2fe6902_buggy.java b/tmp/bbefa075-4917-4f9d-bf8d-324396ed5936_fixed.java
+index 1186509..cbee587 100644
+--- a/tmp/9746037d-891d-4c57-8f4d-1b38a2fe6902_buggy.java
++++ b/tmp/bbefa075-4917-4f9d-bf8d-324396ed5936_fixed.java
+@@ -1,7 +1,9 @@
+ private void printRow(final Help.TextTable table, final SearchResponse.Response.Doc doc) {
+     var lastUpdated = DATE_TIME_FORMATTER.format(
+             Instant.ofEpochMilli(doc.timestamp()).atZone(ZoneId.systemDefault())
+     );
+ 
+-        table.addRowValues(doc.id(), lastUpdated);
++    // Assuming the table expects the following columns in this order: GAV, Last Updated
++    String gav = String.format("%s:%s:%s", doc.groupId(), doc.artifactId(), doc.version());
++    table.addRowValues(gav, lastUpdated);
+ }
+\ No newline at end of file

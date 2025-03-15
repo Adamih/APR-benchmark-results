@@ -1,0 +1,28 @@
+diff --git a/tmp/4ef0aa4e-abe3-4541-9225-2c45cf28d028_buggy.java b/tmp/717017e1-374d-46e0-a7e8-32aa8d7e0cb0_fixed.java
+index 5bf31b1..050b1d4 100644
+--- a/tmp/4ef0aa4e-abe3-4541-9225-2c45cf28d028_buggy.java
++++ b/tmp/717017e1-374d-46e0-a7e8-32aa8d7e0cb0_fixed.java
+@@ -1,17 +1,20 @@
+     private String consumeSubQuery() {
+         StringBuilder sq = StringUtil.borrowBuilder();
++        boolean seenNonCombinator = false; // eat until we hit a combinator after eating something else
+         while (!tq.isEmpty()) {
+             if (tq.matches("("))
+                 sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+             else if (tq.matches("["))
+                 sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+             else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++                if (seenNonCombinator)
+                     break;
+-                else
+-                    tq.consume();
+                 else
+                     sq.append(tq.consume());
++            else {
++                seenNonCombinator = true;
++                sq.append(tq.consume());
++            }
+         }
+         return StringUtil.releaseBuilder(sq);
+     }

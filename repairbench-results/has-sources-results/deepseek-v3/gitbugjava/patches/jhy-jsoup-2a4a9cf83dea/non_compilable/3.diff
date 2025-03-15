@@ -1,0 +1,25 @@
+diff --git a/tmp/e1abb78c-0eb9-4584-b329-7a97ccc6a000_buggy.java b/tmp/88a89071-f9b5-40a5-b1b3-0c303f0db9e8_fixed.java
+index c9c2b44..94047a9 100644
+--- a/tmp/e1abb78c-0eb9-4584-b329-7a97ccc6a000_buggy.java
++++ b/tmp/88a89071-f9b5-40a5-b1b3-0c303f0db9e8_fixed.java
+@@ -1,13 +1,19 @@
+ @Override
+ public boolean matches(Element root, Element element) {
+     // evaluate from last to first
+     for (int i = evaluators.size() - 1; i >= 0; --i) {
+         if (element == null)
+             return false;
+         Evaluator eval = evaluators.get(i);
+         if (!eval.matches(root, element))
+             return false;
++        // Only consider direct parent if the evaluator is a direct child evaluator
++        if (eval instanceof Evaluator.ImmediateParentEvaluator) {
+             element = element.parent();
++        } else {
++            // For other evaluators, continue with the parent chain
++            element = element.parent();
++        }
+     }
+     return true;
+ }
+\ No newline at end of file

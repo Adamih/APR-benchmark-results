@@ -1,0 +1,29 @@
+diff --git a/tmp/f2ef511e-5ed9-4f33-a5f1-af2e3f7d3cf7_buggy.java b/tmp/cd744669-8c9e-455d-8372-1652a9ba7c31_fixed.java
+index 6f49dcb..825ab9d 100644
+--- a/tmp/f2ef511e-5ed9-4f33-a5f1-af2e3f7d3cf7_buggy.java
++++ b/tmp/cd744669-8c9e-455d-8372-1652a9ba7c31_fixed.java
+@@ -1,9 +1,24 @@
+     @Override
+     public StringBuilder getGenericSignature(StringBuilder sb)
+     {
+         _classSignature(_class, sb, false);
+         sb.append('<');
+         sb = _referencedType.getGenericSignature(sb);
++        if (_referencedType instanceof CollectionLikeType) {
++            JavaType ct = ((CollectionLikeType) _referencedType).getContentType();
++            ct.getGenericSignature(sb);
+             sb.append(';');
++       } else if (_referencedType instanceof MapLikeType) {
++            MapLikeType mt = (MapLikeType) _referencedType;
++            JavaType kt = mt.getKeyType();
++            kt.getGenericSignature(sb);
++            sb.append(';');
++            JavaType vt = mt.getContentType();
++            vt.getGenericSignature(sb);
++            sb.append(';');
++
++        } else  {
++            sb.append(';');
++        }
+         return sb;
+     }

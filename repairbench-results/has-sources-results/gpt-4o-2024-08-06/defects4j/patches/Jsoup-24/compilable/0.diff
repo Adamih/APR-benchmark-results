@@ -1,0 +1,47 @@
+diff --git a/tmp/a0ef009d-d6b9-4257-b04d-a5709fe2cd7e_buggy.java b/tmp/efcecfc0-23de-4084-958a-4aa8148d1d81_fixed.java
+index b2d53db..724921d 100644
+--- a/tmp/a0ef009d-d6b9-4257-b04d-a5709fe2cd7e_buggy.java
++++ b/tmp/efcecfc0-23de-4084-958a-4aa8148d1d81_fixed.java
+@@ -1,34 +1,41 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+         t.dataBuffer.append(name);
+         r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
+             default:
+                 t.dataBuffer.append(c);
+                 anythingElse(t, r);
+                 break;
+         }
++    } else {
++        // Check for special case where consuming else may be incorrect
++        if (!t.isAppropriateEndTagToken()) {
++            char c = r.consume();
++            t.dataBuffer.append(c);
++            // Do not call anythingElse to avoid excessive consumption
+         } else {
+             anythingElse(t, r);
+         }
+     }
++}
+\ No newline at end of file

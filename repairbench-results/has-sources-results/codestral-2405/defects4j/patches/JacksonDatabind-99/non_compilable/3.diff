@@ -1,0 +1,32 @@
+diff --git a/tmp/5184f8d0-6067-4cee-9ba8-355b88737043_buggy.java b/tmp/9e4c47c4-5c56-4454-b063-a3582e3dee21_fixed.java
+index ee836e4..c03bcd0 100644
+--- a/tmp/5184f8d0-6067-4cee-9ba8-355b88737043_buggy.java
++++ b/tmp/9e4c47c4-5c56-4454-b063-a3582e3dee21_fixed.java
+@@ -1,9 +1,25 @@
+ @Override
+ protected String buildCanonicalName()
+ {
+     StringBuilder sb = new StringBuilder();
+     sb.append(_class.getName());
++    if(_referencedType != null) {
+         sb.append('<');
+-        sb.append(_referencedType.toCanonical());
++        if(_referencedType instanceof ParameterizedType) {
++            ParameterizedType paramType = (ParameterizedType) _referencedType;
++            Type[] typeArgs = paramType.getActualTypeArguments();
++            for(int i = 0; i < typeArgs.length; i++) {
++                if(i > 0) sb.append(',');
++                sb.append(typeArgs[i].getTypeName());
++            }
++        } else if(_referencedType instanceof GenericArrayType) {
++            GenericArrayType arrayType = (GenericArrayType) _referencedType;
++            sb.append(arrayType.getGenericComponentType().getTypeName());
++            sb.append("[]");
++        } else {
++            sb.append(_referencedType.getTypeName());
++        }
++        sb.append('>');
++    }
+     return sb.toString();
+ }
+\ No newline at end of file

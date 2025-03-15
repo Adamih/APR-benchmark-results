@@ -1,0 +1,32 @@
+diff --git a/tmp/41d1d60c-435e-4246-a51c-9db3d4b6e223_buggy.java b/tmp/6ce8cb2d-1684-43c2-804b-f61b5060eb61_fixed.java
+index e5ad041..a0be34b 100644
+--- a/tmp/41d1d60c-435e-4246-a51c-9db3d4b6e223_buggy.java
++++ b/tmp/6ce8cb2d-1684-43c2-804b-f61b5060eb61_fixed.java
+@@ -1,19 +1,8 @@
+-    @Override
+-    protected JavaType _narrow(Class<?> subclass)
+-    {
+-        if (_class == subclass) {
+-            return this;
+-        }
+-        // Should we check that there is a sub-class relationship?
+-        // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+-        //    placeholder values, so no.
+-        /*
+-        if (!_class.isAssignableFrom(subclass)) {
+-            throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+-                    +_class.getName());
+-        }
+-        */
+-        // 15-Jan-2015, tatu: Not correct; should really re-resolve...
+-        return new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
+-                _valueHandler, _typeHandler, _asStatic);
++public void testSimple() throws Exception {
++    final ObjectMapper mapper = new ObjectMapper();
++    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
++    final String json = aposToQuotes("{'schemas': [{\n"
++        + "  'name': 'FoodMart'\n"
++        + "}]}\n");
++    mapper.readValue(json, JsonRoot.class);
+ }
+\ No newline at end of file

@@ -1,0 +1,17 @@
+diff --git a/tmp/fc81e16c-c4ff-4a13-af0e-4ddbd139cfe2_buggy.java b/tmp/c6c06dbe-fa6f-46ed-9945-5363581b3055_fixed.java
+index 593602f..a882722 100644
+--- a/tmp/fc81e16c-c4ff-4a13-af0e-4ddbd139cfe2_buggy.java
++++ b/tmp/c6c06dbe-fa6f-46ed-9945-5363581b3055_fixed.java
+@@ -1,6 +1,9 @@
+ @Override
+ public String toString() {
+-        return rangesList.stream()
++    String formattedRanges = rangesList.stream()
+        .map(RangesList::formatRanges)
+-            .collect(joining(OR_JOINER));
++       .collect(joining(" and "));
++    return formattedRanges.startsWith("(") && formattedRanges.endsWith(")")
++          ? formattedRanges.substring(1, formattedRanges.length() - 1)
++           : formattedRanges;
+ }
+\ No newline at end of file

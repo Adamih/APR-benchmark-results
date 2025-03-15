@@ -1,0 +1,37 @@
+diff --git a/tmp/daece579-d443-49ae-a03e-a869bf67b9bc_buggy.java b/tmp/6140659e-a8a5-45cd-b5d9-489f32eb3ede_fixed.java
+index 4aff4e4..a1f628a 100644
+--- a/tmp/daece579-d443-49ae-a03e-a869bf67b9bc_buggy.java
++++ b/tmp/6140659e-a8a5-45cd-b5d9-489f32eb3ede_fixed.java
+@@ -1,15 +1,29 @@
++/**
++ * Tests if an element's attribute value conforms to any of the specified protocols.
++ * 
++ * @param el         the HTML element to check
++ * @param attr       the attribute to validate
++ * @param protocols  the set of allowed protocols
++ * @return true if the attribute value matches any of the protocols, false otherwise
++ */
+ private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+     // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+     // rels without a baseuri get removed
+     String value = el.absUrl(attr.getKey());
+     if (!preserveRelativeLinks)
+         attr.setValue(value);
+     
++    // Convert value to lowercase for case-insensitive comparison
++    String valueLower = value.toLowerCase();
++    
++    // Check for custom protocols without the trailing colon (:)
+     for (Protocol protocol : protocols) {
+-            String prot = protocol.toString() + ":";
+-            if (value.toLowerCase().startsWith(prot)) {
++        String protWithColon = protocol.toString().toLowerCase() + ":";
++        String protWithoutColon = protocol.toString().toLowerCase();
++        
++        if (valueLower.startsWith(protWithColon) || valueLower.equals(protWithoutColon)) {
+             return true;
+         }
+     }
+     return false;
+ }
+\ No newline at end of file

@@ -1,0 +1,36 @@
+diff --git a/tmp/28f1681d-846a-4f9f-9077-9a3c286090ac_buggy.java b/tmp/29d62057-733f-4c01-b223-ee2bafd2fb0c_fixed.java
+index 0722547..835a57a 100644
+--- a/tmp/28f1681d-846a-4f9f-9077-9a3c286090ac_buggy.java
++++ b/tmp/29d62057-733f-4c01-b223-ee2bafd2fb0c_fixed.java
+@@ -1,26 +1,5 @@
+-    @Override
+-    public void feedInput(byte[] buf, int start, int end) throws IOException
+-    {
+-        // Must not have remaining input
+-        if (_inputPtr < _inputEnd) {
+-            _reportError("Still have %d undecoded bytes, should not call 'feedInput'", _inputEnd - _inputPtr);
+-        }
+-        if (end < start) {
+-            _reportError("Input end (%d) may not be before start (%d)", end, start);
+-        }
+-        // and shouldn't have been marked as end-of-input
+-        if (_endOfInput) {
+-            _reportError("Already closed, can not feed more input");
+-        }
+-        // Time to update pointers first
+-        _currInputProcessed += _origBufferLen;
+-
+-        // Also need to adjust row start, to work as if it extended into the past wrt new buffer
+ _currInputRowStart = start - (_inputEnd - _currInputRowStart);
+-
+-        // And then update buffer settings
+-        _inputBuffer = buf;
+-        _inputPtr = start;
+-        _inputEnd = end;
+-        _origBufferLen = end - start;
+-    }
++// ...
++assertEquals(1, parser.getCurrentLocation().getColumnNr());
++// ...
++assertEquals(2, parser.getCurrentLocation().getColumnNr());
+\ No newline at end of file

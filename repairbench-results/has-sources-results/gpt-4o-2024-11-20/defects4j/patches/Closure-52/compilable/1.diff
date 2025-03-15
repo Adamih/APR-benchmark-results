@@ -1,0 +1,23 @@
+diff --git a/tmp/5e1689ee-926e-4c34-a4d8-5608cb67e9d7_buggy.java b/tmp/d1eac266-3326-46a0-b45f-807f37f9b8da_fixed.java
+index 4b7f469..3739039 100644
+--- a/tmp/5e1689ee-926e-4c34-a4d8-5608cb67e9d7_buggy.java
++++ b/tmp/d1eac266-3326-46a0-b45f-807f37f9b8da_fixed.java
+@@ -1,10 +1,16 @@
+   static boolean isSimpleNumber(String s) {
+     int len = s.length();
++    boolean hasDecimal = false;
+     for (int index = 0; index < len; index++) {
+       char c = s.charAt(index);
+-      if (c < '0' || c > '9') {
++      if (c == '.') {
++        if (hasDecimal || index == 0 || index == len - 1) {
++          return false;
++        }
++        hasDecimal = true;
++      } else if (c < '0' || c > '9') {
+         return false;
+       }
+     }
+     return len > 0;
+   }
+\ No newline at end of file

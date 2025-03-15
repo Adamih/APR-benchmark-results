@@ -1,0 +1,33 @@
+diff --git a/tmp/94a8ac71-d11c-4629-8add-a3967e70d9a5_buggy.java b/tmp/8739d4fe-9e1d-4985-9a66-78f7c4263770_fixed.java
+index 19fe1b4..a09b645 100644
+--- a/tmp/94a8ac71-d11c-4629-8add-a3967e70d9a5_buggy.java
++++ b/tmp/8739d4fe-9e1d-4985-9a66-78f7c4263770_fixed.java
+@@ -1,17 +1,25 @@
+ public static boolean isJSIdentifier(String s) {
+   int length = s.length();
+ 
+   if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++     !Character.isJavaIdentifierStart(s.charAt(0)) ||
++     !isInRange(s.charAt(0), 0x0001, 0x7F)) {
+     return false;
+   }
+ 
+   for (int i = 1; i < length; i++) {
++    char c = s.charAt(i);
+     if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++       !Character.isJavaIdentifierPart(c) ||
++       !isInRange(c, 0x0001, 0x7F)) {
+       return false;
+     }
+   }
+ 
+   return true;
+ }
++
++// Helper function to check if a character is in the given range
++private static boolean isInRange(char c, int start, int end) {
++  return start <= c && c <= end;
++}
+\ No newline at end of file

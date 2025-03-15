@@ -1,0 +1,69 @@
+diff --git a/tmp/44c8e59e-1b6c-49c0-8b5e-c492b70d4a33_buggy.java b/tmp/a6c107d5-766e-4c42-af7c-89314210b098_fixed.java
+index 40f74f7..490f491 100644
+--- a/tmp/44c8e59e-1b6c-49c0-8b5e-c492b70d4a33_buggy.java
++++ b/tmp/a6c107d5-766e-4c42-af7c-89314210b098_fixed.java
+@@ -1,50 +1,55 @@
+ public static boolean testNode(Node node, NodeTest test) {
+     if (test == null) {
+         return true;
+     }
+     if (test instanceof NodeNameTest) {
+         if (node.getNodeType() != Node.ELEMENT_NODE) {
+             return false;
+         }
+ 
+         NodeNameTest nodeNameTest = (NodeNameTest) test;
+         QName testName = nodeNameTest.getNodeName();
+         String namespaceURI = nodeNameTest.getNamespaceURI();
+-            boolean wildcard = nodeNameTest.isWildcard();
++        boolean wildcard = testName.isWildcard();
+         String testPrefix = testName.getPrefix();
+         if (wildcard && testPrefix == null) {
+             return true;
+         }
+         if (wildcard
+-                || testName.getName()
+-                        .equals(DOMNodePointer.getLocalName(node))) {
+-                String nodeNS = DOMNodePointer.getNamespaceURI(node);
++            || testName.getName().equals(DOMNodePointer.getLocalName(node))) {
++            String nodeNS = getNamespaceURI(node, testPrefix);
+             return equalStrings(namespaceURI, nodeNS);
+         }
+         return false;
+     }
+     if (test instanceof NodeTypeTest) {
+         int nodeType = node.getNodeType();
+         switch (((NodeTypeTest) test).getNodeType()) {
+             case Compiler.NODE_TYPE_NODE :
+-                    return nodeType == Node.ELEMENT_NODE
+-                            || nodeType == Node.DOCUMENT_NODE;
++                return nodeType == Node.ELEMENT_NODE || nodeType == Node.DOCUMENT_NODE;
+             case Compiler.NODE_TYPE_TEXT :
+-                    return nodeType == Node.CDATA_SECTION_NODE
+-                        || nodeType == Node.TEXT_NODE;
++                return nodeType == Node.CDATA_SECTION_NODE || nodeType == Node.TEXT_NODE;
+             case Compiler.NODE_TYPE_COMMENT :
+                 return nodeType == Node.COMMENT_NODE;
+             case Compiler.NODE_TYPE_PI :
+                 return nodeType == Node.PROCESSING_INSTRUCTION_NODE;
+         }
+         return false;
+     }
+     if (test instanceof ProcessingInstructionTest) {
+         if (node.getNodeType() == Node.PROCESSING_INSTRUCTION_NODE) {
+             String testPI = ((ProcessingInstructionTest) test).getTarget();
+             String nodePI = ((ProcessingInstruction) node).getTarget();
+             return testPI.equals(nodePI);
+         }
+     }
+     return false;
+ }
++
++private static String getNamespaceURI(Node node, String prefix) {
++    if (prefix == null || prefix.isEmpty()) {
++        return DOMNodePointer.getNamespaceURI(node);
++    }
++    Element element = node.getOwnerElement();
++    return element == null ? null : element.lookupNamespaceURI(prefix);
++}
+\ No newline at end of file

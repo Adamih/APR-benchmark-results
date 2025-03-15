@@ -1,0 +1,35 @@
+diff --git a/tmp/f8e872d2-069a-40cd-b907-8483d1d60e54_buggy.java b/tmp/f8bc5a51-cc67-430f-a1f0-fb031b5630ac_fixed.java
+index 19fe1b4..efa4ae3 100644
+--- a/tmp/f8e872d2-069a-40cd-b907-8483d1d60e54_buggy.java
++++ b/tmp/f8bc5a51-cc67-430f-a1f0-fb031b5630ac_fixed.java
+@@ -1,17 +1,25 @@
+ public static boolean isJSIdentifier(String s) {
+     int length = s.length();
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++    if (length == 0) {
++        return false;
++    }
++
++    char firstChar = s.charAt(0);
++    if (!Character.isLetter(firstChar) && firstChar != '$' && firstChar != '_') {
+         return false;
+     }
+ 
+     for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++        char c = s.charAt(i);
++        if (!Character.isLetterOrDigit(c) && c != '$' && c != '_' && !isAllowedUnicode(c)) {
+             return false;
+         }
+     }
+ 
+     return true;
+ }
++
++private static boolean isAllowedUnicode(char c) {
++    return (c >= 0x80 && c <= 0xFFFF && !Character.isISOControl(c) && !Character.isWhitespace(c));
++}
+\ No newline at end of file

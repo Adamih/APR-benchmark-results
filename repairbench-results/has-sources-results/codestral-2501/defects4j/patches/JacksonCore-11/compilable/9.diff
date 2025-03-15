@@ -1,0 +1,23 @@
+diff --git a/tmp/0a1145c9-411d-45c6-9c7a-344289cf88fb_buggy.java b/tmp/2639d453-6416-4238-b7cd-ded41e4ac115_fixed.java
+index 29d025a..ec743d6 100644
+--- a/tmp/0a1145c9-411d-45c6-9c7a-344289cf88fb_buggy.java
++++ b/tmp/2639d453-6416-4238-b7cd-ded41e4ac115_fixed.java
+@@ -1,13 +1,17 @@
+ private void _verifySharing()
+ {
+     if (_hashShared) {
+         _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+         _names = Arrays.copyOf(_names, _names.length);
+         _hashShared = false;
+         // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+         //    we rehash as needed, as need-rehash flag is not copied from parent
+     }
+     if (_needRehash) {
+         rehash();
+     }
++    // Ensure that the length of _hashArea and _names are consistent
++    if (_hashArea.length != _names.length) {
++        throw new IllegalStateException("Inconsistent state: _hashArea and _names lengths do not match");
++    }
+ }
+\ No newline at end of file

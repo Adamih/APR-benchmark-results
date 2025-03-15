@@ -1,0 +1,40 @@
+diff --git a/tmp/7ebdff0b-1e52-46cc-8231-90ce6a122761_buggy.java b/tmp/f4d5e31f-51f2-4f28-b9a7-c057eb31b4b9_fixed.java
+index 1530b34..4f4422f 100644
+--- a/tmp/7ebdff0b-1e52-46cc-8231-90ce6a122761_buggy.java
++++ b/tmp/f4d5e31f-51f2-4f28-b9a7-c057eb31b4b9_fixed.java
+@@ -1,23 +1,30 @@
+ /**
+  * Declares all of a function's arguments.
+  */
+ private void declareArguments(Node functionNode) {
+   Node astParameters = functionNode.getFirstChild().getNext();
+   Node body = astParameters.getNext();
+   FunctionType functionType = (FunctionType) functionNode.getJSType();
+   if (functionType!= null) {
+     Node jsDocParameters = functionType.getParametersNode();
+     if (jsDocParameters!= null) {
+       Node jsDocParameter = jsDocParameters.getFirstChild();
+       for (Node astParameter : astParameters.children()) {
++        JSType parameterType = null;
+         if (jsDocParameter!= null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++          parameterType = jsDocParameter.getJSType();
+           jsDocParameter = jsDocParameter.getNext();
+-            } else {
+-              defineSlot(astParameter, functionNode, null, true);
+         }
++        // Check if the parameter is already declared
++        JSType existingType = getSlotType(astParameter.getString(), functionNode);
++        if (existingType!= null &&!existingType.equals(parameterType)) {
++          // If it is, report a JSC_DUP_VAR_DECLARATION warning
++          report(JSC_DUP_VAR_DECLARATION, astParameter).setMessage(
++              "variable %s redefined with type %s, original definition at %s with type %s",
++              astParameter.getString(), parameterType, functionNode.getSourceFileName(), existingType);
++        }
++        defineSlot(astParameter, functionNode, parameterType, true);
+       }
+     }
+   }
+ } // end declareArguments
+\ No newline at end of file

@@ -1,0 +1,43 @@
+diff --git a/tmp/c31956a4-345a-4976-b8c8-a8d0a09b8064_buggy.java b/tmp/c4475ec1-4568-4d12-891c-1e826ac7515e_fixed.java
+index 939f49b..deebbc0 100644
+--- a/tmp/c31956a4-345a-4976-b8c8-a8d0a09b8064_buggy.java
++++ b/tmp/c4475ec1-4568-4d12-891c-1e826ac7515e_fixed.java
+@@ -1,21 +1,27 @@
++/**
++ * Checks if the assignment is to a property of a prototype object.
++ * 
++ * @param assign the assignment node to check
++ * @return true if the assignment is to a prototype property, false otherwise
++ */
+ private boolean isPrototypePropertyAssign(Node assign) {
+   Node n = assign.getFirstChild();
+   if (n!= null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+       && n.getType() == Token.GETPROP
+      ) {
+     // We want to exclude the assignment itself from the usage list
+-        boolean isChainedProperty =
+-            n.getFirstChild().getType() == Token.GETPROP;
+-
+-        if (isChainedProperty) {
+-          Node child = n.getFirstChild().getFirstChild().getNext();
+-
+-          if (child.getType() == Token.STRING &&
+-              child.getString().equals("prototype")) {
+-            return true;
++    boolean isPrototypeProperty = false;
++    Node current = n;
++    while (current.getType() == Token.GETPROP) {
++      Node grandChild = current.getFirstChild().getNext();
++      if (grandChild.getType() == Token.STRING &&
++          grandChild.getString().equals("prototype")) {
++        isPrototypeProperty = true;
++        break;
+       }
++      current = current.getFirstChild();
+     }
++    return isPrototypeProperty;
+   }
+-
+   return false;
+ }
+\ No newline at end of file

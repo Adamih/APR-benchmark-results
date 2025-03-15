@@ -1,0 +1,41 @@
+diff --git a/tmp/38937cb0-2c75-4464-9469-90a0f6eddc72_buggy.java b/tmp/09b61de8-87a9-4e7a-9426-41edd25ffbb8_fixed.java
+index 46817a7..3b685b6 100644
+--- a/tmp/38937cb0-2c75-4464-9469-90a0f6eddc72_buggy.java
++++ b/tmp/09b61de8-87a9-4e7a-9426-41edd25ffbb8_fixed.java
+@@ -1,16 +1,31 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
++    RecordType thatRecordType = that.toMaybeRecordType();
+     for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
++        if (thatRecordType.hasProperty(property)) {
++            builder.addProperty(property, getLeastSupertypeOfProperties(
++                    getPropertyType(property), thatRecordType.getPropertyType(property)),
+                     getPropertyNode(property));
+         }
+     }
++    for (String property : thatRecordType.Properties().keySet()) {
++        if (!properties.containsKey(property)) {
++            builder.addProperty(property, thatRecordType.getPropertyType(property),
++                    thatRecordType.getPropertyNode(property));
++        }
++    }
+     return builder.build();
+ }
++
++// Helper function to get the least supertype of two property types.
++private JSType getLeastSupertypeOfProperties(JSType type1, JSType type2) {
++    if (type1.isEquivalentTo(type2)) {
++        return type1;
++    } else {
++        return registry.createUnionType(type1, type2);
++    }
++}
+\ No newline at end of file

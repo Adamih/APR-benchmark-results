@@ -1,0 +1,38 @@
+diff --git a/tmp/db23140e-6666-4537-b4fe-5294caf2d36d_buggy.java b/tmp/c9055287-e2fb-4547-9127-2cf8b1ffdb66_fixed.java
+index 19fe1b4..fec1c1f 100644
+--- a/tmp/db23140e-6666-4537-b4fe-5294caf2d36d_buggy.java
++++ b/tmp/c9055287-e2fb-4547-9127-2cf8b1ffdb66_fixed.java
+@@ -1,17 +1,30 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++          !Character.isJavaIdentifierStart(s.charAt(0)) ||
++          !isValidJSIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+       for (int i = 1; i < length; i++) {
+         if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++            !Character.isJavaIdentifierPart(s.charAt(i)) ||
++            !isValidJSIdentifierPart(s.charAt(i))) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }
++
++    private static boolean isValidJSIdentifierStart(char ch) {
++        // JS identifiers must not include ignorable control characters.
++        return ch != '\u0004';
++    }
++
++    private static boolean isValidJSIdentifierPart(char ch) {
++        // Additional checks for characters not valid in JS identifiers
++        // even if they are valid in Java identifiers.
++        return ch != '\u0004';
++    }
+\ No newline at end of file

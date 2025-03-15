@@ -1,0 +1,55 @@
+diff --git a/tmp/d4b09e5e-c9b9-4887-b53e-c8a4b18186b1_buggy.java b/tmp/d8a2ce8f-9a8c-4d8d-b63e-33c391dc756a_fixed.java
+index 670114d..2de6515 100644
+--- a/tmp/d4b09e5e-c9b9-4887-b53e-c8a4b18186b1_buggy.java
++++ b/tmp/d8a2ce8f-9a8c-4d8d-b63e-33c391dc756a_fixed.java
+@@ -1,48 +1,46 @@
+ @Override
+ public void visit(NodeTraversal t, Node n, Node parent) {
+-
+   // Record global variable and function declarations
+   if (t.inGlobalScope()) {
+     if (NodeUtil.isVarDeclaration(n)) {
+       NameInformation ns = createNameInformation(t, n, parent);
+       Preconditions.checkNotNull(ns);
+       recordSet(ns.name, n);
+     } else if (NodeUtil.isFunctionDeclaration(n)) {
+       Node nameNode = n.getFirstChild();
+       NameInformation ns = createNameInformation(t, nameNode, n);
+       if (ns != null) {
+         JsName nameInfo = getName(nameNode.getString(), true);
+         recordSet(nameInfo.name, nameNode);
+       }
+     } else if (NodeUtil.isObjectLitKey(n, parent)) {
+       NameInformation ns = createNameInformation(t, n, parent);
+       if (ns != null) {
+         recordSet(ns.name, n);
+       }
+     }
+   }
+ 
+   // Record assignments and call sites
+   if (n.isAssign()) {
+     Node nameNode = n.getFirstChild();
+-
+     NameInformation ns = createNameInformation(t, nameNode, n);
+     if (ns != null) {
+       if (ns.isPrototype) {
+         recordPrototypeSet(ns.prototypeClass, ns.prototypeProperty, n);
+       } else {
+         recordSet(ns.name, nameNode);
+       }
+     }
+   } else if (n.isCall()) {
+     Node nameNode = n.getFirstChild();
+     NameInformation ns = createNameInformation(t, nameNode, n);
+-        if (ns != null && ns.onlyAffectsClassDef) {
++    if (ns != null) {
+       JsName name = getName(ns.name, false);
+       if (name != null) {
+         refNodes.add(new ClassDefiningFunctionNode(
+             name, n, parent, parent.getParent()));
+       }
+     }
+   }
+ }
+\ No newline at end of file

@@ -1,0 +1,38 @@
+diff --git a/tmp/c6c733dc-ae1f-4cba-9f10-808a04fea719_buggy.java b/tmp/526bfa1a-5b1d-44ef-9642-2af7e1393f50_fixed.java
+index 98d89dc..4ad2a94 100644
+--- a/tmp/c6c733dc-ae1f-4cba-9f10-808a04fea719_buggy.java
++++ b/tmp/526bfa1a-5b1d-44ef-9642-2af7e1393f50_fixed.java
+@@ -1,23 +1,32 @@
+     private boolean compute(Object left, Object right) {
+         left = reduce(left);
+         right = reduce(right);
+ 
+         if (left instanceof InitialContext) {
+             ((InitialContext) left).reset();
+         }
+         if (right instanceof InitialContext) {
+             ((InitialContext) right).reset();
+         }
+         if (left instanceof Iterator && right instanceof Iterator) {
+             return findMatch((Iterator) left, (Iterator) right);
+         }
+         if (left instanceof Iterator) {
+             return containsMatch((Iterator) left, right);
+         }
+         if (right instanceof Iterator) {
+             return containsMatch((Iterator) right, left);
+         }
++        
+         double ld = InfoSetUtil.doubleValue(left);
+         double rd = InfoSetUtil.doubleValue(right);
++        
++        // Adjust logic to handle NaN comparisons correctly
++        if (Double.isNaN(ld) || Double.isNaN(rd)) {
++            // NaN compared to any number, including another NaN, using <, >, or == should follow xPath's semantics
++            // According to the XPath specification, NaN == NaN should return true
++            return Double.isNaN(ld) && Double.isNaN(rd);
++        }
++        
+         return evaluateCompare(ld == rd ? 0 : ld < rd ? -1 : 1);
+     }
+\ No newline at end of file

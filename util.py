@@ -58,6 +58,12 @@ def truncate(sample: str) -> str:
 def tokenize_code(
     sample: str, tokenizer: PreTrainedTokenizerBase, length: int
 ) -> Tokens:
+    import re
+
+    pattern = r"```(?:\w+)?\n([\s\S]*?)```"
+    match = re.search(pattern, sample)
+    if match:
+        sample = match.group(1).strip()
     return tokenizer.encode(sample)[:length] if length else tokenizer.encode(sample)
 
 

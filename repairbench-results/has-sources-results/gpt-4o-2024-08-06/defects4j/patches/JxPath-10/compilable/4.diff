@@ -1,0 +1,23 @@
+diff --git a/tmp/25482179-3b42-43ef-8566-8dc996beceb1_buggy.java b/tmp/b401f38a-25e7-4463-b08f-9ca3d7a0cb6d_fixed.java
+index b86b44d..ba20c1c 100644
+--- a/tmp/25482179-3b42-43ef-8566-8dc996beceb1_buggy.java
++++ b/tmp/b401f38a-25e7-4463-b08f-9ca3d7a0cb6d_fixed.java
+@@ -1,4 +1,15 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        Object leftValue = args[0].computeValue(context);
++        Object rightValue = args[1].computeValue(context);
++        
++        if (isEmptyNodeSet(leftValue) || isEmptyNodeSet(rightValue)) {
++            return Boolean.FALSE;
++        }
++        
++        return compute(leftValue, rightValue) ? Boolean.TRUE : Boolean.FALSE;
++    }
++    
++    private boolean isEmptyNodeSet(Object value) {
++        // Assuming that empty node sets are represented as null or empty collections
++        return value == null || (value instanceof Collection && ((Collection<?>) value).isEmpty());
+     }
+\ No newline at end of file

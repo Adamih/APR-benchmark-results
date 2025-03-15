@@ -1,0 +1,37 @@
+diff --git a/tmp/5c96d2d0-29f9-4a4c-983d-2a46e55777ea_buggy.java b/tmp/38913bc4-11c4-4c59-86d6-80524e20359f_fixed.java
+index 46817a7..a252b14 100644
+--- a/tmp/5c96d2d0-29f9-4a4c-983d-2a46e55777ea_buggy.java
++++ b/tmp/38913bc4-11c4-4c59-86d6-80524e20359f_fixed.java
+@@ -1,16 +1,29 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+   if (!that.isRecordType()) {
+     return super.getLeastSupertype(that);
+   }
++  
+   RecordTypeBuilder builder = new RecordTypeBuilder(registry);
++  RecordType thatRecordType = that.toMaybeRecordType();
++  
++  // Add common properties with equivalent types from both records
+   for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
++    if (thatRecordType.hasProperty(property) &&
++        thatRecordType.getPropertyType(property).isEquivalentTo(
+             getPropertyType(property))) {
+       builder.addProperty(property, getPropertyType(property),
+           getPropertyNode(property));
+     }
+   }
++  
++  // Add properties from 'that' record that are not in 'this' record
++  for (String property : thatRecordType.getProperties()) {
++    if (!properties.containsKey(property)) {
++      builder.addProperty(property, thatRecordType.getPropertyType(property),
++          thatRecordType.getPropertyNode(property));
++    }
++  }
++  
+   return builder.build();
+ }
+\ No newline at end of file

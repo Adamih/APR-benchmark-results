@@ -1,0 +1,27 @@
+diff --git a/tmp/e6670fb0-8497-45d6-bc58-e09ddfc6b3ec_buggy.java b/tmp/0a152dce-1295-4c7f-b074-4dd99979af35_fixed.java
+index 4d0be80..92ee929 100644
+--- a/tmp/e6670fb0-8497-45d6-bc58-e09ddfc6b3ec_buggy.java
++++ b/tmp/0a152dce-1295-4c7f-b074-4dd99979af35_fixed.java
+@@ -1,10 +1,12 @@
+-    @Override
+-    Node processForInLoop(ForInLoop loopNode) {
+-
+-        // Return the bare minimum to put the AST in a valid state.
+-      return newNode(
+-          Token.FOR,
+-          transform(loopNode.getIterator()),
+-          transform(loopNode.getIteratedObject()),
+-          transformBlock(loopNode.getBody()));
++public void testForEach() {
++  parseError(
++      "function f(stamp, status) {\n" +
++      "  for each ( var curTiming in this.timeLog.timings ) {\n" +
++      "    if ( curTiming.callId == stamp ) {\n" +
++      "      curTiming.flag = status;\n" +
++      "      break;\n" +
++      "    }\n" +
++      "  }\n" +
++      "};",
++      "unsupported language extension: for each");
+ }
+\ No newline at end of file

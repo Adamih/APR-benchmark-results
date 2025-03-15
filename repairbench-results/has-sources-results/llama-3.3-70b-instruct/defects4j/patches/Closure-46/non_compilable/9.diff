@@ -1,0 +1,36 @@
+diff --git a/tmp/67cf2555-f697-4590-857c-1212842d0074_buggy.java b/tmp/dc1d9840-1ea7-45a0-830c-5e9a5226ba05_fixed.java
+index 46817a7..f1536f5 100644
+--- a/tmp/67cf2555-f697-4590-857c-1212842d0074_buggy.java
++++ b/tmp/dc1d9840-1ea7-45a0-830c-5e9a5226ba05_fixed.java
+@@ -1,16 +1,24 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+   if (!that.isRecordType()) {
+     return super.getLeastSupertype(that);
+   }
++  RecordType thisRecordType = toMaybeRecordType();
++  RecordType thatRecordType = that.toMaybeRecordType();
+   RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++  for (String property : unionOfProperties(thisRecordType, thatRecordType)) {
++    if (thisRecordType.hasProperty(property)) {
++      builder.addProperty(property, thisRecordType.getPropertyType(property), thisRecordType.getPropertyNode(property));
++    } else if (thatRecordType.hasProperty(property)) {
++      builder.addProperty(property, thatRecordType.getPropertyType(property), thatRecordType.getPropertyNode(property));
+     }
+   }
+   return builder.build();
+ }
++
++// Helper function to get the union of properties from two record types
++private Set<String> unionOfProperties(RecordType type1, RecordType type2) {
++  Set<String> union = new HashSet<>(type1.getProperties().keySet());
++  union.addAll(type2.getProperties().keySet());
++  return union;
++}
+\ No newline at end of file

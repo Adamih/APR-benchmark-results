@@ -1,0 +1,55 @@
+diff --git a/tmp/1e1872c2-eb74-44bf-84ea-43cdc13e9c73_buggy.java b/tmp/2b2f7f75-24dd-49ed-8b95-196a54e32e50_fixed.java
+index 58a1651..e34bc43 100644
+--- a/tmp/1e1872c2-eb74-44bf-84ea-43cdc13e9c73_buggy.java
++++ b/tmp/2b2f7f75-24dd-49ed-8b95-196a54e32e50_fixed.java
+@@ -1,32 +1,45 @@
+   @Override
+   JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+     setResolvedTypeInternal(this);
+ 
+     call = (ArrowType) safeResolve(call, t, scope);
+     prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+-    // Warning about typeOfThis if it doesn't resolve to an ObjectType
+-    // is handled further upstream.
+-    // TODO(nicksantos): Handle this correctly if we have a UnionType.
+-    typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
++    // Resolve type of this, handle UnionType and ObjectType
++    JSType resolvedTypeOfThis = safeResolve(typeOfThis, t, scope);
++    if (resolvedTypeOfThis instanceof UnionType) {
++      // If it's a UnionType, extract the constituent types and ensure they are Objects
++      UnionType unionType = (UnionType) resolvedTypeOfThis;
++      for (JSType type : unionType_CONSTITUENT_TYPES) {
++        if (!(type instanceof ObjectType)) {
++          t.report(ErrorFormatter.typeOfThisNotObjectType(type));
++        }
++      }
++      typeOfThis = unionType;
++    } else if (resolvedTypeOfThis instanceof ObjectType) {
++      typeOfThis = (ObjectType) resolvedTypeOfThis;
++    } else {
++      t.report(ErrorFormatter.typeOfThisNotObjectType(resolvedTypeOfThis));
++      typeOfThis = null;
++    }
+ 
+     boolean changed = false;
+     ImmutableList.Builder<ObjectType> resolvedInterfaces =
+         ImmutableList.builder();
+     for (ObjectType iface : implementedInterfaces) {
+       ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+       resolvedInterfaces.add(resolvedIface);
+       changed |= (resolvedIface != iface);
+     }
+     if (changed) {
+       implementedInterfaces = resolvedInterfaces.build();
+     }
+ 
+     if (subTypes != null) {
+       for (int i = 0; i < subTypes.size(); i++) {
+         subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+       }
+     }
+ 
+     return super.resolveInternal(t, scope);
+   }
+\ No newline at end of file

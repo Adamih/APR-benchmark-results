@@ -1,0 +1,41 @@
+diff --git a/tmp/f8854af9-aa74-42e7-aa85-aecba7f0ece0_buggy.java b/tmp/212a44a8-ab0c-474d-8613-65176dccb73e_fixed.java
+index 1530b34..747ba14 100644
+--- a/tmp/f8854af9-aa74-42e7-aa85-aecba7f0ece0_buggy.java
++++ b/tmp/212a44a8-ab0c-474d-8613-65176dccb73e_fixed.java
+@@ -1,23 +1,33 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+             if (jsDocParameter != null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++              JSType jsDocType = jsDocParameter.getJSType();
++              JSType existingType = astParameter.getJSType();
++              if (existingType != null && !jsDocType.isEquivalentTo(existingType)) {
++                // Report type mismatch for duplicate declarations
++                compiler.report(
++                    JSError.make(
++                        astParameter,
++                        TypeValidator.TYPE_MISMATCH_WARNING,
++                        "variable " + astParameter.getString() + " redefined with type " +
++                        jsDocType + ", original definition with type " + existingType));
++              }
++              defineSlot(astParameter, functionNode, jsDocType, true);
+               jsDocParameter = jsDocParameter.getNext();
+             } else {
+               defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+     } // end declareArguments
+\ No newline at end of file

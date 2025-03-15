@@ -1,0 +1,44 @@
+diff --git a/tmp/0db05b85-97bc-45c9-9db3-10c974b849e9_buggy.java b/tmp/b13d3485-8d3e-4137-926e-5dcd6a02f41f_fixed.java
+index b2d53db..4a37ce6 100644
+--- a/tmp/0db05b85-97bc-45c9-9db3-10c974b849e9_buggy.java
++++ b/tmp/b13d3485-8d3e-4137-926e-5dcd6a02f41f_fixed.java
+@@ -1,34 +1,38 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+         t.dataBuffer.append(name);
+         r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() &&!r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
++            case '\\': // Add handling for backslash
++                t.dataBuffer.append(c);
++                anythingElse(t, r);
++                break;
+             default:
+                 t.dataBuffer.append(c);
+                 anythingElse(t, r);
+                 break;
+         }
+     } else {
+         anythingElse(t, r);
+     }
+ }
+\ No newline at end of file

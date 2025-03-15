@@ -1,0 +1,43 @@
+diff --git a/tmp/dfd3395c-cab8-426f-828f-e2dca9f355db_buggy.java b/tmp/67a07215-2a3d-4f29-82a9-e899b0289416_fixed.java
+index 46817a7..8339be1 100644
+--- a/tmp/dfd3395c-cab8-426f-828f-e2dca9f355db_buggy.java
++++ b/tmp/67a07215-2a3d-4f29-82a9-e899b0289416_fixed.java
+@@ -1,16 +1,32 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
++    RecordType otherRecord = that.toMaybeRecordType();
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
++    
++    // Add all properties from this record
+     for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++        JSType thisType = getPropertyType(property);
++        JSType otherType = otherRecord.getPropertyType(property);
++        if (otherType != null) {
++            // If property exists in both, take the least supertype of their types
++            JSType supertype = thisType.getLeastSupertype(otherType);
++            builder.addProperty(property, supertype, getPropertyNode(property));
++        } else {
++            // Property only in this record
++            builder.addProperty(property, thisType, getPropertyNode(property));
+         }
+     }
++    
++    // Add properties only in the other record
++    for (String property : otherRecord.getProperties().keySet()) {
++        if (!properties.containsKey(property)) {
++            JSType otherType = otherRecord.getPropertyType(property);
++            builder.addProperty(property, otherType, otherRecord.getPropertyNode(property));
++        }
++    }
++    
+     return builder.build();
+ }
+\ No newline at end of file

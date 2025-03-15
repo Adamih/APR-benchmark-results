@@ -1,0 +1,35 @@
+diff --git a/tmp/be433512-03d3-4463-9892-4bcbbb227252_buggy.java b/tmp/ab75131d-0b95-4fe1-9b20-f8d575cc4522_fixed.java
+index 00914da..0036a24 100644
+--- a/tmp/be433512-03d3-4463-9892-4bcbbb227252_buggy.java
++++ b/tmp/ab75131d-0b95-4fe1-9b20-f8d575cc4522_fixed.java
+@@ -1,17 +1,25 @@
+-    // does not recurse.
+ private void normalise(Element element) {
+-        List<Node> toMove = new ArrayList<Node>();
++    List<Node> toMove = new ArrayList<>();
+     for (Node node : element.childNodes) {
+         if (node instanceof TextNode) {
+             TextNode tn = (TextNode) node;
+             if (!tn.isBlank())
+                 toMove.add(tn);
+         }
+     }
+ 
+     for (Node node : toMove) {
+         element.removeChild(node);
+-            body().appendChild(new TextNode(" ", ""));
+-            body().appendChild(node);
++        // Instead of appending to the end of the body, insert the space and node in their original positions
++        int index = element.getChildNodes().indexOf(node);
++        if (index > 0) {
++            Node previousNode = element.getChildNodes().get(index - 1);
++            if (!(previousNode instanceof TextNode)) {
++                // Insert a space before the moved node if the previous node is not a text node
++                element.insertBefore(new TextNode(" ", ""), node);
++            }
++        }
++        // Reinsert the node back into its original position
++        element.insertBefore(node, element.getChildNodes().get(index));
+     }
+ }
+\ No newline at end of file

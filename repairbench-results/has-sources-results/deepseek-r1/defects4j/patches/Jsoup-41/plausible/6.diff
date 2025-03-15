@@ -1,0 +1,19 @@
+diff --git a/tmp/c47a8430-1cb7-4c9a-9b87-ab7bfb262b9b_buggy.java b/tmp/52f64c2d-9ecd-4267-9ab1-f719ecce8fb6_fixed.java
+index d457dbe..c70a4c2 100644
+--- a/tmp/c47a8430-1cb7-4c9a-9b87-ab7bfb262b9b_buggy.java
++++ b/tmp/52f64c2d-9ecd-4267-9ab1-f719ecce8fb6_fixed.java
+@@ -1,10 +1,12 @@
+     @Override
+     public boolean equals(Object o) {
+         if (this == o) return true;
+         if (o == null || getClass() != o.getClass()) return false;
+         if (!super.equals(o)) return false;
+ 
+         Element element = (Element) o;
+ 
+-        return this == o;
++        // Compare Element's tag and attributes for equality
++        return Objects.equals(tag, element.tag) && 
++               Objects.equals(attributes(), element.attributes());
+     }
+\ No newline at end of file

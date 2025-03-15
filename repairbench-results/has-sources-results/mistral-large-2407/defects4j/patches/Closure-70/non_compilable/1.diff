@@ -1,0 +1,35 @@
+diff --git a/tmp/8c803dbc-674e-4e0b-a1b9-2892668bd2e3_buggy.java b/tmp/e14a9999-81af-4a65-8cea-ed93e997de7d_fixed.java
+index 1530b34..eaed405 100644
+--- a/tmp/8c803dbc-674e-4e0b-a1b9-2892668bd2e3_buggy.java
++++ b/tmp/e14a9999-81af-4a65-8cea-ed93e997de7d_fixed.java
+@@ -1,23 +1,25 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+       Node astParameters = functionNode.getFirstChild().getNext();
+       Node body = astParameters.getNext();
+       FunctionType functionType = (FunctionType) functionNode.getJSType();
+       if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+           Node jsDocParameter = jsDocParameters.getFirstChild();
+           for (Node astParameter : astParameters.children()) {
+-            if (jsDocParameter != null) {
++            Node paramNameNode = astParameter.getFirstChild();
++            while (jsDocParameter != null && !paramNameNode.getString().equals(jsDocParameter.getString())) {
++              jsDocParameter = jsDocParameter.getNext();
++            }
+             defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++                jsDocParameter != null ? jsDocParameter.getJSType() : null, true);
++            if (jsDocParameter != null) {
+               jsDocParameter = jsDocParameter.getNext();
+-            } else {
+-              defineSlot(astParameter, functionNode, null, true);
+             }
+           }
+         }
+       }
+     } // end declareArguments
+\ No newline at end of file

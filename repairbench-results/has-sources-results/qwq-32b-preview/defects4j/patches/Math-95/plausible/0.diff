@@ -1,0 +1,34 @@
+diff --git a/tmp/487ed926-9834-4847-b26b-fbcfb74ae755_buggy.java b/tmp/5eecac84-0bd0-4abf-a45f-ead71e5bf75b_fixed.java
+index 25c13b3..dc438ec 100644
+--- a/tmp/487ed926-9834-4847-b26b-fbcfb74ae755_buggy.java
++++ b/tmp/5eecac84-0bd0-4abf-a45f-ead71e5bf75b_fixed.java
+@@ -1,15 +1,19 @@
+-    /**
+-     * Access the initial domain value, based on <code>p</code>, used to
+-     * bracket a CDF root.  This method is used by
+-     * {@link #inverseCumulativeProbability(double)} to find critical values.
+-     * 
+-     * @param p the desired probability for the critical value
+-     * @return initial domain value
+-     */
+     protected double getInitialDomain(double p) {
+         double ret;
+         double d = getDenominatorDegreesOfFreedom();
+-            // use mean
++        double n = getNumeratorDegreesOfFreedom();
++
++        // Check if mean is defined and positive
++        if (d > 2) {
++            // Use mean
+             ret = d / (d - 2.0);
++        } else if (n > 0 && d > 0) {
++            // F-distribution is defined for n > 0 and d > 0
++            // Use a small positive value when mean is undefined or negative
++            ret = 1.0; // or another small positive constant
++        } else {
++            // Distribution is not defined
++            throw new IllegalArgumentException("Numerator and denominator degrees of freedom must be positive.");
++        }
+         return ret;
+     }
+\ No newline at end of file

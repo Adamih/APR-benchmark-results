@@ -1,0 +1,17 @@
+diff --git a/tmp/4e5d4110-8484-4be3-bbdc-e921159034c8_buggy.java b/tmp/f1937d6b-0ea3-40d4-8f7b-f59494e094be_fixed.java
+index d5b3da9..0183208 100644
+--- a/tmp/4e5d4110-8484-4be3-bbdc-e921159034c8_buggy.java
++++ b/tmp/f1937d6b-0ea3-40d4-8f7b-f59494e094be_fixed.java
+@@ -1,7 +1,9 @@
+ private void copyAttributes(org.jsoup.nodes.Node source, Element el) {
+     for (Attribute attribute : source.attributes()) {
+-                // valid xml attribute names are: ^[a-zA-Z_:][-a-zA-Z0-9_:.]
+-                String key = attribute.getKey().replaceAll("[^-a-zA-Z0-9_:.]", "");
++        String key = attribute.getKey();
++        // valid xml attribute names must start with a letter, underscore or colon, and contain only [-a-zA-Z0-9_:.]
++        if (key.matches("^[a-zA-Z_:][\\-a-zA-Z0-9_:.]*$")) {
+             el.setAttribute(key, attribute.getValue());
+         }
+     }
++}
+\ No newline at end of file

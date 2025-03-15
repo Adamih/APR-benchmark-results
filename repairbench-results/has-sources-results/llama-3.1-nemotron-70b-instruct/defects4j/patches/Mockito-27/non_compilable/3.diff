@@ -1,0 +1,26 @@
+diff --git a/tmp/07d9c74a-36b9-4d86-abe9-0567fa25d27d_buggy.java b/tmp/8bee278c-f028-45d8-b886-e490c0fda9c0_fixed.java
+index 5c5286c..d7f6ec6 100644
+--- a/tmp/07d9c74a-36b9-4d86-abe9-0567fa25d27d_buggy.java
++++ b/tmp/8bee278c-f028-45d8-b886-e490c0fda9c0_fixed.java
+@@ -1,6 +1,19 @@
++/**
++ * Fixes the resetMock function to preserve existing invocation listeners when resetting a mock.
++ * 
++ * @param <T> the type of the mock object
++ * @param mock the mock object to reset
++ */
+ public <T> void resetMock(T mock) {
+     MockHandlerInterface<T> oldMockHandler = getMockHandler(mock);
+     MockHandler<T> newMockHandler = new MockHandler<T>(oldMockHandler);
+-        MethodInterceptorFilter newFilter = new MethodInterceptorFilter(newMockHandler, (MockSettingsImpl) org.mockito.Mockito.withSettings().defaultAnswer(org.mockito.Mockito.RETURNS_DEFAULTS));
++    
++    // Preserve existing invocation listeners
++    List<InvocationListener> listeners = ((MockSettingsImpl) oldMockHandler.getMockSettings()).getInvocationListeners();
++    MockSettingsImpl newSettings = (MockSettingsImpl) org.mockito.Mockito.withSettings()
++           .defaultAnswer(org.mockito.Mockito.RETURNS_DEFAULTS)
++           .invocationListeners(listeners.toArray(new InvocationListener[0]));
++    
++    MethodInterceptorFilter newFilter = new MethodInterceptorFilter(newMockHandler, newSettings);
+     ((Factory) mock).setCallback(0, newFilter);
+ }
+\ No newline at end of file

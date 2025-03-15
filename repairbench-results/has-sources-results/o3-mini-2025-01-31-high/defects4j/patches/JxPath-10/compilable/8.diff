@@ -1,0 +1,32 @@
+diff --git a/tmp/774238fe-a7d1-4117-9a49-76bee3b963d7_buggy.java b/tmp/aa92670c-8290-4915-a9d9-b38c1172aecf_fixed.java
+index b86b44d..7aa471f 100644
+--- a/tmp/774238fe-a7d1-4117-9a49-76bee3b963d7_buggy.java
++++ b/tmp/aa92670c-8290-4915-a9d9-b38c1172aecf_fixed.java
+@@ -1,4 +1,24 @@
+ public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    Object left = args[0].computeValue(context);
++    Object right = args[1].computeValue(context);
++
++    // If either operand is "empty" (null, an empty collection, or an empty array),
++    // then per XPath rules the comparison must yield false.
++    if (left == null || right == null) {
++        return Boolean.FALSE;
++    }
++    if (left instanceof java.util.Collection && ((java.util.Collection<?>) left).isEmpty()) {
++        return Boolean.FALSE;
++    }
++    if (right instanceof java.util.Collection && ((java.util.Collection<?>) right).isEmpty()) {
++        return Boolean.FALSE;
++    }
++    if (left.getClass().isArray() && java.lang.reflect.Array.getLength(left) == 0) {
++        return Boolean.FALSE;
++    }
++    if (right.getClass().isArray() && java.lang.reflect.Array.getLength(right) == 0) {
++        return Boolean.FALSE;
++    }
++    
++    return compute(left, right) ? Boolean.TRUE : Boolean.FALSE;
+ }
+\ No newline at end of file

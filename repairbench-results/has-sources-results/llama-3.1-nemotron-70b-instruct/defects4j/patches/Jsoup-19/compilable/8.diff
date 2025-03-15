@@ -1,0 +1,25 @@
+diff --git a/tmp/c80cdcd8-5e2e-4d80-b957-7d141d5ccad0_buggy.java b/tmp/fb92c6ee-f071-4356-b0ad-87e5839bbd05_fixed.java
+index 4aff4e4..6183a18 100644
+--- a/tmp/c80cdcd8-5e2e-4d80-b957-7d141d5ccad0_buggy.java
++++ b/tmp/fb92c6ee-f071-4356-b0ad-87e5839bbd05_fixed.java
+@@ -1,15 +1,17 @@
+ private boolean testValidProtocol(Element el, Attribute attr, Set<Protocol> protocols) {
+     // try to resolve relative urls to abs, and optionally update the attribute so output html has abs.
+     // rels without a baseuri get removed
+     String value = el.absUrl(attr.getKey());
+     if (!preserveRelativeLinks)
+         attr.setValue(value);
+     
++    // Fix: also check for protocols without a trailing colon (:) 
+     for (Protocol protocol : protocols) {
+-            String prot = protocol.toString() + ":";
+-            if (value.toLowerCase().startsWith(prot)) {
++        String protWithColon = protocol.toString() + ":";
++        String protWithoutColon = protocol.toString();
++        if (value.equalsIgnoreCase(protWithColon) || value.toLowerCase().startsWith(protWithoutColon)) {
+             return true;
+         }
+     }
+     return false;
+ }
+\ No newline at end of file

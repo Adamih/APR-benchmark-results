@@ -1,0 +1,13 @@
+diff --git a/tmp/e322285c-95e6-49a7-8dd6-4678d120bf0a_buggy.java b/tmp/a672bf69-c5a9-4eac-9a26-0fb38ea8c60b_fixed.java
+index 593602f..b241f45 100644
+--- a/tmp/e322285c-95e6-49a7-8dd6-4678d120bf0a_buggy.java
++++ b/tmp/a672bf69-c5a9-4eac-9a26-0fb38ea8c60b_fixed.java
+@@ -1,6 +1,7 @@
+     @Override
+     public String toString() {
+-        return rangesList.stream()
++        String joined = rangesList.stream()
+             .map(RangesList::formatRanges)
+             .collect(joining(OR_JOINER));
++        return joined.startsWith("(") && joined.endsWith(")") ? joined.substring(1, joined.length() - 1) : joined;
+     }

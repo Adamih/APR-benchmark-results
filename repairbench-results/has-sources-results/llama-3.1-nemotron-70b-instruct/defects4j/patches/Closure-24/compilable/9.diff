@@ -1,0 +1,46 @@
+diff --git a/tmp/75025ad1-8e68-455a-91de-6e245d5308b3_buggy.java b/tmp/ca4cf6e6-1687-45e6-8541-59495ed972f6_fixed.java
+index 602226b..37db0b8 100644
+--- a/tmp/75025ad1-8e68-455a-91de-6e245d5308b3_buggy.java
++++ b/tmp/ca4cf6e6-1687-45e6-8541-59495ed972f6_fixed.java
+@@ -1,26 +1,35 @@
++/**
++ * Finds and reports non-alias locals in the given scope.
++ * 
++ * @param t the NodeTraversal object
++ */
+ private void findAliases(NodeTraversal t) {
+   Scope scope = t.getScope();
+   for (Var v : scope.getVarIterable()) {
+     Node n = v.getNode();
+     int type = n.getType();
+     Node parent = n.getParent();
+     if (parent.isVar()) {
+       if (n.hasChildren() && n.getFirstChild().isQualifiedName()) {
+         String name = n.getString();
+         Var aliasVar = scope.getVar(name);
++        if (aliasVar!= null) { // Check if aliasVar is not null
+           aliases.put(name, aliasVar);
+ 
+           String qualifiedName =
+               aliasVar.getInitialValue().getQualifiedName();
+           transformation.addAlias(name, qualifiedName);
+-          // Bleeding functions already get a BAD_PARAMETERS error, so just
+-          // do nothing.
+-          // Parameters of the scope function also get a BAD_PARAMETERS
+-          // error.
+         } else {
+-          // TODO(robbyw): Support using locals for private variables.
+           report(t, n, GOOG_SCOPE_NON_ALIAS_LOCAL, n.getString());
+         }
++      } else {
++        // Report non-alias locals (not just qualified names)
++        report(t, n, GOOG_SCOPE_NON_ALIAS_LOCAL, n.getString());
++      }
++    } 
++    // Report function declarations as non-alias locals
++    else if (type == Token.FUNCTION) {
++      report(t, n, GOOG_SCOPE_NON_ALIAS_LOCAL, n.getString());
+     }
+   }
+ }
+\ No newline at end of file

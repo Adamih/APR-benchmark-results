@@ -1,0 +1,17 @@
+diff --git a/tmp/59ada029-7050-4459-9842-db90683f1030_buggy.java b/tmp/ed3ce795-c18b-4eac-9138-26afe719d93b_fixed.java
+index 3ba614a..8bfe14d 100644
+--- a/tmp/59ada029-7050-4459-9842-db90683f1030_buggy.java
++++ b/tmp/ed3ce795-c18b-4eac-9138-26afe719d93b_fixed.java
+@@ -1,9 +1,9 @@
+     @Override
+     public int read() throws IOException {
+         int current = super.read();
+-        if (current == '\n') {
++        if (current == '\n' || (current == '\r' && lastChar != '\n')) {
+             lineCounter++;
+         }
+         lastChar = current;
+-        return lastChar;
++        return current;
+     }
+\ No newline at end of file

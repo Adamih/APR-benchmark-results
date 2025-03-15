@@ -1,0 +1,55 @@
+diff --git a/tmp/65dfd32c-069e-41d5-87ce-793d7a949148_buggy.java b/tmp/5c2e451b-071f-4ade-af05-6a397065b0d9_fixed.java
+index 58a1651..e249393 100644
+--- a/tmp/65dfd32c-069e-41d5-87ce-793d7a949148_buggy.java
++++ b/tmp/5c2e451b-071f-4ade-af05-6a397065b0d9_fixed.java
+@@ -1,32 +1,45 @@
+ @Override
+ JSType resolveInternal(ErrorReporter t, StaticScope<JSType> scope) {
+   setResolvedTypeInternal(this);
+ 
+   call = (ArrowType) safeResolve(call, t, scope);
+   prototype = (FunctionPrototypeType) safeResolve(prototype, t, scope);
+ 
+-    // Warning about typeOfThis if it doesn't resolve to an ObjectType
+-    // is handled further upstream.
+-    // TODO(nicksantos): Handle this correctly if we have a UnionType.
+-    typeOfThis = (ObjectType) safeResolve(typeOfThis, t, scope);
++  JSType resolvedTypeOfThis = safeResolve(typeOfThis, t, scope);
++  if (resolvedTypeOfThis instanceof UnionType) {
++    UnionType unionType = (UnionType) resolvedTypeOfThis;
++    for (JSType alternateType : unionType.getAlternates()) {
++      if (alternateType instanceof ObjectType) {
++        typeOfThis = (ObjectType) alternateType;
++        break;
++      }
++    }
++    if (typeOfThis == null) {
++      t.warning("@this type of a function must be an object, but none found in the union type");
++    }
++  } else if (resolvedTypeOfThis instanceof ObjectType) {
++    typeOfThis = (ObjectType) resolvedTypeOfThis;
++  } else {
++    t.warning("@this type of a function must be an object, but the actual type is " + resolvedTypeOfThis);
++  }
+ 
+   boolean changed = false;
+   ImmutableList.Builder<ObjectType> resolvedInterfaces =
+       ImmutableList.builder();
+   for (ObjectType iface : implementedInterfaces) {
+     ObjectType resolvedIface = (ObjectType) iface.resolve(t, scope);
+     resolvedInterfaces.add(resolvedIface);
+     changed |= (resolvedIface != iface);
+   }
+   if (changed) {
+     implementedInterfaces = resolvedInterfaces.build();
+   }
+ 
+   if (subTypes != null) {
+     for (int i = 0; i < subTypes.size(); i++) {
+       subTypes.set(i, (FunctionType) subTypes.get(i).resolve(t, scope));
+     }
+   }
+ 
+   return super.resolveInternal(t, scope);
+ }
+\ No newline at end of file

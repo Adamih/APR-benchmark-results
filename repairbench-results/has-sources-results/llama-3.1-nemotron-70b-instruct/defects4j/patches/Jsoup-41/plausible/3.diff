@@ -1,0 +1,21 @@
+diff --git a/tmp/3f0225d7-e509-42ca-af74-a74defe00113_buggy.java b/tmp/3d3d6299-4ca7-4f19-80da-62919d397fba_fixed.java
+index d457dbe..d7bf250 100644
+--- a/tmp/3f0225d7-e509-42ca-af74-a74defe00113_buggy.java
++++ b/tmp/3d3d6299-4ca7-4f19-80da-62919d397fba_fixed.java
+@@ -1,10 +1,14 @@
+ @Override
+ public boolean equals(Object o) {
+     if (this == o) return true;
+     if (o == null || getClass()!= o.getClass()) return false;
+     if (!super.equals(o)) return false;
+ 
+     Element element = (Element) o;
+ 
+-        return this == o;
++    // Fix: Compare the actual attributes and contents, not just object identity
++    return tagName().equals(element.tagName()) 
++           && attributes().equals(element.attributes()) 
++           && data().equals(element.data()) 
++           && children().equals(element.children());
+ }
+\ No newline at end of file

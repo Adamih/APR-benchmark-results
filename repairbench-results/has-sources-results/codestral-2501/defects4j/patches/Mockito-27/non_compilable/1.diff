@@ -1,0 +1,15 @@
+diff --git a/tmp/299dee7d-a7ff-4363-adbb-52ed6ef16f4b_buggy.java b/tmp/37890a11-ad5b-4805-8a4f-325f3582017a_fixed.java
+index 5c5286c..f8e732a 100644
+--- a/tmp/299dee7d-a7ff-4363-adbb-52ed6ef16f4b_buggy.java
++++ b/tmp/37890a11-ad5b-4805-8a4f-325f3582017a_fixed.java
+@@ -1,6 +1,9 @@
+ public <T> void resetMock(T mock) {
+     MockHandlerInterface<T> oldMockHandler = getMockHandler(mock);
+     MockHandler<T> newMockHandler = new MockHandler<T>(oldMockHandler);
+     MethodInterceptorFilter newFilter = new MethodInterceptorFilter(newMockHandler, (MockSettingsImpl) org.mockito.Mockito.withSettings().defaultAnswer(org.mockito.Mockito.RETURNS_DEFAULTS));
+     ((Factory) mock).setCallback(0, newFilter);
++
++    // Copy over the invocation listeners from the old mock handler to the new mock handler
++    newMockHandler.setListeners(oldMockHandler.getInvocationListeners());
+ }
+\ No newline at end of file

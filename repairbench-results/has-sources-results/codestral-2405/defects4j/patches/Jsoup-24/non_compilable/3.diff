@@ -1,0 +1,59 @@
+diff --git a/tmp/44fb35db-1f26-4d31-a9cb-0fb8cfe291b9_buggy.java b/tmp/6bdc842b-a169-4ab7-8ade-5d9abf0adb46_fixed.java
+index b2d53db..96d6abf 100644
+--- a/tmp/44fb35db-1f26-4d31-a9cb-0fb8cfe291b9_buggy.java
++++ b/tmp/6bdc842b-a169-4ab7-8ade-5d9abf0adb46_fixed.java
+@@ -1,34 +1,52 @@
+ void read(Tokeniser t, CharacterReader r) {
++    if (t.getState() == TagOpen) {
+         if (r.matchesLetter()) {
+             String name = r.consumeLetterSequence();
+             t.tagPending.appendTagName(name.toLowerCase());
+             t.dataBuffer.append(name);
+-                r.advance();
+             return;
+         }
++        if (r.matches("!--")) {
++            t.transition(MarkupDeclarationOpen);
++            r.advance("!--".length());
++            return;
++        }
++        if (r.matches("/script")) {
++            t.transition(EndTagOpen);
++            t.appendTagPending().append("script");
++            r.advance("/script".length());
++            return;
++        }
++        // parse script content separately
++        else if (t.tagPending.toString().equals("script")) {
++            t.transition(RawText); // Assuming this is the correct state for script content.
++            return;
++        }
++    }
+ 
++    // Previous conditions not met, continue as normal...
+     if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
+             default:
+                 t.dataBuffer.append(c);
+                 anythingElse(t, r);
+                 break;
+         }
+     } else {
+         anythingElse(t, r);
+     }
+ }
+\ No newline at end of file

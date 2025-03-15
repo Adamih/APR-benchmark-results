@@ -1,0 +1,18 @@
+diff --git a/tmp/61c8f6b6-22db-46d4-a595-7354efd68d99_buggy.java b/tmp/2f4e6284-1ff9-46c4-b38a-ac43b8faca14_fixed.java
+index f1d02c1..e898dd9 100644
+--- a/tmp/61c8f6b6-22db-46d4-a595-7354efd68d99_buggy.java
++++ b/tmp/2f4e6284-1ff9-46c4-b38a-ac43b8faca14_fixed.java
+@@ -1,4 +1,12 @@
+ @Override
+ protected JSType caseTopType(JSType topType) {
++  if (topType.isUnion() && topType.isSubtypeOf(ARRAY_TYPE)) {
++    // If it's a union that includes the array type without null, use that.
++    JSType withoutNull = topType.removeNull();
++    if (withoutNull.isExactType(ARRAY_TYPE)) {
++      return withoutNull;
++    }
++    return topType;
++  }
+   return topType;
+ }
+\ No newline at end of file

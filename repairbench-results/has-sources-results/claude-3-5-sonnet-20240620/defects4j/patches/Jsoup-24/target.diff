@@ -1,0 +1,39 @@
+diff --git a/tmp/9284f66f-d753-4e44-b1e3-393b45a0d655_buggy.java b/tmp/cd3430b6-4491-4d64-a5b7-6d2f98ec80fe_fixed.java
+index b2d53db..0bc6850 100644
+--- a/tmp/9284f66f-d753-4e44-b1e3-393b45a0d655_buggy.java
++++ b/tmp/cd3430b6-4491-4d64-a5b7-6d2f98ec80fe_fixed.java
+@@ -1,34 +1,33 @@
+         void read(Tokeniser t, CharacterReader r) {
+             if (r.matchesLetter()) {
+                 String name = r.consumeLetterSequence();
+                 t.tagPending.appendTagName(name.toLowerCase());
+                 t.dataBuffer.append(name);
+-                r.advance();
+                 return;
+             }
+ 
+             if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+                 char c = r.consume();
+                 switch (c) {
+                     case '\t':
+                     case '\n':
+                     case '\f':
+                     case ' ':
+                         t.transition(BeforeAttributeName);
+                         break;
+                     case '/':
+                         t.transition(SelfClosingStartTag);
+                         break;
+                     case '>':
+                         t.emitTagPending();
+                         t.transition(Data);
+                         break;
+                     default:
+                         t.dataBuffer.append(c);
+                         anythingElse(t, r);
+                         break;
+                 }
+             } else {
+                 anythingElse(t, r);
+             }
+         }

@@ -1,0 +1,14 @@
+diff --git a/tmp/ce83d0a7-6180-4b6e-a2ab-c5660e969314_buggy.java b/tmp/3887e079-a004-4d64-8ff1-c2eb35d1e7dc_fixed.java
+index 0878b6b..ceb1a8d 100644
+--- a/tmp/ce83d0a7-6180-4b6e-a2ab-c5660e969314_buggy.java
++++ b/tmp/3887e079-a004-4d64-8ff1-c2eb35d1e7dc_fixed.java
+@@ -1,3 +1,8 @@
+ public final boolean isEmptyType() {
++  if (isFunctionType()) {
++    // For function types, the “empty” (bottom) function type is defined
++    // as having no instance type. All proper function types have an instance.
++    return getInstanceType() == null;
++  }
+   return isNoType() || isNoObjectType() || isNoResolvedType();
+ }
+\ No newline at end of file

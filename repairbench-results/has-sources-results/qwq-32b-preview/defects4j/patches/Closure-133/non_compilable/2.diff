@@ -1,0 +1,38 @@
+diff --git a/tmp/1e7e69e5-9b09-4aa8-bbdd-079f140eec90_buggy.java b/tmp/173f82b1-d42d-47bc-ad08-6cca149a4ac5_fixed.java
+index 42d4174..0ef389b 100644
+--- a/tmp/1e7e69e5-9b09-4aa8-bbdd-079f140eec90_buggy.java
++++ b/tmp/173f82b1-d42d-47bc-ad08-6cca149a4ac5_fixed.java
+@@ -1,7 +1,30 @@
+ /**
+  * Returns the remainder of the line.
+  */
+ private String getRemainingJSDocLine() {
+-    String result = stream.getRemainingJSDocLine();
+-    return result;
++  // Ensure that the stream is at a valid position before reading the remaining line.
++  if (!stream.hasNext()) {
++    return "";
++  }
++  
++  int currentLine = stream.getCurrentLine();
++  StringBuilder result = new StringBuilder();
++  
++  while (stream.hasNext()) {
++    char c = stream.peek();
++    result.append(c);
++    stream.next(); // Consume the character
++    
++    if (c == '\n') {
++      break;
++    }
++  }
++  
++  // Check if the line was not terminated by a newline character
++  if (stream.hasNext() && stream.peek() != '\n') {
++    // Handle the case where the line continues beyond the current buffer
++    // This might not be necessary depending on how the stream is implemented
++  }
++  
++  return result.toString();
+ }
+\ No newline at end of file

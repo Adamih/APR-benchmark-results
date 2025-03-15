@@ -1,0 +1,23 @@
+diff --git a/tmp/706e31bc-27d3-4ed9-b30e-df5b2e43fed9_buggy.java b/tmp/ab2d603a-5b4d-491d-b9a6-fe2f35820748_fixed.java
+index 46817a7..89ad41a 100644
+--- a/tmp/706e31bc-27d3-4ed9-b30e-df5b2e43fed9_buggy.java
++++ b/tmp/ab2d603a-5b4d-491d-b9a6-fe2f35820748_fixed.java
+@@ -1,16 +1,7 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+       return super.getLeastSupertype(that);
+     }
+-    RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
+-      }
+-    }
+-    return builder.build();
++    return registry.createUnionType(this, that);
+   }
+\ No newline at end of file

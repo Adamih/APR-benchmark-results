@@ -1,0 +1,42 @@
+diff --git a/tmp/751def30-dcae-464f-8d9d-6be48fee9030_buggy.java b/tmp/69dbc86c-421a-434d-846e-5471c113c3bd_fixed.java
+index 4b7f469..78370d3 100644
+--- a/tmp/751def30-dcae-464f-8d9d-6be48fee9030_buggy.java
++++ b/tmp/69dbc86c-421a-434d-846e-5471c113c3bd_fixed.java
+@@ -1,10 +1,32 @@
+ static boolean isSimpleNumber(String s) {
+-    int len = s.length();
+-    for (int index = 0; index < len; index++) {
+-      char c = s.charAt(index);
++    if (s.isEmpty()) {
++        return false;
++    }
++    // Handle hexadecimal literal forms (e.g., "0x10", "0X10")
++    if (s.startsWith("0x") || s.startsWith("0X")) {
++        if (s.length() == 2) {
++            return false; // "0x" without digits is not valid.
++        }
++        for (int i = 2; i < s.length(); i++) {
++            char c = s.charAt(i);
++            if (!((c >= '0' && c <= '9') || 
++                  (c >= 'a' && c <= 'f') || 
++                  (c >= 'A' && c <= 'F'))) {
++                return false;
++            }
++        }
++        return true;
++    }
++    // Reject if there is a decimal point (or any non-digit character like '.')
++    if (s.indexOf('.') != -1) {
++        return false;
++    }
++    // Check that every character is a digit.
++    for (int i = 0; i < s.length(); i++) {
++        char c = s.charAt(i);
+         if (c < '0' || c > '9') {
+             return false;
+         }
+     }
+-    return len > 0;
++    return true;
+ }
+\ No newline at end of file

@@ -1,0 +1,53 @@
+diff --git a/tmp/2a6492a1-5e62-4b69-b6b2-9e24c57b8593_buggy.java b/tmp/07e3c2e6-0804-4517-9020-903552481f8f_fixed.java
+index b2d53db..32cd0f5 100644
+--- a/tmp/2a6492a1-5e62-4b69-b6b2-9e24c57b8593_buggy.java
++++ b/tmp/07e3c2e6-0804-4517-9020-903552481f8f_fixed.java
+@@ -1,34 +1,47 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+         t.dataBuffer.append(name);
+         r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
+                 t.emitTagPending();
+                 t.transition(Data);
+                 break;
+             default:
++                // In script tags, collect everything until </script>
++                if (t.inScriptTag()) {
+                     t.dataBuffer.append(c);
++                    // Check if the current position might be the start of </script>
++                    if (r.lookAhead(8).toLowerCase().startsWith("</script")) {
++                        // Potential end tag found, handle accordingly
++                        t.transition(EndTagInScript);
++                    } else {
++                        // Not the end tag, continue collecting data
+                         anythingElse(t, r);
++                    }
++                } else {
++                    t.dataBuffer.append(c);
++                    anythingElse(t, r);
++                }
+                 break;
+         }
+     } else {
+         anythingElse(t, r);
+     }
+ }
+\ No newline at end of file

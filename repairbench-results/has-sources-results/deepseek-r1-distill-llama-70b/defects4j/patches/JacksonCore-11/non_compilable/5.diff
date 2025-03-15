@@ -1,0 +1,29 @@
+diff --git a/tmp/62c9913b-5932-404d-8c98-4695731b37f3_buggy.java b/tmp/f47ad751-9fbf-4c8a-8ae0-1ab9c792b4d2_fixed.java
+index 29d025a..88402b5 100644
+--- a/tmp/62c9913b-5932-404d-8c98-4695731b37f3_buggy.java
++++ b/tmp/f47ad751-9fbf-4c8a-8ae0-1ab9c792b4d2_fixed.java
+@@ -1,13 +1,19 @@
+ private void _verifySharing()
+ {
+     if (_hashShared) {
+-            _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+-            _names = Arrays.copyOf(_names, _names.length);
++        // Calculate the new capacity, typically the next power of two
++        int newCapacity = _calculateNewCapacity();
++        _hashArea = Arrays.copyOf(_hashArea, newCapacity);
++        _names = Arrays.copyOf(_names, newCapacity);
+         _hashShared = false;
+-            // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+-            //    we rehash as needed, as need-rehash flag is not copied from parent
++        // Ensure that the number of elements does not exceed the new capacity
++        _count = Math.min(_count, newCapacity);
++        // Ensure the threshold is updated if necessary
++        if (_threshold <= 0) {
++            _threshold = (int) (newCapacity * _loadFactor);
++        }
+     }
+     if (_needRehash) {
+         rehash();
+     }
+ }
+\ No newline at end of file

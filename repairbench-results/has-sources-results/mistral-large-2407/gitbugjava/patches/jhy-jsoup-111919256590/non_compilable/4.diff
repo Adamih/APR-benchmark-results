@@ -1,0 +1,25 @@
+diff --git a/tmp/46c95a43-bd87-4179-b1bf-e102d9d8b206_buggy.java b/tmp/90aa5849-bb12-4b70-9520-199f59e1050f_fixed.java
+index e807cbf..e4c638b 100644
+--- a/tmp/46c95a43-bd87-4179-b1bf-e102d9d8b206_buggy.java
++++ b/tmp/90aa5849-bb12-4b70-9520-199f59e1050f_fixed.java
+@@ -1,7 +1,18 @@
+     private boolean isInlineable(Document.OutputSettings out) {
+         if (!tag.isInline())
+             return false;
+         return (parent() == null || parent().isBlock())
+-            && !isEffectivelyFirst()
++            && !isEffectivelyFirstWithSiblingBrOrPcdata(out)
+             && !out.outline();
+     }
++
++    private boolean isEffectivelyFirstWithSiblingBrOrPcdata(Document.OutputSettings out) {
++        Element parent = parent();
++        if (parent == null) return false;
++
++        int sibIdx = siblingIndex() - 1;
++        while (sibIdx >= 0 && !parent.child(sibIdx).tag().isInline() && parent.child(sibIdx).tag() != Tag.valueOf("br"))
++            sibIdx--;
++
++        return sibIdx < 0;
++    }
+\ No newline at end of file

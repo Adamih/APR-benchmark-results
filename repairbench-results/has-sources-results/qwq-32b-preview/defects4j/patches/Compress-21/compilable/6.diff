@@ -1,0 +1,28 @@
+diff --git a/tmp/49d306bd-78ae-4737-bda6-154fbe66acf6_buggy.java b/tmp/f1ab4b25-a0bf-46ed-b03d-b774f9f0c110_fixed.java
+index ce3d60f..7fbc6a6 100644
+--- a/tmp/49d306bd-78ae-4737-bda6-154fbe66acf6_buggy.java
++++ b/tmp/f1ab4b25-a0bf-46ed-b03d-b774f9f0c110_fixed.java
+@@ -1,16 +1,17 @@
+ private void writeBits(final DataOutput header, final BitSet bits, final int length) throws IOException {
+     int cache = 0;
+     int shift = 7;
+     for (int i = 0; i < length; i++) {
+-            cache |= ((bits.get(i) ? 1 : 0) << shift);
+-            --shift;
+-            if (shift == 0) {
++        cache |= (bits.get(i) ? 1 : 0) << shift;
++        shift--;
++        if (shift < 0) {
+             header.write(cache);
+-                shift = 7;
+             cache = 0;
++            shift = 7;
+         }
+     }
+-        if (length > 0 && shift > 0) {
++    if (shift < 7) {
++        // Write any remaining bits in the cache
+         header.write(cache);
+     }
+ }
+\ No newline at end of file

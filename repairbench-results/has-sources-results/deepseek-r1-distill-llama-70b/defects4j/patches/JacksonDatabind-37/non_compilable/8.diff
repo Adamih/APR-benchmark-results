@@ -1,0 +1,29 @@
+diff --git a/tmp/b31b9dc7-6d9b-4cef-afa7-63df2a19f510_buggy.java b/tmp/cbf4c277-44d2-49f6-833e-9bef002fcaa7_fixed.java
+index e5ad041..f66804f 100644
+--- a/tmp/b31b9dc7-6d9b-4cef-afa7-63df2a19f510_buggy.java
++++ b/tmp/cbf4c277-44d2-49f6-833e-9bef002fcaa7_fixed.java
+@@ -1,19 +1,10 @@
+     @Override
+-    protected JavaType _narrow(Class<?> subclass)
+-    {
++    protected JavaType _narrow(Class<?> subclass) {
+         if (_class == subclass) {
+             return this;
+         }
+-        // Should we check that there is a sub-class relationship?
+-        // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+-        //    placeholder values, so no.
+-        /*
+-        if (!_class.isAssignableFrom(subclass)) {
+-            throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+-                    +_class.getName());
+-        }
+-        */
+-        // 15-Jan-2015, tatu: Not correct; should really re-resolve...
++        // Determine if the subclass is static or not
++        boolean asStatic = (subclass.isStatic() || _asStatic);
+         return new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
+-                _valueHandler, _typeHandler, _asStatic);
++                _valueHandler, _typeHandler, asStatic);
+     }
+\ No newline at end of file

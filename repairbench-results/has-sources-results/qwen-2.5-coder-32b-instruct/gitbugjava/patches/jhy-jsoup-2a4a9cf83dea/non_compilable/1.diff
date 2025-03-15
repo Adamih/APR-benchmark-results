@@ -1,0 +1,22 @@
+diff --git a/tmp/ccf46ca4-64f6-40f3-96ae-3d2e0154f04c_buggy.java b/tmp/2cbe868b-c992-4df8-bbdb-ae3c3dc5934d_fixed.java
+index c9c2b44..ea27501 100644
+--- a/tmp/ccf46ca4-64f6-40f3-96ae-3d2e0154f04c_buggy.java
++++ b/tmp/2cbe868b-c992-4df8-bbdb-ae3c3dc5934d_fixed.java
+@@ -1,13 +1,16 @@
+ @Override
+ public boolean matches(Element root, Element element) {
+     // evaluate from last to first
+     for (int i = evaluators.size() - 1; i >= 0; --i) {
+         if (element == null)
+             return false;
+         Evaluator eval = evaluators.get(i);
+         if (!eval.matches(root, element))
+             return false;
++        // Do not change the element if the evaluator is a combinator that requires the current element
++        if (!(eval instanceof Combinator)) {
+             element = element.parent();
+         }
++    }
+     return true;
+ }
+\ No newline at end of file

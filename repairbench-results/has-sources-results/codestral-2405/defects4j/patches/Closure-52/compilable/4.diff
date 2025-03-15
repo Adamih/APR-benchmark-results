@@ -1,0 +1,39 @@
+diff --git a/tmp/96136376-5c18-4829-9f14-55edeae926f8_buggy.java b/tmp/bba18966-966a-4d4a-b813-fc531cea406c_fixed.java
+index 4b7f469..e78c58f 100644
+--- a/tmp/96136376-5c18-4829-9f14-55edeae926f8_buggy.java
++++ b/tmp/bba18966-966a-4d4a-b813-fc531cea406c_fixed.java
+@@ -1,10 +1,30 @@
+ static boolean isSimpleNumber(String s) {
+-    int len = s.length();
+-    for (int index = 0; index < len; index++) {
++  if(s.length() == 0) return false;
++  char firstChar = s.charAt(0);
++  if(firstChar == '0' && s.length() > 1) {
++    char secondChar = s.charAt(1);
++    if(secondChar == 'x') {
++      for (int index = 2; index < s.length(); index++) {
++        char c = s.charAt(index);
++        if ((c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F')) {
++          return false;
++        }
++      }
++    } else {
++      for (int index = 1; index < s.length(); index++) {
+         char c = s.charAt(index);
+         if (c < '0' || c > '9') {
+           return false;
+         }
+       }
+-    return len > 0;
++    }
++  } else {
++    for (int index = 0; index < s.length(); index++) {
++      char c = s.charAt(index);
++      if (c < '0' || c > '9') {
++        return false;
++      }
++    }
++  }
++  return true;
+ }
+\ No newline at end of file

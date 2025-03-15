@@ -1,0 +1,43 @@
+diff --git a/tmp/4dc0635c-1326-48b0-aa04-9cf3c2c010b3_buggy.java b/tmp/f6459ad6-d8e8-4df0-9448-215a08873050_fixed.java
+index 1530b34..3dcafd7 100644
+--- a/tmp/4dc0635c-1326-48b0-aa04-9cf3c2c010b3_buggy.java
++++ b/tmp/f6459ad6-d8e8-4df0-9448-215a08873050_fixed.java
+@@ -1,23 +1,35 @@
+ /**
+  * Declares all of a function's arguments.
+  */
+ private void declareArguments(Node functionNode) {
+     Node astParameters = functionNode.getFirstChild().getNext();
+     Node body = astParameters.getNext();
+     FunctionType functionType = (FunctionType) functionNode.getJSType();
+     if (functionType != null) {
+         Node jsDocParameters = functionType.getParametersNode();
+         if (jsDocParameters != null) {
+             Node jsDocParameter = jsDocParameters.getFirstChild();
+             for (Node astParameter : astParameters.children()) {
+                 if (jsDocParameter != null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++                    JSType jsDocType = jsDocParameter.getJSType();
++                    JSType existingType = astParameter.getJSType();
++                    
++                    // Check for duplicate declarations with conflicting types
++                    if (existingType != null && !jsDocType.isEquivalentTo(existingType)) {
++                        compiler.report(
++                            JSError.make(astParameter,
++                                JSC_DUP_VAR_DECLARATION,
++                                astParameter.getString(),
++                                jsDocType.toString(),
++                                existingType.toString()));
++                    }
++                    
++                    defineSlot(astParameter, functionNode, jsDocType, true);
+                     jsDocParameter = jsDocParameter.getNext();
+                 } else {
+                     defineSlot(astParameter, functionNode, null, true);
+                 }
+             }
+         }
+     }
+ } // end declareArguments
+\ No newline at end of file

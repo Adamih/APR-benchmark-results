@@ -1,0 +1,36 @@
+diff --git a/tmp/4ee66d88-b4d8-46af-ac33-c6b3dc98be34_buggy.java b/tmp/947f5d21-3e00-4427-9418-1684df921e44_fixed.java
+index ef76662..59a0b95 100644
+--- a/tmp/4ee66d88-b4d8-46af-ac33-c6b3dc98be34_buggy.java
++++ b/tmp/947f5d21-3e00-4427-9418-1684df921e44_fixed.java
+@@ -1,17 +1,29 @@
+ void read(Tokeniser t, CharacterReader r) {
+     char c = r.consume();
+     switch (c) {
+         case '>':
++            t.emitTagPending();
++            t.transition(Data);
++            break;
++        case '/':
++            // If the next character is '>', it's a self-closing tag
++            if (r.matches('>')) {
++                r.consume();
+                 t.tagPending.selfClosing = true;
+                 t.emitTagPending();
+                 t.transition(Data);
++            } else {
++                // Otherwise, treat '/' as part of an attribute name
++                t.tagPending.appendTagName(c);
++                t.transition(BeforeAttributeName);
++            }
+             break;
+         case eof:
+             t.eofError(this);
+             t.transition(Data);
+             break;
+         default:
+-                    t.error(this);
++            t.tagPending.appendTagName(c);
+             t.transition(BeforeAttributeName);
+     }
+ }
+\ No newline at end of file

@@ -1,0 +1,37 @@
+diff --git a/tmp/dda254c9-22ca-4237-a7a4-55f55556f6fe_buggy.java b/tmp/2d7e8350-b910-4d87-a83c-3e4e902164f3_fixed.java
+index 3127f85..164d3af 100644
+--- a/tmp/dda254c9-22ca-4237-a7a4-55f55556f6fe_buggy.java
++++ b/tmp/2d7e8350-b910-4d87-a83c-3e4e902164f3_fixed.java
+@@ -1,24 +1,29 @@
+ /**
+  * For this distribution, {@code X}, this method returns {@code P(X < x)}.
+  * If {@code x} is more than 40 standard deviations from the mean, 0 or 1 is returned,
+  * as in these cases the actual value is within {@code Double.MIN_VALUE} of 0 or 1.
+  *
+  * @param x Value at which the CDF is evaluated.
+  * @return CDF evaluated at {@code x}.
+  * @throws MathException if the algorithm fails to converge
+  */
+ public double cumulativeProbability(double x) throws MathException {
++    if (Double.isInfinite(x)) {
++        return x > 0? 1.0 : 0.0;
++    }
+     final double dev = x - mean;
++    if (Math.abs(dev) > 40 * standardDeviation) {
++        return dev < 0? 0.0 : 1.0;
++    }
+     try {
+-        return 0.5 * (1.0 + Erf.erf((dev) /
+-                    (standardDeviation * FastMath.sqrt(2.0))));
++        return 0.5 * (1.0 + Erf.erf((dev) / (standardDeviation * FastMath.sqrt(2.0))));
+     } catch (MaxIterationsExceededException ex) {
+         if (x < (mean - 20 * standardDeviation)) { // JDK 1.5 blows at 38
+             return 0;
+         } else if (x > (mean + 20 * standardDeviation)) {
+             return 1;
+         } else {
+             throw ex;
+         }
+     }
+ }
+\ No newline at end of file

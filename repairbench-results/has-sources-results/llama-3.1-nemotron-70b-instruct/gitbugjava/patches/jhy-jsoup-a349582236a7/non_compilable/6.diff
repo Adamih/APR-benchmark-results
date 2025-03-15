@@ -1,0 +1,20 @@
+diff --git a/tmp/39859cfb-a5b7-4509-ba25-2edd52300aa5_buggy.java b/tmp/d37c56ad-5b5d-46c8-b6e3-e2298af82a55_fixed.java
+index 3ecd591..8621641 100644
+--- a/tmp/39859cfb-a5b7-4509-ba25-2edd52300aa5_buggy.java
++++ b/tmp/d37c56ad-5b5d-46c8-b6e3-e2298af82a55_fixed.java
+@@ -1,6 +1,13 @@
++/**
++ * Checks if the current element can be inlined based on its tag type, 
++ * parent element, previous sibling, and output settings.
++ * 
++ * @param out the output settings
++ * @return true if the element can be inlined, false otherwise
++ */
+ private boolean isInlineable(Document.OutputSettings out) {
+     return tag().isInline() 
+         && (parent() == null || parent().isBlock())
+-            && previousSibling() != null
++        && (previousSibling() == null || previousSibling().isInline())
+         &&!out.outline();
+ }
+\ No newline at end of file

@@ -1,0 +1,40 @@
+diff --git a/tmp/1a77fd36-fec1-461e-8502-83abaf5236c2_buggy.java b/tmp/45f9477a-be65-4917-a154-97673e1b24d6_fixed.java
+index b2d53db..d2cce63 100644
+--- a/tmp/1a77fd36-fec1-461e-8502-83abaf5236c2_buggy.java
++++ b/tmp/45f9477a-be65-4917-a154-97673e1b24d6_fixed.java
+@@ -1,34 +1,34 @@
+         void read(Tokeniser t, CharacterReader r) {
+             if (r.matchesLetter()) {
+                 String name = r.consumeLetterSequence();
+                 t.tagPending.appendTagName(name.toLowerCase());
+                 t.dataBuffer.append(name);
+                 r.advance();
+                 return;
+             }
+ 
+             if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+                 char c = r.consume();
+                 switch (c) {
+                     case '\t':
+                     case '\n':
+                     case '\f':
+                     case ' ':
+                         t.transition(BeforeAttributeName);
+                         break;
+                     case '/':
+                         t.transition(SelfClosingStartTag);
+                         break;
+                     case '>':
+                         t.emitTagPending();
+                         t.transition(Data);
+                         break;
+                     default:
+                         t.dataBuffer.append(c);
+-                        anythingElse(t, r);
++                        // anythingElse(t, r);  // the problem is here. this is an end tag, so don't delegate
+                         break;
+                 }
+             } else {
+                 anythingElse(t, r);
+             }
+         }

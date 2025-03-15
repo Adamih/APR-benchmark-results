@@ -1,0 +1,12 @@
+diff --git a/tmp/a913b838-5fd2-4cd5-8505-7e81303a2615_buggy.java b/tmp/1760cc93-2e03-47dd-ba0f-84f48da7f53e_fixed.java
+index 5c5286c..1851e93 100644
+--- a/tmp/a913b838-5fd2-4cd5-8505-7e81303a2615_buggy.java
++++ b/tmp/1760cc93-2e03-47dd-ba0f-84f48da7f53e_fixed.java
+@@ -1,6 +1,5 @@
+     public <T> void resetMock(T mock) {
+         MockHandlerInterface<T> oldMockHandler = getMockHandler(mock);
+-        MockHandler<T> newMockHandler = new MockHandler<T>(oldMockHandler);
+-        MethodInterceptorFilter newFilter = new MethodInterceptorFilter(newMockHandler, (MockSettingsImpl) org.mockito.Mockito.withSettings().defaultAnswer(org.mockito.Mockito.RETURNS_DEFAULTS));
++        MethodInterceptorFilter newFilter = newMethodInterceptorFilter(oldMockHandler.getMockSettings());
+         ((Factory) mock).setCallback(0, newFilter);
+     }

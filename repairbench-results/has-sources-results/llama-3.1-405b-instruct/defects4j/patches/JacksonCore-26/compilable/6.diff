@@ -1,0 +1,36 @@
+diff --git a/tmp/ad3bf2b5-e857-4839-a4b8-efbea4096b54_buggy.java b/tmp/2f60585a-5ece-43ea-8b9e-d9c240a9c4d0_fixed.java
+index 0722547..75a7443 100644
+--- a/tmp/ad3bf2b5-e857-4839-a4b8-efbea4096b54_buggy.java
++++ b/tmp/2f60585a-5ece-43ea-8b9e-d9c240a9c4d0_fixed.java
+@@ -1,26 +1,26 @@
+ @Override
+-    public void feedInput(byte[] buf, int start, int end) throws IOException
+-    {
++public void feedInput(byte[] buf, int start, int end) throws IOException {
+     // Must not have remaining input
+     if (_inputPtr < _inputEnd) {
+         _reportError("Still have %d undecoded bytes, should not call 'feedInput'", _inputEnd - _inputPtr);
+     }
+     if (end < start) {
+         _reportError("Input end (%d) may not be before start (%d)", end, start);
+     }
+     // and shouldn't have been marked as end-of-input
+     if (_endOfInput) {
+         _reportError("Already closed, can not feed more input");
+     }
+     // Time to update pointers first
+     _currInputProcessed += _origBufferLen;
+ 
+-        // Also need to adjust row start, to work as if it extended into the past wrt new buffer
+-        _currInputRowStart = start - (_inputEnd - _currInputRowStart);
++    // Adjust row start to reflect amount of data already consumed before this new buffer.
++    int consumedBefore = start - _inputEnd;
++    _currInputRowStart = Math.max(_currInputRowStart + consumedBefore, 0);
+ 
+     // And then update buffer settings
+     _inputBuffer = buf;
+     _inputPtr = start;
+     _inputEnd = end;
+     _origBufferLen = end - start;
+ }
+\ No newline at end of file

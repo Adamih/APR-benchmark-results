@@ -1,0 +1,19 @@
+diff --git a/tmp/5781292d-fd06-4023-a4d1-704febb0e5e7_buggy.java b/tmp/2824fad5-56e8-4155-a56a-3f990f97d302_fixed.java
+index dcc36a4..2d910d9 100644
+--- a/tmp/5781292d-fd06-4023-a4d1-704febb0e5e7_buggy.java
++++ b/tmp/2824fad5-56e8-4155-a56a-3f990f97d302_fixed.java
+@@ -1,12 +1,13 @@
+ protected void replaceChild(Node out, Node in) {
+     Validate.isTrue(out.parentNode == this);
+     Validate.notNull(in);
+     if (in.parentNode != null)
+         in.parentNode.removeChild(in);
+ 
+     final int index = out.siblingIndex;
+     ensureChildNodes().set(index, in);
+     in.parentNode = this;
+     in.setSiblingIndex(index);
+     out.parentNode = null;
++    out.setSiblingIndex(-1); // Ensure the outgoing node is properly detached
+ }
+\ No newline at end of file

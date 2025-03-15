@@ -1,0 +1,39 @@
+diff --git a/tmp/278a321a-4e57-4ae2-9839-0d13e7b98a6e_buggy.java b/tmp/9fe2e7b9-2e25-405f-9112-82303f8abcf5_fixed.java
+index 862c60c..edba27d 100644
+--- a/tmp/278a321a-4e57-4ae2-9839-0d13e7b98a6e_buggy.java
++++ b/tmp/9fe2e7b9-2e25-405f-9112-82303f8abcf5_fixed.java
+@@ -1,25 +1,33 @@
+     void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+         final boolean prettyPrint = out.prettyPrint();
+         final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+         final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+ 
+         boolean trimLeading = false;
+         boolean trimTrailing = false;
+         if (normaliseWhite) {
+             trimLeading = (siblingIndex == 0 && parent != null && parent.tag().isBlock()) ||
+                 parentNode instanceof Document;
+             trimTrailing = nextSibling() == null && parent != null && parent.tag().isBlock();
+ 
+             // if this text is just whitespace, and the next node will cause an indent, skip this text:
+             Node next = this.nextSibling();
+             boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+                 || (next instanceof TextNode && (((TextNode) next).isBlank())); // next is blank text, from re-parenting
+             if (couldSkip && isBlank()) return;
+ 
+             if ((siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank()) ||
+                 (out.outline() && siblingNodes().size() > 0 && !isBlank()))
+                 indent(accum, depth, out);
+         }
+ 
++        // Add whitespace after <br /> tags
++        if (normaliseWhite && parent != null && parent.tag().formatAsBlock() && isBlank()) {
++            Node previous = this.previousSibling();
++            if (previous instanceof Element && ((Element) previous).tagName().equals("br")) {
++                accum.append("\n");
++            }
++        }
++
+         Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
+     }
+\ No newline at end of file

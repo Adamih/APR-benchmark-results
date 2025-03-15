@@ -1,0 +1,24 @@
+diff --git a/tmp/7fa9e642-8bde-4825-a720-5c8ad1e0b0dd_buggy.java b/tmp/a6ee7be8-2f78-4d1a-b318-7c05e20b3ff9_fixed.java
+index 42d4174..47427ca 100644
+--- a/tmp/7fa9e642-8bde-4825-a720-5c8ad1e0b0dd_buggy.java
++++ b/tmp/a6ee7be8-2f78-4d1a-b318-7c05e20b3ff9_fixed.java
+@@ -1,7 +1,13 @@
+-  /**
+-   * Returns the remainder of the line.
+-   */
+ private String getRemainingJSDocLine() {
+-    String result = stream.getRemainingJSDocLine();
+-    return result;
++  String line = stream.getRemainingJSDocLine();
++  // When parsing multi‐line JSDoc comments the first nonblank character of
++  // each line is a "*" that isn’t actually part of the JSDoc text.
++  // Remove the "*" and a following space if present.
++  if (!line.isEmpty() && line.charAt(0) == '*') {
++    line = line.substring(1);
++    if (!line.isEmpty() && line.charAt(0) == ' ') {
++      line = line.substring(1);
++    }
++  }
++  return line;
+ }
+\ No newline at end of file

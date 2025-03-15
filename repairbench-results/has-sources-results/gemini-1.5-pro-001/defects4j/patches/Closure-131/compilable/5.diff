@@ -1,0 +1,27 @@
+diff --git a/tmp/07bfbdaa-d302-464e-8eaf-9f18fdd19a22_buggy.java b/tmp/08f023cf-7c3c-4094-b8b9-c2bc93547f3f_fixed.java
+index 19fe1b4..0eb9a4a 100644
+--- a/tmp/07bfbdaa-d302-464e-8eaf-9f18fdd19a22_buggy.java
++++ b/tmp/08f023cf-7c3c-4094-b8b9-c2bc93547f3f_fixed.java
+@@ -1,17 +1,20 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+       if (length == 0 ||
+           !Character.isJavaIdentifierStart(s.charAt(0))) {
+         return false;
+       }
+ 
+       for (int i = 1; i < length; i++) {
+         if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++            !Character.isJavaIdentifierPart(s.charAt(i)) ||
++            // Java considers the "Connecting punctuation" characters in
++            // Unicode category Pc to be identifier parts, but JS does not.
++            (s.charAt(i) >= '\u203C' && s.charAt(i) <= '\u2040')) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }
+\ No newline at end of file

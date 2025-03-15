@@ -1,0 +1,27 @@
+diff --git a/tmp/2854c695-5b77-4a24-8828-4d9dcea041d1_buggy.java b/tmp/2f6f2160-18f3-4f95-bb2a-6b6b7f9da028_fixed.java
+index 5eedc11..f121083 100644
+--- a/tmp/2854c695-5b77-4a24-8828-4d9dcea041d1_buggy.java
++++ b/tmp/2f6f2160-18f3-4f95-bb2a-6b6b7f9da028_fixed.java
+@@ -1,6 +1,20 @@
++/**
++ * Handles rawtext elements (e.g. style, script, textarea, title, noscript, noframes).
++ * These elements are not parsed for HTML, and their contents are treated as raw text.
++ * 
++ * @param startTag the start tag of the rawtext element
++ * @param tb the HTML tree builder
++ */
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
++    // Insert the start tag into the DOM
+     tb.insert(startTag);
++    
++    // Transition the tokeniser to rawtext state to prevent HTML parsing
+     tb.tokeniser.transition(TokeniserState.Rawtext);
++    
++    // Mark the current insertion mode for later restoration
+     tb.markInsertionMode();
+-        tb.transition(Text);
++    
++    // Switch to a special insertion mode for rawtext elements
++    tb.transition(Rawtext); // Fix: Changed from Text to Rawtext
+ }
+\ No newline at end of file

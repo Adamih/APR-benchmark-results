@@ -1,0 +1,38 @@
+diff --git a/tmp/26f1dab0-f087-4b8a-b6f3-4718857cccfd_buggy.java b/tmp/e71eefb3-af4a-4b0f-8464-d75cbf15b2cb_fixed.java
+index 862c60c..6cab744 100644
+--- a/tmp/26f1dab0-f087-4b8a-b6f3-4718857cccfd_buggy.java
++++ b/tmp/e71eefb3-af4a-4b0f-8464-d75cbf15b2cb_fixed.java
+@@ -1,25 +1,32 @@
+ void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+     final boolean prettyPrint = out.prettyPrint();
+     final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+     final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+ 
+     boolean trimLeading = false;
+     boolean trimTrailing = false;
+     if (normaliseWhite) {
+         trimLeading = (siblingIndex == 0 && parent != null && parent.tag().isBlock()) ||
+             parentNode instanceof Document;
+         trimTrailing = nextSibling() == null && parent != null && parent.tag().isBlock();
+ 
+         // if this text is just whitespace, and the next node will cause an indent, skip this text:
+         Node next = this.nextSibling();
+         boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+             || (next instanceof TextNode && (((TextNode) next).isBlank())); // next is blank text, from re-parenting
+         if (couldSkip && isBlank()) return;
+ 
+         if ((siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank()) ||
+             (out.outline() && siblingNodes().size() > 0 && !isBlank()))
+             indent(accum, depth, out);
+     }
+ 
++    // Fix: Don't normalize whitespace or trim leading/trailing spaces for text nodes immediately following a <br> tag
++    if (previousSibling() instanceof Element && ((Element) previousSibling()).tag().getName().equals("br")) {
++        normaliseWhite = false;
++        trimLeading = false;
++        trimTrailing = false;
++    }
++
+     Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
+ }
+\ No newline at end of file

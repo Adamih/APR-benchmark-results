@@ -1,0 +1,20 @@
+diff --git a/tmp/8e096ec3-e829-484f-a7c4-a7fb8378db6b_buggy.java b/tmp/fec45032-01d4-4250-9e5e-d0b66119a0aa_fixed.java
+index 1c92640..63d45bc 100644
+--- a/tmp/8e096ec3-e829-484f-a7c4-a7fb8378db6b_buggy.java
++++ b/tmp/fec45032-01d4-4250-9e5e-d0b66119a0aa_fixed.java
+@@ -1,7 +1,9 @@
+-    /**
+-     * Set the name of the entry.
+-     * @param name the name to use
+-     */
++import java.nio.file.FileSystems;
++import java.nio.file.Path;
++import java.nio.file.Paths;
++
+ protected void setName(String name) {
+-        this.name = name;
++    // Normalize the path to avoid issues with different path separators
++    Path normalizedPath = Paths.get(name).normalize();
++    this.name = normalizedPath.toString();
+ }
+\ No newline at end of file

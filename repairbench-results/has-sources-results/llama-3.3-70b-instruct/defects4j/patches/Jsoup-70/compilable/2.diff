@@ -1,0 +1,20 @@
+diff --git a/tmp/057eee04-1967-4656-9508-0ba78b11dd78_buggy.java b/tmp/444550e5-7dea-4545-a4df-08363ee0163f_fixed.java
+index 6c87721..80d0731 100644
+--- a/tmp/057eee04-1967-4656-9508-0ba78b11dd78_buggy.java
++++ b/tmp/444550e5-7dea-4545-a4df-08363ee0163f_fixed.java
+@@ -1,11 +1,11 @@
+ static boolean preserveWhitespace(Node node) {
+-        // looks only at this element and five levels up, to prevent recursion & needless stack searches
+     if (node!= null && node instanceof Element) {
+         Element el = (Element) node;
++        for (int i = 0; i <= 5 && el!= null; i++) {
+             if (el.tag.preserveWhitespace())
+                 return true;
+-                else
+-                    return el.parent() != null && el.parent().tag.preserveWhitespace();
++            el = el.parent();
++        }
+     }
+     return false;
+ }
+\ No newline at end of file

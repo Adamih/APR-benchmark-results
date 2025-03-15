@@ -1,0 +1,37 @@
+diff --git a/tmp/f1d9618b-4ddd-44ba-a71a-6270553cdc07_buggy.java b/tmp/8d89d930-c4f8-4cc8-bcd8-8e9a7697dc7c_fixed.java
+index 7e43c1c..e142f3a 100644
+--- a/tmp/f1d9618b-4ddd-44ba-a71a-6270553cdc07_buggy.java
++++ b/tmp/8d89d930-c4f8-4cc8-bcd8-8e9a7697dc7c_fixed.java
+@@ -1,19 +1,31 @@
+ /**
+  * Visits a NEW node.
+  */
+ private void visitNew(NodeTraversal t, Node n) {
+   Node constructor = n.getFirstChild();
+   JSType type = getJSType(constructor).restrictByNotNullOrUndefined();
++  
++  // Enhanced type checking to handle interface and constructor intersections
+   if (type.isConstructor() || type.isEmptyType() || type.isUnknownType()) {
+     FunctionType fnType = type.toMaybeFunctionType();
+     if (fnType!= null) {
+       visitParameterList(t, n, fnType);
++      // Verify if the constructor implements an interface
++      if (type.isIntersectionType()) {
++        for (JSType intersectType : type.getIntersectionTypes()) {
++          if (intersectType.isInterface()) {
++            ensureTyped(t, n, intersectType);
++            break; // Assuming only one interface is expected
++          }
++        }
++      } else {
+         ensureTyped(t, n, fnType.getInstanceType());
++      }
+     } else {
+       ensureTyped(t, n);
+     }
+   } else {
+     report(t, n, NOT_A_CONSTRUCTOR);
+     ensureTyped(t, n);
+   }
+ }
+\ No newline at end of file

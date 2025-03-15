@@ -1,0 +1,49 @@
+diff --git a/tmp/eb6b3677-fb30-493a-9baf-be5d34d91d84_buggy.java b/tmp/6d4ab950-06ca-4f2f-8eb2-40f3a370a7b4_fixed.java
+index 1530b34..0763be5 100644
+--- a/tmp/eb6b3677-fb30-493a-9baf-be5d34d91d84_buggy.java
++++ b/tmp/6d4ab950-06ca-4f2f-8eb2-40f3a370a7b4_fixed.java
+@@ -1,23 +1,37 @@
+     /**
+      * Declares all of a function's arguments.
+      */
+     private void declareArguments(Node functionNode) {
+         Node astParameters = functionNode.getFirstChild().getNext();
+         Node body = astParameters.getNext();
+         FunctionType functionType = (FunctionType) functionNode.getJSType();
+         if (functionType != null) {
+             Node jsDocParameters = functionType.getParametersNode();
+-        if (jsDocParameters != null) {
+-          Node jsDocParameter = jsDocParameters.getFirstChild();
++            Node jsDocParameter = jsDocParameters != null ? jsDocParameters.getFirstChild() : null;
++            int paramIndex = 0;
+             for (Node astParameter : astParameters.children()) {
++                JSType type = null;
+                 if (jsDocParameter != null) {
+-              defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++                    type = jsDocParameter.getJSType();
+                     jsDocParameter = jsDocParameter.getNext();
++                }
++                // Use jsdoc type if available, otherwise default to inferred type from AST
++                // Check if the parameter is already declared to prevent duplicates
++                if (varStack.size() > 0) {
++                    boolean isDuplicate = false;
++                    for (Slot slot : varStack.peek().slots) {
++                        if (slot.getName().equals	astParameter.getQualifiedName())) {
++                            isDuplicate = true;
++                            break;
++                        }
++                    }
++                    if (!isDuplicate) {
++                        defineSlot(astParameter, functionNode, type, true);
++                    }
+                 } else {
+-              defineSlot(astParameter, functionNode, null, true);
+-            }
++                    defineSlot(astParameter, functionNode, type, true);
+                 }
++                paramIndex++;
+             }
+         }
+     } // end declareArguments
+\ No newline at end of file

@@ -1,0 +1,19 @@
+diff --git a/tmp/ea6ea6fd-5ec1-4418-9968-d09ade41f2e0_buggy.java b/tmp/7bc33f65-f74a-4e7a-a2e5-0eec804d3dd6_fixed.java
+index 42d4174..258c402 100644
+--- a/tmp/ea6ea6fd-5ec1-4418-9968-d09ade41f2e0_buggy.java
++++ b/tmp/7bc33f65-f74a-4e7a-a2e5-0eec804d3dd6_fixed.java
+@@ -1,7 +1,12 @@
+   /**
+    * Returns the remainder of the line.
+    */
+   private String getRemainingJSDocLine() {
+-    String result = stream.getRemainingJSDocLine();
++    // Trim spaces and asterisks that could be part of JSDoc formatting
++    String result = stream.getRemainingJSDocLine().trim();
++
++    if (result.startsWith("*")) {
++      result = result.substring(1).trim();
++    }
+     return result;
+   }
+\ No newline at end of file

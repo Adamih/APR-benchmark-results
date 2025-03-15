@@ -1,0 +1,38 @@
+diff --git a/tmp/e03b6a2b-20ec-4670-934b-be3e05608215_buggy.java b/tmp/d5455c63-6cc1-481e-aecb-1cfc7054ab52_fixed.java
+index 55391e1..381523b 100644
+--- a/tmp/e03b6a2b-20ec-4670-934b-be3e05608215_buggy.java
++++ b/tmp/d5455c63-6cc1-481e-aecb-1cfc7054ab52_fixed.java
+@@ -1,19 +1,31 @@
+ /**
+  * Returns a clone of the time series.
+  * <P>
+  * Notes:
+  * <ul>
+  *   <li>no need to clone the domain and range descriptions, since String 
+  *     object is immutable;</li>
+  *   <li>we pass over to the more general method clone(start, end).</li>
+  * </ul>
+  *
+  * @return A clone of the time series.
+  * 
+  * @throws CloneNotSupportedException not thrown by this class, but 
+  *         subclasses may differ.
+  */
+ public Object clone() throws CloneNotSupportedException {
+-        Object clone = createCopy(0, getItemCount() - 1);
++    int itemCount = getItemCount();
++    TimeSeries clone;
++    
++    // If there are items, use createCopy over the valid range.
++    if (itemCount > 0) {
++        clone = createCopy(0, itemCount - 1);
++    }
++    // If there are no items, create a new empty series with the same properties.
++    else {
++        clone = new TimeSeries(getKey(), getDomainDescription(), getRangeDescription());
++        clone.setMaximumItemCount(getMaximumItemCount());
++    }
++    
+     return clone;
+ }
+\ No newline at end of file

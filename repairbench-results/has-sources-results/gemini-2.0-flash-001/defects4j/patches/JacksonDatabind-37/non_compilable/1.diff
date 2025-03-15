@@ -1,0 +1,30 @@
+diff --git a/tmp/ffc97116-a3a7-4d0c-815b-96a7f0680430_buggy.java b/tmp/9841f444-5a99-4a4f-b8d1-da541512586d_fixed.java
+index e5ad041..8820bda 100644
+--- a/tmp/ffc97116-a3a7-4d0c-815b-96a7f0680430_buggy.java
++++ b/tmp/9841f444-5a99-4a4f-b8d1-da541512586d_fixed.java
+@@ -1,19 +1,24 @@
+     @Override
+     protected JavaType _narrow(Class<?> subclass)
+     {
+         if (_class == subclass) {
+             return this;
+         }
+         // Should we check that there is a sub-class relationship?
+         // 15-Jan-2016, tatu: Almost yes, but there are some complications with
+         //    placeholder values, so no.
+         /*
+         if (!_class.isAssignableFrom(subclass)) {
+             throw new IllegalArgumentException("Class "+subclass.getName()+" not sub-type of "
+                     +_class.getName());
+         }
+         */
+         // 15-Jan-2015, tatu: Not correct; should really re-resolve...
++        
++        // [databind#1083]: need to retain extra information (if any)
++        if (_class == String.class) {
+             return new SimpleType(subclass, _bindings, _superClass, _superInterfaces,
+                     _valueHandler, _typeHandler, _asStatic);
+         }
++        return SimpleType.construct(subclass, _bindings);
++    }
+\ No newline at end of file

@@ -1,0 +1,20 @@
+diff --git a/tmp/420083a0-c93e-4fa0-adb5-44f54aeac618_buggy.java b/tmp/b71b2f5f-d1bd-4420-b119-47ba5ec911be_fixed.java
+index 6f49dcb..987e5e0 100644
+--- a/tmp/420083a0-c93e-4fa0-adb5-44f54aeac618_buggy.java
++++ b/tmp/b71b2f5f-d1bd-4420-b119-47ba5ec911be_fixed.java
+@@ -1,9 +1,14 @@
+ @Override
+ public StringBuilder getGenericSignature(StringBuilder sb)
+ {
+     _classSignature(_class, sb, false);
+     sb.append('<');
+     sb = _referencedType.getGenericSignature(sb);
++    if (_referencedType.isArrayType()) {
++        sb.setLength(sb.length() - 1); // Remove the trailing ';'
++        sb.append("[];");
++    } else {
+         sb.append(';');
++    }
+     return sb;
+ }
+\ No newline at end of file

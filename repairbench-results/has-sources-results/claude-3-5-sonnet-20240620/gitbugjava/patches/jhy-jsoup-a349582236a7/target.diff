@@ -1,0 +1,20 @@
+diff --git a/tmp/3811be28-7e83-44e1-88cf-a3cf96b735e1_buggy.java b/tmp/b11b0b1b-cf7b-4c7d-bb35-051d0b7587bc_fixed.java
+index 3ecd591..27744ff 100644
+--- a/tmp/3811be28-7e83-44e1-88cf-a3cf96b735e1_buggy.java
++++ b/tmp/b11b0b1b-cf7b-4c7d-bb35-051d0b7587bc_fixed.java
+@@ -1,6 +1,12 @@
+     private boolean isInlineable(Document.OutputSettings out) {
+-        return tag().isInline()
+-            && (parent() == null || parent().isBlock())
+-            && previousSibling() != null
++        if (!tag.isInline())
++            return false;
++
++        final Node prev = previousSibling();
++        boolean isFirst = siblingIndex == 0;
++        if (siblingIndex == 1 && prev instanceof TextNode && (((TextNode) prev).isBlank()))
++            isFirst = true;
++        return (parent() == null || parent().isBlock())
++            && !isFirst
+             && !out.outline();
+     }

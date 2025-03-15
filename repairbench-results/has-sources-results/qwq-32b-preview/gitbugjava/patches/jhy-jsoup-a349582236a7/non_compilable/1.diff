@@ -1,0 +1,25 @@
+diff --git a/tmp/a682e2d5-065c-46e9-b83d-ebeb8194fbd9_buggy.java b/tmp/63f37a12-86be-4a4d-b288-bbd99de9b43e_fixed.java
+index 3ecd591..b950fa5 100644
+--- a/tmp/a682e2d5-065c-46e9-b83d-ebeb8194fbd9_buggy.java
++++ b/tmp/63f37a12-86be-4a4d-b288-bbd99de9b43e_fixed.java
+@@ -1,6 +1,18 @@
+ private boolean isInlineable(Document.OutputSettings out) {
+     return tag().isInline()
+         && (parent() == null || parent().isBlock())
+-            && previousSibling() != null
++        && !isAnchorWithBlockDescendants()
+         && !out.outline();
+ }
++
++private boolean isAnchorWithBlockDescendants() {
++    if (!tag().isAnchor()) {
++        return false;
++    }
++    for (Element child : tag().children()) {
++        if (child.isBlock() || isAnchorWithBlockDescendants(child)) {
++            return true;
++        }
++    }
++    return false;
++}
+\ No newline at end of file

@@ -1,0 +1,41 @@
+diff --git a/tmp/509772e7-d6a0-494d-8ee7-ba61ad7baf0f_buggy.java b/tmp/4ae46ba4-629e-42e9-8ea5-24a2f3b77649_fixed.java
+index 46817a7..d894c30 100644
+--- a/tmp/509772e7-d6a0-494d-8ee7-ba61ad7baf0f_buggy.java
++++ b/tmp/4ae46ba4-629e-42e9-8ea5-24a2f3b77649_fixed.java
+@@ -1,16 +1,29 @@
+   @Override
+   public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+       return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++    Set<String> allProperties = new HashSet<>(properties.keySet());
++    allProperties.addAll(that.toMaybeRecordType().getProperties().keySet());
++    for (String property : allProperties) {
++      if (properties.containsKey(property) && that.toMaybeRecordType().hasProperty(property)) {
++        // If both record types have the property, put the union of the types in the least supertype
++        JSType type1 = properties.get(property).getType();
++        JSType type2 = that.toMaybeRecordType().getPropertyType(property).getType();
++        JSType unionType = registry.createUnionType(type1, type2);
++        if (unionType == null) {
++          // If no common supertype, the least supertype is a ProxyObjectType
++          unionType = new ProxyObjectType(registry, type1, type2);
++        }
++        builder.addProperty(property, unionType, getPropertyNode(property));
++      } else if (properties.containsKey(property)) {
++        // If only the current record type has the property, put its type in the least supertype
++        builder.addProperty(property, properties.get(property).getType(), getPropertyNode(property));
++      } else {
++        // If only the other record type has the property, put its type in the least supertype
++        builder.addProperty(property, that.toMaybeRecordType().getPropertyType(property).getType(), that.toMaybeRecordType().getPropertyNode(property));
+       }
+     }
+     return builder.build();
+   }
+\ No newline at end of file

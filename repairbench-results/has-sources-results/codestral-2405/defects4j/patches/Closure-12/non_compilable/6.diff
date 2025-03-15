@@ -1,0 +1,17 @@
+diff --git a/tmp/263f56fa-5fc5-4bad-8833-48ca9cd45ba3_buggy.java b/tmp/bf2fd0b2-8909-44e4-afa2-014ad54a3a38_fixed.java
+index 22640dd..45725cd 100644
+--- a/tmp/263f56fa-5fc5-4bad-8833-48ca9cd45ba3_buggy.java
++++ b/tmp/bf2fd0b2-8909-44e4-afa2-014ad54a3a38_fixed.java
+@@ -1,3 +1,11 @@
+   private boolean hasExceptionHandler(Node cfgNode) {
++    if (cfgNode.getType() == Token.TRY) {
++      // If the node is a try-statement, check if it has a catch or finally block
++      Node block = cfgNode.getSecondChild();
++      while (block != null && block.getType() != Token.CATCH && block.getType() != Token.FINALLY) {
++        block = block.getNext();
++      }
++      return block != null;
++    }
+     return false;
+   }
+\ No newline at end of file

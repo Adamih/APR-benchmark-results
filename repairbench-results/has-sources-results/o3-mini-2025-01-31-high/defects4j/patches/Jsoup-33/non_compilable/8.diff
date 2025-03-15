@@ -1,0 +1,31 @@
+diff --git a/tmp/58ac3f93-df6e-475a-9d6a-d4cb6f541564_buggy.java b/tmp/5c8a1a73-0a87-4290-8af6-2e463789c131_fixed.java
+index dc93be3..b23edb8 100644
+--- a/tmp/58ac3f93-df6e-475a-9d6a-d4cb6f541564_buggy.java
++++ b/tmp/5c8a1a73-0a87-4290-8af6-2e463789c131_fixed.java
+@@ -1,14 +1,20 @@
+ Element insert(Token.StartTag startTag) {
+-        // handle empty unknown tags
+-        // when the spec expects an empty tag, will directly hit insertEmpty, so won't generate this fake end tag.
++    Tag tag = Tag.valueOf(startTag.name());
++    // if a self closing slash was provided, then for tags that aren’t allowed to be empty
++    // (i.e. known non‑empty tags) we ignore it; for unknown tags, or for known empty tags like <img>, we use it.
+     if (startTag.isSelfClosing()) {
++        // if we recognize the tag and it isn’t inherently empty, then drop the self closing flag
++        if (tag.isKnown() && !tag.isEmpty()) {
++            startTag.setSelfClosing(false);
++        } else {
++            // For unknown tags or empty tags, treat it as an empty element.
+             Element el = insertEmpty(startTag);
+             stack.add(el);
+-            tokeniser.emit(new Token.EndTag(el.tagName()));  // ensure we get out of whatever state we are in. emitted for yielded processing
++            tokeniser.emit(new Token.EndTag(el.tagName())); // ensure we exit current state
+             return el;
+         }
+-        
+-        Element el = new Element(Tag.valueOf(startTag.name()), baseUri, startTag.attributes);
++    }
++    Element el = new Element(tag, baseUri, startTag.attributes);
+     insert(el);
+     return el;
+ }
+\ No newline at end of file

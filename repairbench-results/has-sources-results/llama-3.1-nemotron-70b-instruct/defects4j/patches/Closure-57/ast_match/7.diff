@@ -1,0 +1,34 @@
+diff --git a/tmp/2a52ce9e-7543-4166-a25b-2b15b5eef8d2_buggy.java b/tmp/e3a4210c-df01-48a7-b6cd-2a289548392c_fixed.java
+index 1ea204a..9497a80 100644
+--- a/tmp/2a52ce9e-7543-4166-a25b-2b15b5eef8d2_buggy.java
++++ b/tmp/e3a4210c-df01-48a7-b6cd-2a289548392c_fixed.java
+@@ -1,17 +1,25 @@
+-  private static String extractClassNameIfGoog(Node node, Node parent,
+-      String functionName){
++/**
++ * Extracts the class name if the given node represents a goog.require() call.
++ *
++ * @param node         the node to check
++ * @param parent       the parent node of the given node
++ * @param functionName the expected function name (e.g., "goog.require")
++ * @return the class name if the node represents a goog.require() call, otherwise null
++ */
++private static String extractClassNameIfGoog(Node node, Node parent, String functionName) {
+     String className = null;
+     if (NodeUtil.isExprCall(parent)) {
+       Node callee = node.getFirstChild();
+       if (callee!= null && callee.getType() == Token.GETPROP) {
+         String qualifiedName = callee.getQualifiedName();
+         if (functionName.equals(qualifiedName)) {
+           Node target = callee.getNext();
+-          if (target != null) {
++          if (target!= null && target.getType() == Token.STRING) {
++            // Ensure the argument is a string literal before extracting the class name
+             className = target.getString();
+           }
+         }
+       }
+     }
+     return className;
+ }
+\ No newline at end of file

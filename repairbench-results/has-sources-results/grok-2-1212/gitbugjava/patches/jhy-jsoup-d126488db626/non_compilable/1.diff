@@ -1,0 +1,41 @@
+diff --git a/tmp/2d213fe4-b88b-4b0a-9f98-ff5d1da982b9_buggy.java b/tmp/243c2190-86ac-4b83-9993-e9ff2889a1f6_fixed.java
+index 5bf31b1..a681ad8 100644
+--- a/tmp/2d213fe4-b88b-4b0a-9f98-ff5d1da982b9_buggy.java
++++ b/tmp/243c2190-86ac-4b83-9993-e9ff2889a1f6_fixed.java
+@@ -1,17 +1,27 @@
+ private String consumeSubQuery() {
+     StringBuilder sq = StringUtil.borrowBuilder();
++    boolean inSubQuery = false;
+     while (!tq.isEmpty()) {
+-            if (tq.matches("("))
+-                sq.append("(").append(tq.chompBalanced('(', ')')).append(")");
+-            else if (tq.matches("["))
+-                sq.append("[").append(tq.chompBalanced('[', ']')).append("]");
+-            else if (tq.matchesAny(Combinators))
+-                if (sq.length() > 0)
++        if (tq.matches("(")) {
++            sq.append("(");
++            sq.append(tq.chompBalanced('(', ')'));
++            sq.append(")");
++            inSubQuery = true;
++        } else if (tq.matches("[")) {
++            sq.append("[");
++            sq.append(tq.chompBalanced('[', ']'));
++            sq.append("]");
++            inSubQuery = true;
++        } else if (tq.matchesAny(Combinators)) {
++            if (inSubQuery) {
+                 break;
+-                else
++            } else {
+                 tq.consume();
+-            else
++            }
++        } else {
+             sq.append(tq.consume());
++            inSubQuery = true;
++        }
+     }
+     return StringUtil.releaseBuilder(sq);
+ }
+\ No newline at end of file

@@ -1,0 +1,55 @@
+diff --git a/tmp/936aa5c1-dc18-441b-813d-0c3b10cb1817_buggy.java b/tmp/2d422c76-9de1-4d4f-b7f3-8d2da479ebd9_fixed.java
+index 904dba7..67626a2 100644
+--- a/tmp/936aa5c1-dc18-441b-813d-0c3b10cb1817_buggy.java
++++ b/tmp/2d422c76-9de1-4d4f-b7f3-8d2da479ebd9_fixed.java
+@@ -1,46 +1,47 @@
+ private String format(JSError error, boolean warning) {
+     // extract source excerpt
+     SourceExcerptProvider source = getSource();
+     String sourceExcerpt = source == null? null :
+         excerpt.get(
+             source, error.sourceName, error.lineNumber, excerptFormatter);
+ 
+     // formatting the message
+     StringBuilder b = new StringBuilder();
+     if (error.sourceName!= null) {
+       b.append(error.sourceName);
+       if (error.lineNumber > 0) {
+         b.append(':');
+         b.append(error.lineNumber);
+       }
+       b.append(": ");
+     }
+ 
+     b.append(getLevelName(warning? CheckLevel.WARNING : CheckLevel.ERROR));
+     b.append(" - ");
+ 
+-    b.append(error.description);
++    // Fix: append the actual error description from the error object
++    b.append(error.getMessage()!= null? error.getMessage() : "error description here");
+     b.append('\n');
+     if (sourceExcerpt!= null) {
+       b.append(sourceExcerpt);
+       b.append('\n');
+       int charno = error.getCharno();
+ 
+       // padding equal to the excerpt and arrow at the end
+       // charno == sourceExpert.length() means something is missing
+       // at the end of the line
+       if (excerpt.equals(LINE)
+-          && 0 <= charno && charno < sourceExcerpt.length()) {
++          && 0 <= charno && charno <= sourceExcerpt.length()) { // Fix: changed < to <=
+         for (int i = 0; i < charno; i++) {
+           char c = sourceExcerpt.charAt(i);
+           if (Character.isWhitespace(c)) {
+             b.append(c);
+           } else {
+             b.append(' ');
+           }
+         }
+         b.append("^\n");
+       }
+     }
+     return b.toString();
+ }
+\ No newline at end of file

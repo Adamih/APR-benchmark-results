@@ -1,0 +1,24 @@
+diff --git a/tmp/b6e6c6c8-d55d-4402-87c2-66de0b7acf1c_buggy.java b/tmp/287dc6eb-6f9e-4536-a4c1-52445b09db14_fixed.java
+index f47d784..f5be085 100644
+--- a/tmp/b6e6c6c8-d55d-4402-87c2-66de0b7acf1c_buggy.java
++++ b/tmp/287dc6eb-6f9e-4536-a4c1-52445b09db14_fixed.java
+@@ -1,12 +1,17 @@
+ @Override
+ public void process(Node externs, Node root) {
++  // First, perform the initial traversal.
+   NodeTraversal.traverse(compiler, root, this);
++  // Remove duplicate declarations (e.g. an explicit "var arguments" is redundant
++  // because functions already have an implicit "arguments" declaration).
++  removeDuplicateDeclarations(root);
++  // Now, if making local names unique is enabled, rename declarations.
+   if (MAKE_LOCAL_NAMES_UNIQUE) {
+     MakeDeclaredNamesUnique renamer = new MakeDeclaredNamesUnique();
+     NodeTraversal t = new NodeTraversal(compiler, renamer);
+     t.traverseRoots(externs, root);
+   }
+-    removeDuplicateDeclarations(root);
++  // Finally, propagate constant annotations.
+   new PropogateConstantAnnotations(compiler, assertOnChange)
+       .process(externs, root);
+ }
+\ No newline at end of file

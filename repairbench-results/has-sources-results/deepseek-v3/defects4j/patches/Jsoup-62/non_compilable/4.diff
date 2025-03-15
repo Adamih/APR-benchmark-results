@@ -1,0 +1,28 @@
+diff --git a/tmp/ff1a37fb-b92f-4845-b60d-d33b99ae2f96_buggy.java b/tmp/8d33d8c5-4247-482e-977c-96db39d433b6_fixed.java
+index 7dc89ed..42cc84f 100644
+--- a/tmp/ff1a37fb-b92f-4845-b60d-d33b99ae2f96_buggy.java
++++ b/tmp/8d33d8c5-4247-482e-977c-96db39d433b6_fixed.java
+@@ -1,20 +1,20 @@
+ boolean anyOtherEndTag(Token t, HtmlTreeBuilder tb) {
+     String name = t.asEndTag().normalName();
+     ArrayList<Element> stack = tb.getStack();
+     for (int pos = stack.size() -1; pos >= 0; pos--) {
+         Element node = stack.get(pos);
+-                if (node.nodeName().equals(name)) {
++        if (node.normalName().equals(name)) {  // Use normalName() for case-insensitive comparison
+             tb.generateImpliedEndTags(name);
+-                    if (!name.equals(tb.currentElement().nodeName()))
++            if (!name.equals(tb.currentElement().normalName()))  // Use normalName() for case-insensitive comparison
+                 tb.error(this);
+             tb.popStackToClose(name);
+             break;
+         } else {
+             if (tb.isSpecial(node)) {
+                 tb.error(this);
+                 return false;
+             }
+         }
+     }
+     return true;
+ }
+\ No newline at end of file

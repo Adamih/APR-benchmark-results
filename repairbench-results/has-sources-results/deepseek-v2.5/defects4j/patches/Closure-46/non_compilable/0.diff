@@ -1,0 +1,44 @@
+diff --git a/tmp/770891b0-fadf-4fe2-9e86-7c9cb77ccedb_buggy.java b/tmp/792c381c-ca78-4657-89a2-68b50873f07b_fixed.java
+index 46817a7..a1d4a32 100644
+--- a/tmp/770891b0-fadf-4fe2-9e86-7c9cb77ccedb_buggy.java
++++ b/tmp/792c381c-ca78-4657-89a2-68b50873f07b_fixed.java
+@@ -1,16 +1,33 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+   if (!that.isRecordType()) {
+     return super.getLeastSupertype(that);
+   }
+   RecordTypeBuilder builder = new RecordTypeBuilder(registry);
++  Map<String, JSType> propertiesToAdd = new HashMap<>();
++
++  // Add properties from this record type
+   for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++    propertiesToAdd.put(property, getPropertyType(property));
+   }
++
++  // Add properties from the other record type
++  for (String property : that.toMaybeRecordType().getProperties()) {
++    if (!propertiesToAdd.containsKey(property)) {
++      propertiesToAdd.put(property, that.toMaybeRecordType().getPropertyType(property));
++    } else {
++      JSType thisPropertyType = propertiesToAdd.get(property);
++      JSType thatPropertyType = that.toMaybeRecordType().getPropertyType(property);
++      if (!thisPropertyType.isEquivalentTo(thatPropertyType)) {
++        propertiesToAdd.put(property, registry.createUnionType(thisPropertyType, thatPropertyType));
+       }
++    }
++  }
++
++  // Build the new record type
++  for (Map.Entry<String, JSType> entry : propertiesToAdd.entrySet()) {
++    builder.addProperty(entry.getKey(), entry.getValue(), getPropertyNode(entry.getKey()));
++  }
++
+   return builder.build();
+ }
+\ No newline at end of file

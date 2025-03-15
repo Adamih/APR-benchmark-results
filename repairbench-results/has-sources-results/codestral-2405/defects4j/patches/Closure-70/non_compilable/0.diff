@@ -1,0 +1,36 @@
+diff --git a/tmp/7c28cb55-72ab-4bc7-89db-2f8bea189ff1_buggy.java b/tmp/f543697b-1aba-4e1d-98e6-4b5948ef28fe_fixed.java
+index 1530b34..c4f06e0 100644
+--- a/tmp/7c28cb55-72ab-4bc7-89db-2f8bea189ff1_buggy.java
++++ b/tmp/f543697b-1aba-4e1d-98e6-4b5948ef28fe_fixed.java
+@@ -1,23 +1,27 @@
+ /**
+  * Declares all of a function's arguments.
+  */
+ private void declareArguments(Node functionNode) {
+   Node astParameters = functionNode.getFirstChild().getNext();
+   Node body = astParameters.getNext();
+   FunctionType functionType = (FunctionType) functionNode.getJSType();
+   if (functionType != null) {
+     Node jsDocParameters = functionType.getParametersNode();
+-        if (jsDocParameters != null) {
++    if (jsDocParameters != null && jsDocParameters.hasChildren()) {
+       Node jsDocParameter = jsDocParameters.getFirstChild();
+       for (Node astParameter : astParameters.children()) {
+         if (jsDocParameter != null) {
+           defineSlot(astParameter, functionNode,
+-                  jsDocParameter.getJSType(), true);
++              jsDocParameter.getJSType(), true, astParameter.isNameDefined());
+           jsDocParameter = jsDocParameter.getNext();
+         } else {
+-              defineSlot(astParameter, functionNode, null, true);
++          defineSlot(astParameter, functionNode, null, true, astParameter.isNameDefined());
+         }
+       }
++    } else {
++      for (Node astParameter : astParameters.children()) {
++        defineSlot(astParameter, functionNode, null, true, astParameter.isNameDefined());
++      }
+     }
+   }
+ } // end declareArguments
+\ No newline at end of file

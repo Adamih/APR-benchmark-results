@@ -1,0 +1,20 @@
+diff --git a/tmp/c783d390-e394-433d-8647-dcc5af522197_buggy.java b/tmp/e3533d81-4938-498c-ad90-778c763f488a_fixed.java
+index ae6c2b1..82eb830 100644
+--- a/tmp/c783d390-e394-433d-8647-dcc5af522197_buggy.java
++++ b/tmp/e3533d81-4938-498c-ad90-778c763f488a_fixed.java
+@@ -1,10 +1,14 @@
+ public int parseInto(DateTimeParserBucket bucket, String text, int position) {
+     String str = text.substring(position);
+     for (String id : ALL_IDS) {
+         if (str.startsWith(id)) {
++            int nextCharPos = position + id.length();
++            if (nextCharPos < text.length() && text.charAt(nextCharPos) == '_') {
++                continue; // Skip if the next character is an underscore.
++            }
+             bucket.setZone(DateTimeZone.forID(id));
+             return position + id.length();
+         }
+     }
+     return ~position;
+ }
+\ No newline at end of file

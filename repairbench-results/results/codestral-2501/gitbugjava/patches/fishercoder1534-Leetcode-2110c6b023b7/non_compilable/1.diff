@@ -1,0 +1,24 @@
+diff --git a/tmp/14c2ea5c-0f17-4f24-ba10-706f6409c40e_buggy.java b/tmp/a9ca744b-8929-4e17-b486-fa75b4ca34e6_fixed.java
+index dd3b100..db5ebee 100644
+--- a/tmp/14c2ea5c-0f17-4f24-ba10-706f6409c40e_buggy.java
++++ b/tmp/a9ca744b-8929-4e17-b486-fa75b4ca34e6_fixed.java
+@@ -1,12 +1,12 @@
+ public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+     if (root == null || p == root || q == root) {
+         return root;
+     }
+-            if ((root.val - p.val) * (root.val - q.val) > 0) {
+-                if (root.val - p.val > 0) {
+-                    return lowestCommonAncestor(root.left, p, q);
+-                }
+-                return lowestCommonAncestor(root.right, p, q);
+-            }
++    TreeNode left = lowestCommonAncestor(root.left, p, q);
++    TreeNode right = lowestCommonAncestor(root.right, p, q);
++
++    if (left != null && right != null) {
+         return root;
+     }
++    return left != null ? left : right;
++}
+\ No newline at end of file

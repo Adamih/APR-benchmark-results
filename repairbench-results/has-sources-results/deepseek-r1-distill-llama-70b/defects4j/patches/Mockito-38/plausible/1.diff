@@ -1,0 +1,17 @@
+diff --git a/tmp/72f6dff9-3c0d-4650-9bfd-6a21c568cd82_buggy.java b/tmp/f3e5ff21-74ba-49c1-a0cc-c6dc3a8a2c9f_fixed.java
+index db60019..bfdfee7 100644
+--- a/tmp/72f6dff9-3c0d-4650-9bfd-6a21c568cd82_buggy.java
++++ b/tmp/f3e5ff21-74ba-49c1-a0cc-c6dc3a8a2c9f_fixed.java
+@@ -1,3 +1,10 @@
+ private boolean toStringEquals(Matcher m, Object arg) {
+-        return StringDescription.toString(m).equals(arg.toString());
++    if (m == null) {
++        return "null".equals(arg == null ? null : arg.toString());
++    }
++    String mToString = StringDescription.toString(m);
++    if (arg == null) {
++        return "null".equals(mToString);
++    }
++    return mToString.equals(arg.toString());
+ }
+\ No newline at end of file

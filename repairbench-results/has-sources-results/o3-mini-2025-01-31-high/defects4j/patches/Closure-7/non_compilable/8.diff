@@ -1,0 +1,21 @@
+diff --git a/tmp/ef6716cc-b15f-41f9-b985-373932e54fa0_buggy.java b/tmp/b0029c84-18c7-449b-95c9-4e70c549e7eb_fixed.java
+index a38ec6d..463c83f 100644
+--- a/tmp/ef6716cc-b15f-41f9-b985-373932e54fa0_buggy.java
++++ b/tmp/b0029c84-18c7-449b-95c9-4e70c549e7eb_fixed.java
+@@ -1,10 +1,11 @@
+ @Override
+ public JSType caseObjectType(ObjectType type) {
+   if (value.equals("function")) {
+-        JSType ctorType = getNativeType(U2U_CONSTRUCTOR_TYPE);
+-        return resultEqualsValue && ctorType.isSubtype(type) ? ctorType : null;
+-          // Objects are restricted to "Function", subtypes are left
+-          // Only filter out subtypes of "function"
++    // Instead of simply checking with isSubtype, we now “refine” the type.
++    // When the test is true, we restrict the type to just its function part;
++    // when false, we remove the function possibility.
++    return type.getRestrictedTypeGivenToBooleanOutcome(
++        resultEqualsValue, getNativeType(U2U_CONSTRUCTOR_TYPE));
+   }
+   return matchesExpectation("object") ? type : null;
+ }
+\ No newline at end of file

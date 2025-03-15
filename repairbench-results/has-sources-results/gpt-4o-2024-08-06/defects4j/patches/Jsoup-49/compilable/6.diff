@@ -1,0 +1,18 @@
+diff --git a/tmp/44adf279-2f25-48c2-9b85-70fa7f858ecc_buggy.java b/tmp/0ebb755f-0caa-462e-82bd-19f2939520e9_fixed.java
+index a37dc7a..44413d4 100644
+--- a/tmp/44adf279-2f25-48c2-9b85-70fa7f858ecc_buggy.java
++++ b/tmp/0ebb755f-0caa-462e-82bd-19f2939520e9_fixed.java
+@@ -1,10 +1,10 @@
+ protected void addChildren(int index, Node... children) {
+     Validate.noNullElements(children);
+     ensureChildNodes();
+-        for (int i = children.length - 1; i >= 0; i--) {
++    for (int i = 0; i < children.length; i++) { // Fix: iterate forwards
+         Node in = children[i];
+         reparentChild(in);
+-            childNodes.add(index, in);
++        childNodes.add(index + i, in); // Fix: add sequentially at the right index
+     }
+     reindexChildren(index);
+ }
+\ No newline at end of file

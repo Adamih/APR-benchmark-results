@@ -1,0 +1,25 @@
+diff --git a/tmp/aa8ea232-a7f7-41e0-b5ac-8eaf1f9972e9_buggy.java b/tmp/34866cc7-91d9-450a-954b-cddd71e0b6a1_fixed.java
+index 3ecd591..093236e 100644
+--- a/tmp/aa8ea232-a7f7-41e0-b5ac-8eaf1f9972e9_buggy.java
++++ b/tmp/34866cc7-91d9-450a-954b-cddd71e0b6a1_fixed.java
+@@ -1,6 +1,18 @@
++/**
++ * Fixes to ensure proper handling of nested inline elements (e.g., anchor tags within other anchor tags).
++ * 
++ * @param out the Document.OutputSettings
++ * @return true if the element is inlineable, false otherwise
++ */
+ private boolean isInlineable(Document.OutputSettings out) {
++    // Ensure the tag itself is inline
+     return tag().isInline()
++        // Verify the parent is either null or a block element
+         && (parent() == null || parent().isBlock())
++        // Check for previous sibling to maintain positioning
+         && previousSibling()!= null
+-            && !out.outline();
++        // Only consider outlining if it's not already set to outline
++        &&!out.outline()
++        // NEW CONDITION: Disallow inlineable if parent is also inline and not a phrasing content container
++        &&!(parent()!= null && parent().isInline() &&!parent().isPhrasingContentContainer());
+ }
+\ No newline at end of file

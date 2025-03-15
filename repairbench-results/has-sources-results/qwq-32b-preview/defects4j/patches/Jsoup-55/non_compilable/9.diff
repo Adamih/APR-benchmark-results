@@ -1,0 +1,33 @@
+diff --git a/tmp/c7e4b430-ff1d-4621-abe3-bfa5a501177b_buggy.java b/tmp/c30bb5d6-234f-4dd7-b1aa-e8a0aac53bb6_fixed.java
+index ef76662..4eca103 100644
+--- a/tmp/c7e4b430-ff1d-4621-abe3-bfa5a501177b_buggy.java
++++ b/tmp/c30bb5d6-234f-4dd7-b1aa-e8a0aac53bb6_fixed.java
+@@ -1,17 +1,17 @@
+-        void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
+-            switch (c) {
+-                case '>':
++default:
++    if (c == '/') {
+         t.tagPending.selfClosing = true;
++        // 可能需要消耗下一个字符，确保它是'>'
++        char next = r.consume();
++        if (next == '>') {
+             t.emitTagPending();
+             t.transition(Data);
+-                    break;
+-                case eof:
+-                    t.eofError(this);
+-                    t.transition(Data);
+-                    break;
+-                default:
++        } else {
++            // 处理错误情况
+             t.error(this);
+             t.transition(BeforeAttributeName);
+         }
++    } else {
++        t.error(this);
++        t.transition(BeforeAttributeName);
+     }
+\ No newline at end of file

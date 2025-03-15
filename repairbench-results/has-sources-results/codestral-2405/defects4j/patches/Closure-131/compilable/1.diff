@@ -1,0 +1,27 @@
+diff --git a/tmp/ebe25c81-1df6-45a3-92fb-c6c87b744b9c_buggy.java b/tmp/0bf3f164-b9cd-4075-a74a-e049aa7ecfa1_fixed.java
+index 19fe1b4..399ed31 100644
+--- a/tmp/ebe25c81-1df6-45a3-92fb-c6c87b744b9c_buggy.java
++++ b/tmp/0bf3f164-b9cd-4075-a74a-e049aa7ecfa1_fixed.java
+@@ -1,17 +1,11 @@
+ public static boolean isJSIdentifier(String s) {
+   int length = s.length();
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++  if (length == 0) {
+     return false;
+   }
+ 
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
+-          return false;
+-        }
+-      }
+-
+-      return true;
++  // Now we should allow special characters in JavaScript object keys, and also empty strings
++  // and strings with only whitespace characters
++  return s.matches("^[a-zA-Z_$0-9\\u0080-\\uFFFF]+$|^$|^\\s+$");
+ }
+\ No newline at end of file

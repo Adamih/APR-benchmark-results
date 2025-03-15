@@ -1,0 +1,41 @@
+diff --git a/tmp/ff44233e-cdfe-48c3-8d10-dda68333135e_buggy.java b/tmp/1882dcc7-907f-4b76-9f24-948850114d1d_fixed.java
+index 07b0792..2bf408d 100644
+--- a/tmp/ff44233e-cdfe-48c3-8d10-dda68333135e_buggy.java
++++ b/tmp/1882dcc7-907f-4b76-9f24-948850114d1d_fixed.java
+@@ -1,22 +1,33 @@
+     /**
+      * @return Whether the variable is only assigned a value once for its
+      *     lifetime.
+      */
+     boolean isAssignedOnceInLifetime() {
+       Reference ref = getOneAndOnlyAssignment();
+       if (ref == null) {
+         return false;
+       }
+ 
+       // Make sure this assignment is not in a loop.
+-      for (BasicBlock block = ref.getBasicBlock();
+-           block != null; block = block.getParent()) {
++      BasicBlock block = ref.getBasicBlock();
++      while (block != null) {
+         if (block.isFunction) {
+           break;
+         } else if (block.isLoop) {
+           return false;
+         }
++        block = block.getParent();
+       }
+ 
++      List<ControlFlowGraph.Branch> branches = getCfg().getBranches();
++      for (ControlFlowGraph.Branch branch : branches) {
++        if (branch.isConditional()
++            && ControlFlowAnalysis.isBreakTarget(
++                branch.getCondition().getNode(), ref.getNode())) {
++          return false;
++        }
++      }
++
++
+       return true;
+     }
+\ No newline at end of file

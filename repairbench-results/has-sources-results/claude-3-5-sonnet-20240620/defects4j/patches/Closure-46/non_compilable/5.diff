@@ -1,0 +1,39 @@
+diff --git a/tmp/058599ad-896c-4663-b466-9ffca6a461d7_buggy.java b/tmp/af4f550f-ca7d-4bae-b2d4-f1c3ab8550e0_fixed.java
+index 46817a7..9ec4ba2 100644
+--- a/tmp/058599ad-896c-4663-b466-9ffca6a461d7_buggy.java
++++ b/tmp/af4f550f-ca7d-4bae-b2d4-f1c3ab8550e0_fixed.java
+@@ -1,16 +1,26 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++    Set<String> allProperties = new HashSet<>(properties.keySet());
++    allProperties.addAll(that.toMaybeRecordType().getOwnPropertyNames());
++
++    for (String property : allProperties) {
++        JSType thisPropertyType = hasProperty(property) ? getPropertyType(property) : null;
++        JSType thatPropertyType = that.toMaybeRecordType().hasProperty(property) ?
++                that.toMaybeRecordType().getPropertyType(property) : null;
++
++        if (thisPropertyType != null && thatPropertyType != null &&
++                thisPropertyType.isEquivalentTo(thatPropertyType)) {
++            builder.addProperty(property, thisPropertyType, getPropertyNode(property));
+         }
+     }
+-    return builder.build();
++
++    JSType builtType = builder.build();
++    if (builtType.isEmptyType()) {
++        return registry.createUnionType(this, that);
++    }
++    return builtType;
+ }
+\ No newline at end of file

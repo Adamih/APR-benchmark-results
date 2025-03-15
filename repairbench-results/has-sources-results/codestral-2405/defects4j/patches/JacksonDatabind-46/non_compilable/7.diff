@@ -1,0 +1,25 @@
+diff --git a/tmp/d383fa20-90d3-4c11-85a5-bf295a5aaa66_buggy.java b/tmp/6ae5d39d-c087-4346-bc83-6a9876b92c8e_fixed.java
+index 6f49dcb..7322576 100644
+--- a/tmp/d383fa20-90d3-4c11-85a5-bf295a5aaa66_buggy.java
++++ b/tmp/6ae5d39d-c087-4346-bc83-6a9876b92c8e_fixed.java
+@@ -1,9 +1,18 @@
+ @Override
+ public StringBuilder getGenericSignature(StringBuilder sb)
+ {
+     _classSignature(_class, sb, false);
+     sb.append('<');
+-        sb = _referencedType.getGenericSignature(sb);
++    JavaType componentType = _referencedType;
++    while (componentType.isArrayType()) {
++        componentType = componentType.getContentType();
++        sb.append('[');
++    }
++    sb = componentType.getGenericSignature(sb);
++    while (_referencedType.isArrayType()) {
++        sb.append(';');  // close array type signature
++        _referencedType = _referencedType.getContentType();
++    }
+     sb.append(';');
+     return sb;
+ }
+\ No newline at end of file

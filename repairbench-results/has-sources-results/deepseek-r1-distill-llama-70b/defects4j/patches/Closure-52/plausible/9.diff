@@ -1,0 +1,24 @@
+diff --git a/tmp/9af308ec-2a31-4961-a00a-bd43eb1eec9a_buggy.java b/tmp/ffa6da56-1341-45f8-ba65-21e16023f1e3_fixed.java
+index 4b7f469..d838bbd 100644
+--- a/tmp/9af308ec-2a31-4961-a00a-bd43eb1eec9a_buggy.java
++++ b/tmp/ffa6da56-1341-45f8-ba65-21e16023f1e3_fixed.java
+@@ -1,10 +1,17 @@
+ static boolean isSimpleNumber(String s) {
+     int len = s.length();
++    if (len == 0) {
++        return false;
++    }
+     for (int index = 0; index < len; index++) {
+         char c = s.charAt(index);
+         if (c < '0' || c > '9') {
+             return false;
+         }
+     }
+-    return len > 0;
++    // Ensure that numbers with leading zeros aren't considered simple numbers, except for "0"
++    if (len > 1 && s.charAt(0) == '0') {
++        return false;
++    }
++    return true;
+ }
+\ No newline at end of file

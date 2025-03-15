@@ -1,0 +1,18 @@
+diff --git a/tmp/2028c0ed-01a9-41be-9f1c-fbe1644b4e89_buggy.java b/tmp/c5ddaf84-bb89-487d-9666-2ece42d06ff5_fixed.java
+index 08a41cf..91f5c8c 100644
+--- a/tmp/2028c0ed-01a9-41be-9f1c-fbe1644b4e89_buggy.java
++++ b/tmp/c5ddaf84-bb89-487d-9666-2ece42d06ff5_fixed.java
+@@ -1,12 +1,12 @@
+     /**
+      * Overloaded version of {@link #readValue(InputStream)}.
+      */
+     public <T> MappingIterator<T> readValues(byte[] src, int offset, int length)
+         throws IOException, JsonProcessingException
+     {
+         if (_dataFormatReaders != null) {
+             return _detectBindAndReadValues(_dataFormatReaders.findFormat(src, offset, length), false);
+         }
+-        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src),
++        return _bindAndReadValues(_considerFilter(_parserFactory.createParser(src, offset, length),
+                 true));
+     }

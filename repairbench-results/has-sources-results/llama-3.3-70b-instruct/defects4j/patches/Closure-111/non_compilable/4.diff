@@ -1,0 +1,16 @@
+diff --git a/tmp/51246e2f-e13f-4310-98b1-6a8b98236ba5_buggy.java b/tmp/97b830d7-5cd6-4af3-8668-ec682213e162_fixed.java
+index f1d02c1..f1b7088 100644
+--- a/tmp/51246e2f-e13f-4310-98b1-6a8b98236ba5_buggy.java
++++ b/tmp/97b830d7-5cd6-4af3-8668-ec682213e162_fixed.java
+@@ -1,4 +1,10 @@
+ @Override
+ protected JSType caseTopType(JSType topType) {
++  if (topType.isUnknown() || topType.isNull()) {
++    return UNKNOWN_TYPE;
++  } else if (topType.isArrayType() || topType.isFunctionType()) {
++    return ARRAY_TYPE;
++  } else {
+     return topType;
+   }
++}
+\ No newline at end of file

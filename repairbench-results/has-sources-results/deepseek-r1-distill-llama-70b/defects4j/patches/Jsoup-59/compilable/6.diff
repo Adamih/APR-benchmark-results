@@ -1,0 +1,49 @@
+diff --git a/tmp/a34324df-80e0-4cc2-bed6-9285cc79c8d4_buggy.java b/tmp/0c528f12-d299-4972-9ab0-fc5fdf0b8e13_fixed.java
+index 7de6748..64f6266 100644
+--- a/tmp/a34324df-80e0-4cc2-bed6-9285cc79c8d4_buggy.java
++++ b/tmp/0c528f12-d299-4972-9ab0-fc5fdf0b8e13_fixed.java
+@@ -1,23 +1,39 @@
+ final void newAttribute() {
+     if (attributes == null)
+         attributes = new Attributes();
+ 
+     if (pendingAttributeName != null) {
+-                // the tokeniser has skipped whitespace control chars, but trimming could collapse to empty for other control codes, so verify here
++        // Trim the attribute name
+         pendingAttributeName = pendingAttributeName.trim();
++        
++        // Skip if the attribute name becomes empty after trimming
++        if (pendingAttributeName.isEmpty()) {
++            pendingAttributeName = null;
++            resetPendingValues();
++            return;
++        }
++
+         Attribute attribute;
+-                    if (hasPendingAttributeValue)
++        if (hasPendingAttributeValue) {
+             attribute = new Attribute(pendingAttributeName,
+                 pendingAttributeValue.length() > 0 ? pendingAttributeValue.toString() : pendingAttributeValueS);
+-                    else if (hasEmptyAttributeValue)
++        } else if (hasEmptyAttributeValue) {
+             attribute = new Attribute(pendingAttributeName, "");
+-                    else
++        } else {
+             attribute = new BooleanAttribute(pendingAttributeName);
++        }
+         attributes.put(attribute);
+     }
+     pendingAttributeName = null;
+     hasEmptyAttributeValue = false;
+     hasPendingAttributeValue = false;
+     reset(pendingAttributeValue);
+     pendingAttributeValueS = null;
+ }
++
++private void resetPendingValues() {
++    hasEmptyAttributeValue = false;
++    hasPendingAttributeValue = false;
++    reset(pendingAttributeValue);
++    pendingAttributeValueS = null;
++}
+\ No newline at end of file

@@ -1,0 +1,22 @@
+diff --git a/tmp/cb2f563d-d8d0-46af-aec9-d513888b60d5_buggy.java b/tmp/665ac1d3-f35d-4358-a7ed-5d3dee52f89d_fixed.java
+index 5eedc11..2c87877 100644
+--- a/tmp/cb2f563d-d8d0-46af-aec9-d513888b60d5_buggy.java
++++ b/tmp/665ac1d3-f35d-4358-a7ed-5d3dee52f89d_fixed.java
+@@ -1,6 +1,15 @@
+ private static void handleRawtext(Token.StartTag startTag, HtmlTreeBuilder tb) {
+     tb.insert(startTag);
++
++    // The bug was here, tokeniser transition was not correct for the empty elements 'style' and 'noframes'.
++    // Tokeniser state should stay in Data state for them instead of switching to Rawtext state.
++
++    if (startTag.normalName().equals("style") || startTag.normalName().equals("noframes")) {
++        tb.tokeniser.transition(TokeniserState.Data);
++    } else {
+         tb.tokeniser.transition(TokeniserState.Rawtext);
++    }
++
+     tb.markInsertionMode();
+-        tb.transition(Text);
++    tb.transition(TreeBuilder.Text);
+ }
+\ No newline at end of file

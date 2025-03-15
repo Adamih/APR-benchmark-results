@@ -1,0 +1,26 @@
+diff --git a/tmp/e31d4041-248a-4433-8e6e-8d6d18e97744_buggy.java b/tmp/056a5776-5155-46a4-8509-7e3d639754b9_fixed.java
+index 4d0be80..9e98234 100644
+--- a/tmp/e31d4041-248a-4433-8e6e-8d6d18e97744_buggy.java
++++ b/tmp/056a5776-5155-46a4-8509-7e3d639754b9_fixed.java
+@@ -1,10 +1,19 @@
+ @Override
+ Node processForInLoop(ForInLoop loopNode) {
+-
++    if (isForEach(loopNode)) {
++        throw new UnsupportedOperationException("for each loops are not supported");
++    }
+     // Return the bare minimum to put the AST in a valid state.
+     return newNode(
+         Token.FOR,
+         transform(loopNode.getIterator()),
+         transform(loopNode.getIteratedObject()),
+         transformBlock(loopNode.getBody()));
+ }
++
++private boolean isForEach(ForInLoop loopNode) {
++    // Check if the loopNode is a "for each" loop
++    // This could be based on specific properties of the ForInLoop object
++    // For example, checking the loopNode's type or its children
++    return loopNode.getToken() == Token.FOR_EACH;
++}
+\ No newline at end of file

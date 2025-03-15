@@ -1,0 +1,18 @@
+diff --git a/tmp/9ed76d75-2133-4f45-a2b7-be0a6a0bcc71_buggy.java b/tmp/7d54b927-3981-43bd-a47b-2e8ec8f09e48_fixed.java
+index b86b44d..f7ca8fd 100644
+--- a/tmp/9ed76d75-2133-4f45-a2b7-be0a6a0bcc71_buggy.java
++++ b/tmp/7d54b927-3981-43bd-a47b-2e8ec8f09e48_fixed.java
+@@ -1,4 +1,10 @@
+ public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    Object leftValue = args[0].computeValue(context);
++    Object rightValue = args[1].computeValue(context);
++
++    if (leftValue == null || rightValue == null) {
++        return Boolean.FALSE;
++    }
++
++    return compute(leftValue, rightValue) ? Boolean.TRUE : Boolean.FALSE;
+ }
+\ No newline at end of file

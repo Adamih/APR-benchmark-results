@@ -1,0 +1,25 @@
+diff --git a/tmp/9854953a-acfb-4696-9c93-bd00db947d31_buggy.java b/tmp/1d35922d-1677-442f-be6c-f496093f092f_fixed.java
+index 1ea204a..ab262d1 100644
+--- a/tmp/9854953a-acfb-4696-9c93-bd00db947d31_buggy.java
++++ b/tmp/1d35922d-1677-442f-be6c-f496093f092f_fixed.java
+@@ -1,17 +1,18 @@
+ private static String extractClassNameIfGoog(Node node, Node parent,
+     String functionName) {
+     String className = null;
+     if (NodeUtil.isExprCall(parent)) {
+         Node callee = node.getFirstChild();
+         if (callee != null && callee.getType() == Token.GETPROP) {
+             String qualifiedName = callee.getQualifiedName();
+             if (functionName.equals(qualifiedName)) {
+                 Node target = callee.getNext();
+-          if (target != null) {
++                // Check if target is a string literal
++                if (target != null && target.getType() == Token.STRING) {
+                     className = target.getString();
+                 }
+             }
+         }
+     }
+     return className;
+ }
+\ No newline at end of file

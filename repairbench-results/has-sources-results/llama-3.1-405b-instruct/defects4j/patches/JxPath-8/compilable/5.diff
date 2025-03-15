@@ -1,0 +1,43 @@
+diff --git a/tmp/6d719bd2-21b6-49d0-af52-7d0c8514c6f0_buggy.java b/tmp/2dc90fbe-83bd-4ad5-84ad-5808ed6f3e87_fixed.java
+index 98d89dc..be9060d 100644
+--- a/tmp/6d719bd2-21b6-49d0-af52-7d0c8514c6f0_buggy.java
++++ b/tmp/2dc90fbe-83bd-4ad5-84ad-5808ed6f3e87_fixed.java
+@@ -1,23 +1,37 @@
+ private boolean compute(Object left, Object right) {
+     left = reduce(left);
+     right = reduce(right);
+ 
+     if (left instanceof InitialContext) {
+         ((InitialContext) left).reset();
+     }
+     if (right instanceof InitialContext) {
+         ((InitialContext) right).reset();
+     }
+     if (left instanceof Iterator && right instanceof Iterator) {
+         return findMatch((Iterator) left, (Iterator) right);
+     }
+     if (left instanceof Iterator) {
+         return containsMatch((Iterator) left, right);
+     }
+     if (right instanceof Iterator) {
+         return containsMatch((Iterator) right, left);
+     }
+     double ld = InfoSetUtil.doubleValue(left);
+     double rd = InfoSetUtil.doubleValue(right);
++    
++    // Added check for NaN
++    if (Double.isNaN(ld) || Double.isNaN(rd)) {
++        int cmp;
++        if (Double.isNaN(ld) && Double.isNaN(rd)) {
++            cmp = 0; // Two NaN values are considered equal
++        } else if (Double.isNaN(ld)) {
++            cmp = -1; // NaN is less than any other number
++        } else {
++            cmp = 1; // Any other number is greater than NaN
++        }
++        return evaluateCompare(cmp);
++    }
++
+     return evaluateCompare(ld == rd? 0 : ld < rd? -1 : 1);
+ }
+\ No newline at end of file

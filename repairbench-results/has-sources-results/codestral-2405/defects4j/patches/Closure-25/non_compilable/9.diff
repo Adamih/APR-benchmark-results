@@ -1,0 +1,51 @@
+diff --git a/tmp/c614ec73-d9c3-4047-bb94-8a9a82867c26_buggy.java b/tmp/1473516b-ee4a-44be-b2ce-513270d10151_fixed.java
+index b98f0a7..438e6d8 100644
+--- a/tmp/c614ec73-d9c3-4047-bb94-8a9a82867c26_buggy.java
++++ b/tmp/1473516b-ee4a-44be-b2ce-513270d10151_fixed.java
+@@ -1,29 +1,43 @@
+ private FlowScope traverseNew(Node n, FlowScope scope) {
+-
+     Node constructor = n.getFirstChild();
++    FlowScope originScope = scope.copy();
+     scope = traverse(constructor, scope);
+     JSType constructorType = constructor.getJSType();
+     JSType type = null;
+     if (constructorType != null) {
+         constructorType = constructorType.restrictByNotNullOrUndefined();
+         if (constructorType.isUnknownType()) {
+             type = getNativeType(UNKNOWN_TYPE);
+         } else {
+             FunctionType ct = constructorType.toMaybeFunctionType();
+             if (ct == null && constructorType instanceof FunctionType) {
+                 // If constructorType is a NoObjectType, then toMaybeFunctionType will
+                 // return null. But NoObjectType implements the FunctionType
+                 // interface, precisely because it can validly construct objects.
+                 ct = (FunctionType) constructorType;
+             }
+             if (ct != null && ct.isConstructor()) {
+                 type = ct.getInstanceType();
++                // Update scope after determining the instance type
++                if (ct.hasParameters()) {
++                    originScope.mergeWith(updateScopeWithConstructorParameters(originScope, ct.getParameters(), n.getSecondChild()));
++                }
+             }
+         }
+     }
+     n.setJSType(type);
+     for (Node arg = constructor.getNext(); arg != null; arg = arg.getNext()) {
+-      scope = traverse(arg, scope);
++        scope = traverse(arg, originScope);
++    }
++    return scope;
++}
++
++private FlowScope updateScopeWithConstructorParameters(FlowScope scope, List<FunctionType.Parameter> parameters, Node argument) {
++    if (parameters.size() > 0 && argument != null) {
++        JSType argumentType = argument.getJSType();
++        if (argumentType != null) {
++            scope.setTypeOf(parameters.get(0).getNameNode(), argumentType.restrictByNotNullOrUndefined());
++        }
+     }
+     return scope;
+ }
+\ No newline at end of file

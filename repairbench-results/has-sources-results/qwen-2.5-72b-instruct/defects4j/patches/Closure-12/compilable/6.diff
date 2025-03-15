@@ -1,0 +1,20 @@
+diff --git a/tmp/20d60906-5a55-4a6f-9f12-22633d9c8904_buggy.java b/tmp/beb44ff0-d78d-4ac9-b61c-efa2081030c6_fixed.java
+index 22640dd..23911e8 100644
+--- a/tmp/20d60906-5a55-4a6f-9f12-22633d9c8904_buggy.java
++++ b/tmp/beb44ff0-d78d-4ac9-b61c-efa2081030c6_fixed.java
+@@ -1,3 +1,14 @@
+ private boolean hasExceptionHandler(Node cfgNode) {
++    // Check if the node is a TRY node
++    if (cfgNode.isTry()) {
++        // A TRY node always has an associated CATCH or FINALLY block
++        return true;
++    }
++    // If not a TRY node, check its children
++    for (Node child : cfgNode.children()) {
++        if (hasExceptionHandler(child)) {
++            return true;
++        }
++    }
+     return false;
+ }
+\ No newline at end of file

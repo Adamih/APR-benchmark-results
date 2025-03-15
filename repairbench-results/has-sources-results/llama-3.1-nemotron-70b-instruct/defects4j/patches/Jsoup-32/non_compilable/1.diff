@@ -1,0 +1,14 @@
+diff --git a/tmp/7bb5e389-0b1b-4a60-8b8c-fe5e308a19af_buggy.java b/tmp/f3e80b9a-9ec7-4b4a-9764-701d1476e1ad_fixed.java
+index 91469b4..009f446 100644
+--- a/tmp/7bb5e389-0b1b-4a60-8b8c-fe5e308a19af_buggy.java
++++ b/tmp/f3e80b9a-9ec7-4b4a-9764-701d1476e1ad_fixed.java
+@@ -1,6 +1,7 @@
+ @Override
+ public Element clone() {
+     Element clone = (Element) super.clone();
+-        clone.classNames();
++    // Create a defensive copy of the class names set to prevent shared mutable state
++    clone.attributes().addAll(new Attributes(clone.attributes()));
+     return clone;
+ }
+\ No newline at end of file

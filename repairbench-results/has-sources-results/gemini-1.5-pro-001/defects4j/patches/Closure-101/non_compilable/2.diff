@@ -1,0 +1,29 @@
+diff --git a/tmp/62b7fa7e-a96a-4ce7-85cd-608ac7f0acbc_buggy.java b/tmp/eb06c33a-2104-4a8f-a9bd-b618bc799d50_fixed.java
+index 8afddc6..f47db21 100644
+--- a/tmp/62b7fa7e-a96a-4ce7-85cd-608ac7f0acbc_buggy.java
++++ b/tmp/eb06c33a-2104-4a8f-a9bd-b618bc799d50_fixed.java
+@@ -1,22 +1,24 @@
+   @Override
+   protected CompilerOptions createOptions() {
+     CompilerOptions options = new CompilerOptions();
+     options.setCodingConvention(new ClosureCodingConvention());
+     CompilationLevel level = flags.compilation_level;
+     level.setOptionsForCompilationLevel(options);
+     if (flags.debug) {
+       level.setDebugOptionsForCompilationLevel(options);
+     }
+ 
+     WarningLevel wLevel = flags.warning_level;
+     wLevel.setOptionsForWarningLevel(options);
+     for (FormattingOption formattingOption : flags.formatting) {
+       formattingOption.applyToOptions(options);
+     }
+     if (flags.process_closure_primitives) {
+       options.closurePass = true;
++    } else {
++      options.setProcessClosurePrimitives(false);
+     }
+ 
+     initOptionsFromFlags(options);
+     return options;
+   }

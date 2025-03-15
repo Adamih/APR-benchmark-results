@@ -1,0 +1,22 @@
+diff --git a/tmp/f765974d-7a8f-4e8b-8c5e-6402dea6d82f_buggy.java b/tmp/3917e4ac-d475-4c7d-8dbf-69a6ca3510e9_fixed.java
+index b86b44d..67aae8d 100644
+--- a/tmp/f765974d-7a8f-4e8b-8c5e-6402dea6d82f_buggy.java
++++ b/tmp/3917e4ac-d475-4c7d-8dbf-69a6ca3510e9_fixed.java
+@@ -1,4 +1,14 @@
+ public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    Object lhs = args[0].computeValue(context);
++    Object rhs = args[1].computeValue(context);
++    
++    // Handle empty node set comparisons
++    if (lhs instanceof EvalContext && ((EvalContext) lhs).getCurrentNodePointer() == null) {
++        return Boolean.FALSE;
++    }
++    if (rhs instanceof EvalContext && ((EvalContext) rhs).getCurrentNodePointer() == null) {
++        return Boolean.FALSE;
++    }
++    
++    return compute(lhs, rhs) ? Boolean.TRUE : Boolean.FALSE;
+ }
+\ No newline at end of file

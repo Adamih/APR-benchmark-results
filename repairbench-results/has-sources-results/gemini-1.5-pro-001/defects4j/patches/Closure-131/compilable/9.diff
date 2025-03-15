@@ -1,0 +1,27 @@
+diff --git a/tmp/d4647157-cd14-4a7d-bf45-b371a7c75cf5_buggy.java b/tmp/8b669467-8d6d-4bc4-ad47-c18e7112a5f7_fixed.java
+index 19fe1b4..92bdd9b 100644
+--- a/tmp/d4647157-cd14-4a7d-bf45-b371a7c75cf5_buggy.java
++++ b/tmp/8b669467-8d6d-4bc4-ad47-c18e7112a5f7_fixed.java
+@@ -1,17 +1,16 @@
+     public static boolean isJSIdentifier(String s) {
+       int length = s.length();
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++      if (length == 0) {
+         return false;
+       }
+ 
+-      for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++      for (int i = 0; i < length; i++) {
++        if (!Character.isUnicodeIdentifierPart(s.charAt(i))
++            || Character.getType(s.charAt(i)) == Character.CONNECTOR_PUNCTUATION) {
+           return false;
+         }
+       }
+ 
+       return true;
+     }
+\ No newline at end of file

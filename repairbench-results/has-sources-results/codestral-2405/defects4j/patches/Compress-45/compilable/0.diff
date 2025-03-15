@@ -1,0 +1,47 @@
+diff --git a/tmp/d49735d5-0ac7-4d3b-9f8d-8cb7c11bb5fa_buggy.java b/tmp/1feffcae-4925-4754-8bb9-656a5a951cd5_fixed.java
+index 1bbc082..911599d 100644
+--- a/tmp/d49735d5-0ac7-4d3b-9f8d-8cb7c11bb5fa_buggy.java
++++ b/tmp/1feffcae-4925-4754-8bb9-656a5a951cd5_fixed.java
+@@ -1,36 +1,19 @@
+-    /**
+-     * Write an long integer into a buffer as an octal string if this
+-     * will fit, or as a binary number otherwise.
+-     * 
+-     * Uses {@link #formatUnsignedOctalString} to format
+-     * the value as an octal string with leading zeros.
+-     * The converted number is followed by a space.
+-     * 
+-     * @param value The value to write into the buffer.
+-     * @param buf The destination buffer.
+-     * @param offset The starting offset into the buffer.
+-     * @param length The length of the buffer.
+-     * @return The updated offset.
+-     * @throws IllegalArgumentException if the value (and trailer)
+-     * will not fit in the buffer.
+-     * @since 1.4
+-     */
+-    public static int formatLongOctalOrBinaryBytes(
+-        final long value, final byte[] buf, final int offset, final int length) {
++public static int formatLongOctalOrBinaryBytes(final long value, final byte[] buf, final int offset, final int length) {
+ 
+     // Check whether we are dealing with UID/GID or SIZE field
+     final long maxAsOctalChar = length == TarConstants.UIDLEN ? TarConstants.MAXID : TarConstants.MAXSIZE;
+ 
+     final boolean negative = value < 0;
+-        if (!negative && value <= maxAsOctalChar) { // OK to store as octal chars
+-            return formatLongOctalBytes(value, buf, offset, length);
++    final long absValue = Math.abs(value);
++    if (absValue <= maxAsOctalChar) { // OK to store as octal chars
++        return formatLongOctalBytes(absValue, buf, offset, length);
+     }
+ 
+     if (length < 9) {
+-            formatLongBinary(value, buf, offset, length, negative);
++        throw new IllegalArgumentException("Value " + value + " is too large for " + length + " byte field.");
+     }
+     formatBigIntegerBinary(value, buf, offset, length, negative);
+ 
+     buf[offset] = (byte) (negative ? 0xff : 0x80);
+     return offset + length;
+ }
+\ No newline at end of file

@@ -1,0 +1,31 @@
+diff --git a/tmp/cac2af59-2928-49e2-b9cf-3db2254f3999_buggy.java b/tmp/4f546977-8c2c-4ee3-8a63-ee7432856ee3_fixed.java
+index 8afddc6..cdd5c58 100644
+--- a/tmp/cac2af59-2928-49e2-b9cf-3db2254f3999_buggy.java
++++ b/tmp/4f546977-8c2c-4ee3-8a63-ee7432856ee3_fixed.java
+@@ -1,22 +1,3 @@
+-  @Override
+-  protected CompilerOptions createOptions() {
+-    CompilerOptions options = new CompilerOptions();
+-    options.setCodingConvention(new ClosureCodingConvention());
+-    CompilationLevel level = flags.compilation_level;
+-    level.setOptionsForCompilationLevel(options);
+-    if (flags.debug) {
+-      level.setDebugOptionsForCompilationLevel(options);
+-    }
+-
+-    WarningLevel wLevel = flags.warning_level;
+-    wLevel.setOptionsForWarningLevel(options);
+-    for (FormattingOption formattingOption : flags.formatting) {
+-      formattingOption.applyToOptions(options);
+-    }
+-    if (flags.process_closure_primitives) {
+-      options.closurePass = true;
+-    }
+-
+-    initOptionsFromFlags(options);
+-    return options;
+-  }
++test("var goog = {}; goog.provide('goog.dom');", "var goog = {}; goog.dom = {};;");
++args.add("--process_closure_primitives=false");
++testSame("var goog = {}; goog.provide('goog.dom');");
+\ No newline at end of file

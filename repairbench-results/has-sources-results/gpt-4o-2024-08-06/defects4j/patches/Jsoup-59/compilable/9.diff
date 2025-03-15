@@ -1,0 +1,30 @@
+diff --git a/tmp/009156c9-0d5d-49e5-8c8c-878e8512fb32_buggy.java b/tmp/5ca7a2bd-8a92-4b47-ad3b-3d65080eade3_fixed.java
+index 7de6748..3d0f726 100644
+--- a/tmp/009156c9-0d5d-49e5-8c8c-878e8512fb32_buggy.java
++++ b/tmp/5ca7a2bd-8a92-4b47-ad3b-3d65080eade3_fixed.java
+@@ -1,23 +1,23 @@
+ final void newAttribute() {
+     if (attributes == null)
+         attributes = new Attributes();
+ 
+-            if (pendingAttributeName != null) {
++    if (pendingAttributeName != null && !pendingAttributeName.trim().isEmpty()) {
+         // the tokeniser has skipped whitespace control chars, but trimming could collapse to empty for other control codes, so verify here
+         pendingAttributeName = pendingAttributeName.trim();
+         Attribute attribute;
+         if (hasPendingAttributeValue)
+             attribute = new Attribute(pendingAttributeName,
+                 pendingAttributeValue.length() > 0 ? pendingAttributeValue.toString() : pendingAttributeValueS);
+         else if (hasEmptyAttributeValue)
+             attribute = new Attribute(pendingAttributeName, "");
+         else
+             attribute = new BooleanAttribute(pendingAttributeName);
+         attributes.put(attribute);
+     }
+     pendingAttributeName = null;
+     hasEmptyAttributeValue = false;
+     hasPendingAttributeValue = false;
+     reset(pendingAttributeValue);
+     pendingAttributeValueS = null;
+ }
+\ No newline at end of file

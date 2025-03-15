@@ -1,0 +1,27 @@
+diff --git a/tmp/f2a3c4be-aa43-4b3a-9f4c-5006c5073921_buggy.java b/tmp/b047ce9b-c367-4a8a-943d-13d5fdc188c1_fixed.java
+index 5f96616..c10c4ec 100644
+--- a/tmp/f2a3c4be-aa43-4b3a-9f4c-5006c5073921_buggy.java
++++ b/tmp/b047ce9b-c367-4a8a-943d-13d5fdc188c1_fixed.java
+@@ -1,20 +1 @@
+-  @Override
+-  public void matchConstraint(JSType constraint) {
+-    // We only want to match constraints on anonymous types.
+-    if (hasReferenceName()) {
+-      return;
+-    }
+-
+-    // Handle the case where the constraint object is a record type.
+-    //
+-    // param constraint {{prop: (number|undefined)}}
+-    // function f(constraint) {}
+-    // f({});
+-    //
+-    // We want to modify the object literal to match the constraint, by
+-    // taking any each property on the record and trying to match
+-    // properties on this object.
+-    if (constraint.isRecordType()) {
+-      matchRecordTypeConstraint(constraint.toObjectType());
+-    }
+-  }
++junit.framework.ComparisonFailure: expected:<{[prop: (string|undefined)]}> but was:<{[]}>
+\ No newline at end of file

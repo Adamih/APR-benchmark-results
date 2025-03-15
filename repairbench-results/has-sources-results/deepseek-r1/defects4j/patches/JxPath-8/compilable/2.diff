@@ -1,0 +1,38 @@
+diff --git a/tmp/d6e49549-dbcf-48aa-a0cf-a0ada8df6a29_buggy.java b/tmp/ca9c2d4b-bc19-4e19-b1bf-824e4b8a794f_fixed.java
+index 98d89dc..6d1a931 100644
+--- a/tmp/d6e49549-dbcf-48aa-a0cf-a0ada8df6a29_buggy.java
++++ b/tmp/ca9c2d4b-bc19-4e19-b1bf-824e4b8a794f_fixed.java
+@@ -1,23 +1,32 @@
+     private boolean compute(Object left, Object right) {
+         left = reduce(left);
+         right = reduce(right);
+ 
+         if (left instanceof InitialContext) {
+             ((InitialContext) left).reset();
+         }
+         if (right instanceof InitialContext) {
+             ((InitialContext) right).reset();
+         }
+         if (left instanceof Iterator && right instanceof Iterator) {
+             return findMatch((Iterator) left, (Iterator) right);
+         }
+         if (left instanceof Iterator) {
+             return containsMatch((Iterator) left, right);
+         }
+         if (right instanceof Iterator) {
+             return containsMatch((Iterator) right, left);
+         }
+         double ld = InfoSetUtil.doubleValue(left);
+         double rd = InfoSetUtil.doubleValue(right);
++
++        // Handle NaN cases
++        if (Double.isNaN(ld) && Double.isNaN(rd)) {
++            return evaluateCompare(0); // Treat NaNs as equal for =, false for others
++        }
++        if (Double.isNaN(ld) || Double.isNaN(rd)) {
++            return evaluateCompare(1); // Ensure any comparison with a NaN returns false
++        }
++
+         return evaluateCompare(ld == rd ? 0 : ld < rd ? -1 : 1);
+     }
+\ No newline at end of file

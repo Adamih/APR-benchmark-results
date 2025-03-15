@@ -1,0 +1,34 @@
+diff --git a/tmp/8f9b0776-c136-4c65-b16b-f733cd996855_buggy.java b/tmp/cedcf2b5-e0b6-40c6-9a20-de54ee39060a_fixed.java
+index 939f49b..0178501 100644
+--- a/tmp/8f9b0776-c136-4c65-b16b-f733cd996855_buggy.java
++++ b/tmp/cedcf2b5-e0b6-40c6-9a20-de54ee39060a_fixed.java
+@@ -1,21 +1,18 @@
+     private boolean isPrototypePropertyAssign(Node assign) {
+       Node n = assign.getFirstChild();
+       if (n != null && NodeUtil.isVarOrSimpleAssignLhs(n, assign)
+-          && n.getType() == Token.GETPROP
+-          ) {
++          && n.getType() == Token.GETPROP) {
+         // We want to exclude the assignment itself from the usage list
+-        boolean isChainedProperty =
+-            n.getFirstChild().getType() == Token.GETPROP;
+-
+-        if (isChainedProperty) {
+-          Node child = n.getFirstChild().getFirstChild().getNext();
+-
+-          if (child.getType() == Token.STRING &&
+-              child.getString().equals("prototype")) {
++        // check that a prototype property is assigned.
++        Node firstChild = n.getFirstChild();
++        if (firstChild != null && firstChild.getType() == Token.GETPROP) {
++          Node protoNode = firstChild.getFirstChild().getNext();
++          if (protoNode != null && protoNode.getType() == Token.STRING
++              && protoNode.getString().equals("prototype")) {
+             return true;
+           }
+         }
+       }
+ 
+       return false;
+     }
+\ No newline at end of file

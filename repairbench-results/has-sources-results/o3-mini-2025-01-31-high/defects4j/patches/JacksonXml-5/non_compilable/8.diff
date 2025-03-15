@@ -1,0 +1,19 @@
+diff --git a/tmp/22305f81-4c93-4007-8eea-0490196ef5e9_buggy.java b/tmp/2dcdaa07-4886-415d-bd42-fd964dd4d2be_fixed.java
+index 1ed78d0..8e474f9 100644
+--- a/tmp/22305f81-4c93-4007-8eea-0490196ef5e9_buggy.java
++++ b/tmp/2dcdaa07-4886-415d-bd42-fd964dd4d2be_fixed.java
+@@ -1,9 +1,10 @@
+ /**
+  * @since 2.8.9
+  */
+ protected XmlSerializerProvider(XmlSerializerProvider src) {
+     super(src);
+-        // 21-May-2018, tatu: As per [dataformat-xml#282], should NOT really copy
+-        //    root name lookup as that may link back to diff version, configuration
+-        _rootNameLookup = src._rootNameLookup;
++    // As per [dataformat-xml#282], do not copy the existing root name lookup;
++    // instead, create a new instance so that new configuration (e.g. disabling annotations)
++    // will trigger fresh resolution.
++    _rootNameLookup = new RootNameLookup();
+ }
+\ No newline at end of file

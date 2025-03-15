@@ -1,0 +1,21 @@
+diff --git a/tmp/c313a660-6bab-4f28-84d3-31947d4d09d8_buggy.java b/tmp/38b0e936-c19f-42da-a9cc-87953d3b3610_fixed.java
+index d2a3c80..6ccdcbe 100644
+--- a/tmp/c313a660-6bab-4f28-84d3-31947d4d09d8_buggy.java
++++ b/tmp/38b0e936-c19f-42da-a9cc-87953d3b3610_fixed.java
+@@ -1,11 +1,9 @@
+-    /**
+-     * Outputs the record separator.
+-     *
+-     * @throws IOException
+-     *             If an I/O error occurs
+-     */
+     public void println() throws IOException {
+         final String recordSeparator = format.getRecordSeparator();
++        if (recordSeparator != null) {
+             out.append(recordSeparator);
++        } else {
++            out.append(System.lineSeparator());
++        }
+         newRecord = true;
+     }
+\ No newline at end of file

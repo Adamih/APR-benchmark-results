@@ -1,0 +1,29 @@
+diff --git a/tmp/668e82f7-cbb8-427b-88bc-76e4c79351a5_buggy.java b/tmp/571e9b2c-7fb2-4d9c-9b8e-2291da17351e_fixed.java
+index d4e6d48..164773c 100644
+--- a/tmp/668e82f7-cbb8-427b-88bc-76e4c79351a5_buggy.java
++++ b/tmp/571e9b2c-7fb2-4d9c-9b8e-2291da17351e_fixed.java
+@@ -1,23 +1,9 @@
+-  private Node tryFoldSimpleFunctionCall(Node n) {
+-    Preconditions.checkState(n.isCall());
+-    Node callTarget = n.getFirstChild();
+-    if (callTarget != null && callTarget.isName() &&
+-          callTarget.getString().equals("String")) {
+-      // Fold String(a) to '' + (a) on immutable literals,
+-      // which allows further optimizations
+-      //
+-      // We can't do this in the general case, because String(a) has
+-      // slightly different semantics than '' + (a). See
+-      // http://code.google.com/p/closure-compiler/issues/detail?id=759
+ Node value = callTarget.getNext();
+ if (value != null) {
+   Node addition = IR.add(
+       IR.string("").srcref(callTarget),
+       value.detachFromParent());
+   n.getParent().replaceChild(n, addition);
+   reportCodeChange();
+   return addition;
+ }
+\ No newline at end of file
+-    }
+-    return n;
+-  }

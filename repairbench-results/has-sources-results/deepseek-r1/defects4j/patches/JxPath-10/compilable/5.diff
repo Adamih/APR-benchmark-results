@@ -1,0 +1,20 @@
+diff --git a/tmp/9c4c019f-455b-4a0a-9205-5ab237294482_buggy.java b/tmp/3f3f9b52-9c4f-4c29-8cc6-12ee43fcaea3_fixed.java
+index b86b44d..ddd8fb0 100644
+--- a/tmp/9c4c019f-455b-4a0a-9205-5ab237294482_buggy.java
++++ b/tmp/3f3f9b52-9c4f-4c29-8cc6-12ee43fcaea3_fixed.java
+@@ -1,4 +1,12 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        Object arg0 = args[0].computeValue(context);
++        Object arg1 = args[1].computeValue(context);
++        
++        // Check if either argument is an empty collection (node set)
++        if ((arg0 instanceof java.util.Collection && ((java.util.Collection<?>) arg0).isEmpty()) ||
++            (arg1 instanceof java.util.Collection && ((java.util.Collection<?>) arg1).isEmpty())) {
++            return Boolean.FALSE;
++        }
++        
++        return compute(arg0, arg1) ? Boolean.TRUE : Boolean.FALSE;
+     }
+\ No newline at end of file

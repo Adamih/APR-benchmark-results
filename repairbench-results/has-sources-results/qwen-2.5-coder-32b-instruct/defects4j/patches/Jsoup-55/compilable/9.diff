@@ -1,0 +1,40 @@
+diff --git a/tmp/986bdc34-05b2-41b3-9cda-fdc5e57acda5_buggy.java b/tmp/e74a0cfa-bb73-46b8-aec2-81a3e4c16df1_fixed.java
+index ef76662..12837f6 100644
+--- a/tmp/986bdc34-05b2-41b3-9cda-fdc5e57acda5_buggy.java
++++ b/tmp/e74a0cfa-bb73-46b8-aec2-81a3e4c16df1_fixed.java
+@@ -1,17 +1,32 @@
+ void read(Tokeniser t, CharacterReader r) {
+-            char c = r.consume();
++    char c = r.current(); // Use current() instead of consume() to check the character without removing it
+     switch (c) {
+         case '>':
+-                    t.tagPending.selfClosing = true;
++            r.advance(); // Consume the '>' character
++            if (t.tagPending.selfClosing) {
+                 t.emitTagPending();
++            } else {
+                 t.transition(Data);
++            }
++            t.tagPending.selfClosing = false; // Reset selfClosing to false after processing
++            break;
++        case '/':
++            r.advance(); // Consume the '/' character
++            c = r.current(); // Check the next character
++            if (c == '>') {
++                t.tagPending.selfClosing = true;
++                // Do not transition immediately, instead handle the '>' case in the next iteration
++            } else {
++                t.error(this);
++                t.transition(BeforeAttributeName);
++            }
+             break;
+         case eof:
+             t.eofError(this);
+             t.transition(Data);
+             break;
+         default:
+             t.error(this);
+             t.transition(BeforeAttributeName);
+     }
+ }
+\ No newline at end of file

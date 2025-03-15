@@ -1,0 +1,38 @@
+diff --git a/tmp/10313fb1-b94c-4d3f-b849-b80551a295dd_buggy.java b/tmp/ddf6de6f-40b9-4099-851d-e69d7896374a_fixed.java
+index c9c2b44..ae64b11 100644
+--- a/tmp/10313fb1-b94c-4d3f-b849-b80551a295dd_buggy.java
++++ b/tmp/ddf6de6f-40b9-4099-851d-e69d7896374a_fixed.java
+@@ -1,13 +1,28 @@
+ @Override
+ public boolean matches(Element root, Element element) {
+-            // evaluate from last to first
+-            for (int i = evaluators.size() -1; i >= 0; --i) {
++    // First, ensure the candidate element is actually within the given root
++    if (!(root.equals(element) || root.contains(element)))
++        return false;
++
++    // The last evaluator must directly match the candidate element.
++    int sz = evaluators.size();
++    if (!evaluators.get(sz - 1).matches(root, element))
++        return false;
++
++    // Now, work backwards through the evaluators. For each one, move up the 
++    // ancestry (possibly skipping several levels) until we find one that matches.
++    // If we reach the root without a match, then the candidate does not match.
++    for (int i = sz - 2; i >= 0; i--) {
++        element = element.parent();
+         if (element == null)
+             return false;
+-                Evaluator eval = evaluators.get(i);
+-                if (!eval.matches(root, element))
++        while (!evaluators.get(i).matches(root, element)) {
++            if (element == root)
+                 return false;
+             element = element.parent();
++            if (element == null)
++                return false;
++        }
+     }
+     return true;
+ }
+\ No newline at end of file

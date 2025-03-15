@@ -1,0 +1,19 @@
+diff --git a/tmp/cd702344-7152-4549-9cd9-8084b1b828f3_buggy.java b/tmp/5d3cb940-c9a1-4d79-a087-6e07ed9fcd8b_fixed.java
+index b86b44d..cb8d719 100644
+--- a/tmp/cd702344-7152-4549-9cd9-8084b1b828f3_buggy.java
++++ b/tmp/5d3cb940-c9a1-4d79-a087-6e07ed9fcd8b_fixed.java
+@@ -1,4 +1,11 @@
+     public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++        Object leftValue = args[0].computeValue(context);
++        Object rightValue = args[1].computeValue(context);
++        
++        if (leftValue == null || rightValue == null) {
++            // Treat operations involving null (indicative of empty node sets or not-found nodes) as false
++            return Boolean.FALSE;
++        }
++        
++        return compute(leftValue, rightValue) ? Boolean.TRUE : Boolean.FALSE;
+     }
+\ No newline at end of file

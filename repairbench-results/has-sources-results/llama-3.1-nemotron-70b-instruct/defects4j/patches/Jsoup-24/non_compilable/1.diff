@@ -1,0 +1,66 @@
+diff --git a/tmp/85b1d68d-9fa2-453f-b578-a2a5a2d4e7aa_buggy.java b/tmp/39fd6789-fd2e-4e5a-833e-c042313f4590_fixed.java
+index b2d53db..5209a35 100644
+--- a/tmp/85b1d68d-9fa2-453f-b578-a2a5a2d4e7aa_buggy.java
++++ b/tmp/39fd6789-fd2e-4e5a-833e-c042313f4590_fixed.java
+@@ -1,34 +1,60 @@
+ void read(Tokeniser t, CharacterReader r) {
+     if (r.matchesLetter()) {
+         String name = r.consumeLetterSequence();
+         t.tagPending.appendTagName(name.toLowerCase());
+         t.dataBuffer.append(name);
+         r.advance();
+         return;
+     }
+ 
+     if (t.isAppropriateEndTagToken() &&!r.isEmpty()) {
+         char c = r.consume();
+         switch (c) {
+             case '\t':
+             case '\n':
+             case '\f':
+             case ' ':
+                 t.transition(BeforeAttributeName);
+                 break;
+             case '/':
+                 t.transition(SelfClosingStartTag);
+                 break;
+             case '>':
++                // Fix: Check for script tag to handle quotes in comments correctly
++                if (t.tagPending.tagName().equals("script")) {
++                    handleScriptTag(t, r);
++                } else {
+                     t.emitTagPending();
+                     t.transition(Data);
++                }
+                 break;
+             default:
+                 t.dataBuffer.append(c);
+                 anythingElse(t, r);
+                 break;
+         }
+     } else {
+         anythingElse(t, r);
+     }
+ }
++
++// New method to handle script tags
++void handleScriptTag(Tokeniser t, CharacterReader r) {
++    StringBuilder scriptContent = new StringBuilder();
++    while (!r.isEmpty()) {
++        char c = r.consume();
++        if (c == '<') {
++            if (r.matches("/script>")) {
++                r.consume(8); // Consume "/script>"
++                break;
++            } else {
++                scriptContent.append(c);
++            }
++        } else {
++            scriptContent.append(c);
++        }
++    }
++    t.dataBuffer.append(scriptContent.toString());
++    t.emitTagPending();
++    t.transition(Data);
++}
+\ No newline at end of file

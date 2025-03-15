@@ -1,0 +1,36 @@
+diff --git a/tmp/4e1c989b-d7ba-4e22-9549-fe910266f55d_buggy.java b/tmp/d151fb13-a4a9-4778-a285-8fe45ec995b6_fixed.java
+index 862c60c..9f957db 100644
+--- a/tmp/4e1c989b-d7ba-4e22-9549-fe910266f55d_buggy.java
++++ b/tmp/d151fb13-a4a9-4778-a285-8fe45ec995b6_fixed.java
+@@ -1,25 +1,30 @@
+ void outerHtmlHead(Appendable accum, int depth, Document.OutputSettings out) throws IOException {
+     final boolean prettyPrint = out.prettyPrint();
+     final Element parent = parentNode instanceof Element ? ((Element) parentNode) : null;
+     final boolean normaliseWhite = prettyPrint && !Element.preserveWhitespace(parentNode);
+ 
+     boolean trimLeading = false;
+     boolean trimTrailing = false;
+     if (normaliseWhite) {
+         trimLeading = (siblingIndex == 0 && parent != null && parent.tag().isBlock()) ||
+             parentNode instanceof Document;
+         trimTrailing = nextSibling() == null && parent != null && parent.tag().isBlock();
+ 
+         // if this text is just whitespace, and the next node will cause an indent, skip this text:
+         Node next = this.nextSibling();
+         boolean couldSkip = (next instanceof Element && ((Element) next).shouldIndent(out)) // next will indent
+             || (next instanceof TextNode && (((TextNode) next).isBlank())); // next is blank text, from re-parenting
+         if (couldSkip && isBlank()) return;
+ 
+         if ((siblingIndex == 0 && parent != null && parent.tag().formatAsBlock() && !isBlank()) ||
+             (out.outline() && siblingNodes().size() > 0 && !isBlank()))
+             indent(accum, depth, out);
+     }
+ 
++    // Ensure text nodes following a <br> tag are properly wrapped in new lines
++    if (parent != null && parent.tag().getName().equals("br") && isBlank()) {
++        accum.append("\n");
++    }
++
+     Entities.escape(accum, coreValue(), out, false, normaliseWhite, trimLeading, trimTrailing);
+ }
+\ No newline at end of file

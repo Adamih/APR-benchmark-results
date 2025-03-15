@@ -1,0 +1,26 @@
+diff --git a/tmp/8c78e897-5148-49c5-a9ae-732bfb7394c7_buggy.java b/tmp/dee9d65d-9dd7-411c-bc8e-9f063c1c4735_fixed.java
+index c9c2b44..7a8ae8b 100644
+--- a/tmp/8c78e897-5148-49c5-a9ae-732bfb7394c7_buggy.java
++++ b/tmp/dee9d65d-9dd7-411c-bc8e-9f063c1c4735_fixed.java
+@@ -1,13 +1,19 @@
+ @Override
+ public boolean matches(Element root, Element element) {
+     // evaluate from last to first
+     for (int i = evaluators.size() - 1; i >= 0; --i) {
+         if (element == null)
+             return false;
+         Evaluator eval = evaluators.get(i);
+-                if (!eval.matches(root, element))
++        if (!eval.matches(root, element)) {
+             return false;
++        }
+         element = element.parent();
++        // Only consider ancestors of the current root element
++        if (!root.contains(element)) {
++            element = null;
++            return false;
++        }
+     }
+     return true;
+ }
+\ No newline at end of file

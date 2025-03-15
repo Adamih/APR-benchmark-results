@@ -1,0 +1,24 @@
+diff --git a/tmp/85a106dd-c8b3-40b4-8301-3aa073f1776c_buggy.java b/tmp/26a4daa4-01fa-4132-b03e-f27350213eb4_fixed.java
+index a7e6997..147dd90 100644
+--- a/tmp/85a106dd-c8b3-40b4-8301-3aa073f1776c_buggy.java
++++ b/tmp/26a4daa4-01fa-4132-b03e-f27350213eb4_fixed.java
+@@ -1,12 +1,17 @@
+     /**
+      * Tells if the token looks like a short option.
+      * 
+      * @param token
+      */
+     private boolean isShortOption(String token)
+     {
+         // short options (-S, -SV, -S=V, -SV1=V2, -S1S2)
+-        return token.startsWith("-") && token.length() >= 2 && options.hasShortOption(token.substring(1, 2));
++        if (!token.startsWith("-") || token.length() < 2) {
++            return false;
++        }
++
++        final String opt = token.substring(1, 2);
++        return options.hasShortOption(opt);
+ 
+         // remove leading "-" and "=value"
+     }
+\ No newline at end of file

@@ -1,0 +1,40 @@
+diff --git a/tmp/de0d165d-96c1-4fba-8c7b-10e2e4a997fc_buggy.java b/tmp/4df45f7c-063c-4654-b351-eba01a00dd0a_fixed.java
+index 39dd8e7..5280af2 100644
+--- a/tmp/de0d165d-96c1-4fba-8c7b-10e2e4a997fc_buggy.java
++++ b/tmp/4df45f7c-063c-4654-b351-eba01a00dd0a_fixed.java
+@@ -1,30 +1,29 @@
+ private Attribute parseAttribute() {
+     tq.consumeWhitespace();
+     String key = tq.consumeAttributeKey();
+     String value = "";
+     tq.consumeWhitespace();
+     if (tq.matchChomp("=")) {
+         tq.consumeWhitespace();
+ 
+         if (tq.matchChomp(SQ)) {
+             value = tq.chompTo(SQ);
+         } else if (tq.matchChomp(DQ)) {
+             value = tq.chompTo(DQ);
+         } else {
+             StringBuilder valueAccum = new StringBuilder();
+             // no ' or " to look for, so scan to end tag or space (or end of stream)
+-                while (!tq.matchesAny("<", "/>", ">") && !tq.matchesWhitespace() && !tq.isEmpty()) {
++            while (!tq.matchesAny("<", "/>", ">", "=", ",") && !tq.matchesWhitespace() && !tq.isEmpty()) {
+                 valueAccum.append(tq.consume());
+             }
+             value = valueAccum.toString();
+         }
+         tq.consumeWhitespace();
+     }
+-        if (key.length() != 0)
++    if (key != null && key.length() != 0) { // check that key is not null and valid
+         return Attribute.createFromEncoded(key, value);
+-        else {
+-            tq.consume();
+-                
++    } else {
++        tq.consume(); // consume malformed input instead of throwing exception
+         return null;
+     }
+ }
+\ No newline at end of file

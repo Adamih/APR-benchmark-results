@@ -1,0 +1,39 @@
+diff --git a/tmp/8bd86179-80e4-41be-97d2-9c3b50d2fc28_buggy.java b/tmp/21386f33-754f-4cac-9b3c-85d32c9e2855_fixed.java
+index b56897c..53795fd 100644
+--- a/tmp/8bd86179-80e4-41be-97d2-9c3b50d2fc28_buggy.java
++++ b/tmp/21386f33-754f-4cac-9b3c-85d32c9e2855_fixed.java
+@@ -1,27 +1,30 @@
+       @Override
+       public boolean apply(Node n) {
+         // When the node is null it means, we reached the implicit return
+         // where the function returns (possibly without an return statement)
+         if (n == null) {
+           return false;
+         }
+ 
+-        // TODO(user): We only care about calls to functions that
+-        // passes one of the dependent variable to a non-side-effect free
+-        // function.
++        // Check for function calls with side effects
+         if (n.isCall() && NodeUtil.functionCallHasSideEffects(n)) {
+           return true;
+         }
+ 
++        // Check for constructor calls with side effects
+         if (n.isNew() && NodeUtil.constructorCallHasSideEffects(n)) {
+           return true;
+         }
+ 
++        // Check for unary delete operations which have side effects
++        if (n.isUnaryOperation() && n.getToken() == Token.UNARY_DELETE) {
++          return true;
++        }
+ 
+         for (Node c = n.getFirstChild(); c != null; c = c.getNext()) {
+           if (!ControlFlowGraph.isEnteringNewCfgNode(c) && apply(c)) {
+             return true;
+           }
+         }
+         return false;
+       }
+\ No newline at end of file

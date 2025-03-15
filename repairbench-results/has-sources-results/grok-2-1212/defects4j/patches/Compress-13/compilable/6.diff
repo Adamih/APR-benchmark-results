@@ -1,0 +1,19 @@
+diff --git a/tmp/f2bfbd4d-e7fa-4679-8436-588e8c19287b_buggy.java b/tmp/904d1c24-c211-4775-8087-41c480d206da_fixed.java
+index 1c92640..b702f06 100644
+--- a/tmp/f2bfbd4d-e7fa-4679-8436-588e8c19287b_buggy.java
++++ b/tmp/904d1c24-c211-4775-8087-41c480d206da_fixed.java
+@@ -1,7 +1,12 @@
+ /**
+  * Set the name of the entry.
+  * @param name the name to use
+  */
+ protected void setName(String name) {
+-        this.name = name;
++    if (name != null) {
++        // Replace backslashes with forward slashes to handle WinZip workaround
++        this.name = name.replace('\\', '/');
++    } else {
++        this.name = null;
++    }
+ }
+\ No newline at end of file

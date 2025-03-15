@@ -1,0 +1,18 @@
+diff --git a/tmp/45b47926-e0a3-41ba-859c-7079d1312ea9_buggy.java b/tmp/4d63f2ce-ee8c-4564-9939-c7436bc17fc5_fixed.java
+index b86b44d..7d17d0a 100644
+--- a/tmp/45b47926-e0a3-41ba-859c-7079d1312ea9_buggy.java
++++ b/tmp/4d63f2ce-ee8c-4564-9939-c7436bc17fc5_fixed.java
+@@ -1,4 +1,10 @@
+ public final Object computeValue(EvalContext context) {
+-        return compute(args[0].computeValue(context), args[1].computeValue(context))
+-                ? Boolean.TRUE : Boolean.FALSE;
++    Object left = args[0].computeValue(context);
++    Object right = args[1].computeValue(context);
++    // If either operand is an empty node set, the XPath comparison must yield false.
++    if ((left instanceof Collection && ((Collection<?>) left).isEmpty()) ||
++        (right instanceof Collection && ((Collection<?>) right).isEmpty())) {
++        return Boolean.FALSE;
++    }
++    return compute(left, right) ? Boolean.TRUE : Boolean.FALSE;
+ }
+\ No newline at end of file

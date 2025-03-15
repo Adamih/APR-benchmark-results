@@ -1,0 +1,36 @@
+diff --git a/tmp/6c47c135-e7a6-4545-97b1-5a0eaf665a37_buggy.java b/tmp/b1768264-d3df-4ea6-8fce-d90576d9560a_fixed.java
+index 07b0792..1e94955 100644
+--- a/tmp/6c47c135-e7a6-4545-97b1-5a0eaf665a37_buggy.java
++++ b/tmp/b1768264-d3df-4ea6-8fce-d90576d9560a_fixed.java
+@@ -1,22 +1,20 @@
+-    /**
+-     * @return Whether the variable is only assigned a value once for its
+-     *     lifetime.
+-     */
+ boolean isAssignedOnceInLifetime() {
+   Reference ref = getOneAndOnlyAssignment();
+   if (ref == null) {
+     return false;
+   }
+ 
+-      // Make sure this assignment is not in a loop.
+-      for (BasicBlock block = ref.getBasicBlock();
+-           block != null; block = block.getParent()) {
+-        if (block.isFunction) {
+-          break;
+-        } else if (block.isLoop) {
++  // Walk up the basic‐block chain to check that this assignment is
++  // executed only once.  In particular, if the assignment is inside a loop
++  // or a function that isn’t immediately invoked it may be executed repeatedly.
++  for (BasicBlock block = ref.getBasicBlock(); block != null; block = block.getParent()) {
++    if (block.isLoop) {
++      return false;
++    }
++    if (block.isFunction && !block.isImmediatelyInvoked()) {
+       return false;
+     }
+   }
+ 
+   return true;
+ }
+\ No newline at end of file

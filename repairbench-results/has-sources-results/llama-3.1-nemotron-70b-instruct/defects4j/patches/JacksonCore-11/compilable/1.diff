@@ -1,0 +1,24 @@
+diff --git a/tmp/e14144f2-9d83-4328-9b94-1e4937357444_buggy.java b/tmp/abe61bc0-d55a-4cbd-b0c4-7b1223596f42_fixed.java
+index 29d025a..98bc44b 100644
+--- a/tmp/e14144f2-9d83-4328-9b94-1e4937357444_buggy.java
++++ b/tmp/abe61bc0-d55a-4cbd-b0c4-7b1223596f42_fixed.java
+@@ -1,13 +1,16 @@
++/**
++ * Fix for ArrayIndexOutOfBoundsException when symbol table needs rehashing after sharing
++ */
+ private void _verifySharing()
+ {
+     if (_hashShared) {
+-            _hashArea = Arrays.copyOf(_hashArea, _hashArea.length);
+-            _names = Arrays.copyOf(_names, _names.length);
++        _hashArea = Arrays.copyOf(_hashArea, _hashArea.length * 2); // Increase capacity to accommodate growth
++        _names = Arrays.copyOf(_names, _names.length * 2); // Increase capacity to accommodate growth
+         _hashShared = false;
+         // 09-Sep-2015, tatu: As per [jackson-core#216], also need to ensure
+         //    we rehash as needed, as need-rehash flag is not copied from parent
+     }
+     if (_needRehash) {
+         rehash();
+     }
+ }
+\ No newline at end of file

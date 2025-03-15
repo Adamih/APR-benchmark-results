@@ -1,0 +1,43 @@
+diff --git a/tmp/269e1f43-c4d7-453c-93e5-ac93d5bc419e_buggy.java b/tmp/cf51937c-42a9-4812-b176-f24d4a997186_fixed.java
+index 46817a7..4ecd658 100644
+--- a/tmp/269e1f43-c4d7-453c-93e5-ac93d5bc419e_buggy.java
++++ b/tmp/cf51937c-42a9-4812-b176-f24d4a997186_fixed.java
+@@ -1,16 +1,31 @@
+ @Override
+ public JSType getLeastSupertype(JSType that) {
+     if (!that.isRecordType()) {
+         return super.getLeastSupertype(that);
+     }
+     RecordTypeBuilder builder = new RecordTypeBuilder(registry);
+-    for (String property : properties.keySet()) {
+-      if (that.toMaybeRecordType().hasProperty(property) &&
+-          that.toMaybeRecordType().getPropertyType(property).isEquivalentTo(
+-              getPropertyType(property))) {
+-        builder.addProperty(property, getPropertyType(property),
+-            getPropertyNode(property));
++    RecordType thisRecordType = this.toMaybeRecordType();
++    RecordType thatRecordType = that.toMaybeRecordType();
++
++    // Add all properties from this record type
++    for (String property : thisRecordType.getPropertyNames()) {
++        JSType thisPropertyType = thisRecordType.getPropertyType(property);
++        if (thatRecordType.hasProperty(property)) {
++            JSType thatPropertyType = thatRecordType.getPropertyType(property);
++            builder.addProperty(property,
++                JSType.getLeastSupertype(thisPropertyType, thatPropertyType),
++                thisRecordType.getPropertyNode(property));
++        } else {
++            builder.addProperty(property, thisPropertyType, thisRecordType.getPropertyNode(property));
+         }
+     }
++
++    // Add properties from the other record type that aren't in this record type
++    for (String property : thatRecordType.getPropertyNames()) {
++        if (!thisRecordType.hasProperty(property)) {
++            builder.addProperty(property, thatRecordType.getPropertyType(property), thatRecordType.getPropertyNode(property));
++        }
++    }
++
+     return builder.build();
+ }
+\ No newline at end of file

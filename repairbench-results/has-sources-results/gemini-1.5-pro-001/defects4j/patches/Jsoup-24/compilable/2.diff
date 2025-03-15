@@ -1,0 +1,40 @@
+diff --git a/tmp/027ff30b-b33a-4fec-a52a-972de9800ebd_buggy.java b/tmp/006dcebd-332e-4cd6-81d2-99153721123c_fixed.java
+index b2d53db..28f4257 100644
+--- a/tmp/027ff30b-b33a-4fec-a52a-972de9800ebd_buggy.java
++++ b/tmp/006dcebd-332e-4cd6-81d2-99153721123c_fixed.java
+@@ -1,34 +1,34 @@
+         void read(Tokeniser t, CharacterReader r) {
+             if (r.matchesLetter()) {
+                 String name = r.consumeLetterSequence();
+                 t.tagPending.appendTagName(name.toLowerCase());
+                 t.dataBuffer.append(name);
+                 r.advance();
+                 return;
+             }
+ 
+             if (t.isAppropriateEndTagToken() && !r.isEmpty()) {
+                 char c = r.consume();
+                 switch (c) {
+                     case '\t':
+                     case '\n':
+                     case '\f':
+                     case ' ':
+                         t.transition(BeforeAttributeName);
+                         break;
+                     case '/':
+                         t.transition(SelfClosingStartTag);
+                         break;
+                     case '>':
+                         t.emitTagPending();
+                         t.transition(Data);
+                         break;
+                     default:
+                         t.dataBuffer.append(c);
+-                        anythingElse(t, r);
++                        // anythingElse(t, r); // the problem is here. data should be added even in tag
+                         break;
+                 }
+             } else {
+                 anythingElse(t, r);
+             }
+         }

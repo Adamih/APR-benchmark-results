@@ -1,0 +1,28 @@
+diff --git a/tmp/79aebabb-464b-4890-9bf5-79f5c7d36cb7_buggy.java b/tmp/32e008f0-886e-44c6-b315-13fcb8ea75b2_fixed.java
+index 072c672..e62828f 100644
+--- a/tmp/79aebabb-464b-4890-9bf5-79f5c7d36cb7_buggy.java
++++ b/tmp/32e008f0-886e-44c6-b315-13fcb8ea75b2_fixed.java
+@@ -1,20 +1,21 @@
+       @Override
+       public int parseArguments(Parameters params) throws CmdLineException {
+         String param = params.getParameter(0);
+ 
+         if (param == null) {
+           setter.addValue(true);
+           return 0;
+         } else {
+           String lowerParam = param.toLowerCase();
+           if (TRUES.contains(lowerParam)) {
+             setter.addValue(true);
+           } else if (FALSES.contains(lowerParam)) {
+             setter.addValue(false);
+           } else {
+-            setter.addValue(true);
+-            return 0;
++            // If the parameter is not recognized as true/false, it should not be treated as true.
++            // Instead, throw an exception or return an error.
++            throw new CmdLineException(owner, "Invalid value for --version flag: " + param);
+           }
+           return 1;
+         }
+       }

@@ -1,0 +1,30 @@
+diff --git a/tmp/5358b6ec-4081-4924-a7c3-024b1364efe7_buggy.java b/tmp/1fa7b6c6-e3c7-4a7b-9be1-225fd15ce071_fixed.java
+index ef76662..5b1d4e2 100644
+--- a/tmp/5358b6ec-4081-4924-a7c3-024b1364efe7_buggy.java
++++ b/tmp/1fa7b6c6-e3c7-4a7b-9be1-225fd15ce071_fixed.java
+@@ -1,17 +1,24 @@
+         void read(Tokeniser t, CharacterReader r) {
+             char c = r.consume();
+             switch (c) {
+                 case '>':
+                     t.tagPending.selfClosing = true;
+                     t.emitTagPending();
+                     t.transition(Data);
+                     break;
++                case '/':
++                    // Handle the slash character correctly by ignoring it
++                    r.consume();
++                    t.tagPending.selfClosing = true;
++                    t.emitTagPending();
++                    t.transition(Data);
++                    break;
+                 case eof:
+                     t.eofError(this);
+                     t.transition(Data);
+                     break;
+                 default:
+                     t.error(this);
+                     t.transition(BeforeAttributeName);
+             }
+         }
+\ No newline at end of file

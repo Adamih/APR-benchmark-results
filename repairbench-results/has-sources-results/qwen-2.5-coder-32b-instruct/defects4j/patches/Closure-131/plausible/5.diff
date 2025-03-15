@@ -1,0 +1,54 @@
+diff --git a/tmp/f97e5847-f5ea-4b9f-9140-8c3c2c969b33_buggy.java b/tmp/61ad6f37-cefa-4b9c-8a35-084110db3b7c_fixed.java
+index 19fe1b4..df979e2 100644
+--- a/tmp/f97e5847-f5ea-4b9f-9140-8c3c2c969b33_buggy.java
++++ b/tmp/61ad6f37-cefa-4b9c-8a35-084110db3b7c_fixed.java
+@@ -1,17 +1,44 @@
+ public static boolean isJSIdentifier(String s) {
+     int length = s.length();
+ 
+-      if (length == 0 ||
+-          !Character.isJavaIdentifierStart(s.charAt(0))) {
++    if (length == 0) {
+         return false;
+     }
+ 
++    // Check the first character
++    char firstChar = s.charAt(0);
++    if (!isJSIdentifierStart(firstChar)) {
++        return false;
++    }
++
++    // Check the remaining characters
+     for (int i = 1; i < length; i++) {
+-        if (
+-            !Character.isJavaIdentifierPart(s.charAt(i))) {
++        if (!isJSIdentifierPart(s.charAt(i))) {
+             return false;
+         }
+     }
+ 
+     return true;
+ }
++
++private static boolean isJSIdentifierStart(char c) {
++    return (c >= 'A' && c <= 'Z') ||
++           (c >= 'a' && c <= 'z') ||
++           c == '$' ||
++           c == '_' ||
++           isUnicodeLetter(c);
++}
++
++private static boolean isJSIdentifierPart(char c) {
++    return (c >= '0' && c <= '9') ||
++           isJSIdentifierStart(c);
++}
++
++private static boolean isUnicodeLetter(char c) {
++    return Character.getType(c) == Character.UPPERCASE_LETTER ||
++           Character.getType(c) == Character.LOWERCASE_LETTER ||
++           Character.getType(c) == Character.TITLECASE_LETTER ||
++           Character.getType(c) == Character.MODIFIER_LETTER ||
++           Character.getType(c) == Character.OTHER_LETTER ||
++           Character.getType(c) == Character.LETTER_NUMBER;
++}
+\ No newline at end of file

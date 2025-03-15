@@ -1,0 +1,33 @@
+diff --git a/tmp/3244420e-9a0b-4ef7-b5a5-cf2ca4538dd1_buggy.java b/tmp/234cc5cb-5416-45dd-b7db-faeea04bfbfb_fixed.java
+index ce3d60f..4f30afa 100644
+--- a/tmp/3244420e-9a0b-4ef7-b5a5-cf2ca4538dd1_buggy.java
++++ b/tmp/234cc5cb-5416-45dd-b7db-faeea04bfbfb_fixed.java
+@@ -1,16 +1,25 @@
++/**
++ * Writes a BitSet to a DataOutput, packing bits into bytes.
++ * 
++ * @param header DataOutput to write to
++ * @param bits BitSet to write
++ * @param length Number of bits to write from the BitSet
++ * @throws IOException if an I/O error occurs
++ */
+ private void writeBits(final DataOutput header, final BitSet bits, final int length) throws IOException {
+     int cache = 0;
+     int shift = 7;
+     for (int i = 0; i < length; i++) {
+         cache |= ((bits.get(i)? 1 : 0) << shift);
+         --shift;
+-            if (shift == 0) {
++        if (shift < 0) { // Changed from == 0 to < 0
+             header.write(cache);
+             shift = 7;
+             cache = 0;
+         }
+     }
+-        if (length > 0 && shift > 0) {
++    if (shift < 7 && length > 0) { // Added condition to check if there are remaining bits
++        cache <<= shift; // Left shift to align remaining bits to most significant position
+         header.write(cache);
+     }
+ }
+\ No newline at end of file
