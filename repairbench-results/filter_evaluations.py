@@ -175,6 +175,68 @@ def entry_point():
     # Generate table with statistics for all models
     import pandas as pd
 
+    chi_squared_p_values_defects4j = []
+    for model in models:
+        original_path = get_statistics_file_abspaths(ROOT_DIR, model, "defects4j")
+        has_sources_path = get_statistics_file_abspaths(
+            has_sources_root_dir, model, "defects4j"
+        )
+        if not original_path or not has_sources_path:
+            chi_squared_p_values_defects4j.append(None)
+            continue
+        with open(original_path, "r") as f:
+            original_data = json.load(f)
+            with open(has_sources_path, "r") as f:
+                has_sources_data = json.load(f)
+                # "num_bugs_with_patches" is the number of bugs with patches (total)
+                # "num_bugs_with_plausible_candidates" is the number of bugs with plausible candidates (pass)
+                # Perform chi-squared test to check if the difference between pass rate and fail rate between the two benchmarks is significant for each model
+                import scipy.stats
+
+                original_pass = original_data["num_plausible_patches"]
+                original_fail = original_data["num_patches"] - original_pass
+                has_sources_pass = has_sources_data["num_plausible_patches"]
+                has_sources_fail = has_sources_data["num_patches"] - has_sources_pass
+                chi_squared_p_values_defects4j.append(
+                    scipy.stats.chi2_contingency(
+                        [
+                            [original_pass, original_fail],
+                            [has_sources_pass, has_sources_fail],
+                        ]
+                    )[1]
+                )
+
+    chi_squared_p_values_gitbugjava = []
+    for model in models:
+        original_path = get_statistics_file_abspaths(ROOT_DIR, model, "gitbugjava")
+        has_sources_path = get_statistics_file_abspaths(
+            has_sources_root_dir, model, "gitbugjava"
+        )
+        if not original_path or not has_sources_path:
+            chi_squared_p_values_gitbugjava.append(None)
+            continue
+        with open(original_path, "r") as f:
+            original_data = json.load(f)
+            with open(has_sources_path, "r") as f:
+                has_sources_data = json.load(f)
+                # "num_bugs_with_patches" is the number of bugs with patches (total)
+                # "num_bugs_with_plausible_candidates" is the number of bugs with plausible candidates (pass)
+                # Perform chi-squared test to check if the difference between pass rate and fail rate between the two benchmarks is significant for each model
+                import scipy.stats
+
+                original_pass = original_data["num_plausible_patches"]
+                original_fail = original_data["num_patches"] - original_pass
+                has_sources_pass = has_sources_data["num_plausible_patches"]
+                has_sources_fail = has_sources_data["num_patches"] - has_sources_pass
+                chi_squared_p_values_gitbugjava.append(
+                    scipy.stats.chi2_contingency(
+                        [
+                            [original_pass, original_fail],
+                            [has_sources_pass, has_sources_fail],
+                        ]
+                    )[1]
+                )
+
     df = pd.DataFrame(
         {
             "Model": models,
@@ -182,9 +244,40 @@ def entry_point():
             "Plausible@1 Defects4J (No Gemini Sources)": defect4j_has_sources_results,
             "Plausible@1 GitBugJava": gitbugjava_results,
             "Plausible@1 GitBugJava (No Gemini Sources)": gitbugjava_has_sources_results,
+            "Chi-Squared p-value Defect4j": chi_squared_p_values_defects4j,
+            "Chi-Squared p-value GitBugJava": chi_squared_p_values_gitbugjava,
         }
     )
     df.to_csv("results.csv", index=False)
+
+    # Run t-test to test the significance of the difference across all models for each benchmark
+    import scipy.stats
+
+    original_results = [
+        e1
+        for e1, e2 in zip(defect4j_results, defect4j_has_sources_results)
+        if e1 is not None and e2 is not None
+    ]
+    has_sources_results = [
+        e2
+        for e1, e2 in zip(defect4j_results, defect4j_has_sources_results)
+        if e1 is not None and e2 is not None
+    ]
+    t, p = scipy.stats.ttest_rel(original_results, has_sources_results)
+    print(f"Defects4J: t-statistic={t}, p-value={p}")
+
+    original_results = [
+        e1
+        for e1, e2 in zip(gitbugjava_results, gitbugjava_has_sources_results)
+        if e1 is not None and e2 is not None
+    ]
+    has_sources_results = [
+        e2
+        for e1, e2 in zip(gitbugjava_results, gitbugjava_has_sources_results)
+        if e1 is not None and e2 is not None
+    ]
+    t, p = scipy.stats.ttest_rel(original_results, has_sources_results)
+    print(f"GitBugJava: t-statistic={t}, p-value={p}")
 
 
 def main():
